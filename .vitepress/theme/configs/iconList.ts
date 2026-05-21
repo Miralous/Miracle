@@ -1,5 +1,4 @@
 export const data = {
-  about: "ph:info-duotone",
   recentPosts: "ph:newspaper-duotone",
   projects: "ph:acorn-duotone",
   techStack: "ph:code-duotone",
@@ -15,9 +14,6 @@ export const data = {
   edit: "ph:pen-duotone",
   delete: "ph:trash-duotone",
   moment: "ph:clock-duotone",
-  github: "ph:github-logo-duotone",
-  location: "ph:bank-duotone",
-  heart: "ph:heartbeat-duotone",
   musics: "ph:music-notes-duotone",
   singer: "ph:microphone-stage-duotone",
   negative: "ph:smiley-sad-duotone",
