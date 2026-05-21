@@ -76,7 +76,7 @@ export const globalConfig = {
       cardHover: {
         scale: 1.03,
         maxMove: 8,
-        maxRotate: 3, // 3d effect |  set 0 to disable 3D
+        maxRotate: 5, // 3d effect |  set 0 to disable 3D
         easing: 0.5,
         shadowStrength: 2, // shadow strength when hovered (default: 2)
       },
@@ -94,10 +94,8 @@ export const globalConfig = {
     // modules
     modules: {
       banner: {
-        type: "avatar", // "image" or "avatar"
-        imgurl: "", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
-        image: "65vh", // only work when type is "image", e.g. "65vh"
-        avatar: "50vh", // only work when type is "avatar", e.g. "100vh"
+        imgurl: "https://qwq.blue/data/photos/Neko/8.png", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
+        image: "600px", // only work when type is "image", e.g. "65vh"
       },
       pictures: true, // show pictures
       lastMoment: true, // last moment

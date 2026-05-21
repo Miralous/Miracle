@@ -370,10 +370,8 @@ a.header-anchor {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 1px solid var(--vp-c-divider);
     padding: 5px 12px;
     border-radius: var(--vp-border-radius-1);
-    background-color: var(--vp-c-bg);
 
     a.VPLink.link.VPNavBarMenuLink {
       line-height: 24px;
@@ -383,10 +381,8 @@ a.header-anchor {
 
 @media screen and (max-width: 960px) {
   nav.VPNavBarMenu.menu {
-    border: 1px solid var(--vp-c-divider);
     padding: 5px 12px;
     border-radius: var(--vp-border-radius-1);
-    background-color: var(--vp-c-bg);
 
     a.VPLink.link.VPNavBarMenuLink {
       line-height: 24px;
@@ -400,6 +396,11 @@ a.header-anchor {
       padding: 0;
       margin: 0px calc(var(--vp-gap) * 2) !important;
     }
+  }
+
+  .VPNavBarHamburger {
+    width: unset !important;
+    margin-left: var(--vp-gap);
   }
 }
 
@@ -416,48 +417,34 @@ a.header-anchor {
 div.menu .VPMenu {
   border-radius: var(--vp-border-radius-2);
   box-shadow: unset;
-  background-color: var(--vp-c-bg);
   position: relative;
   top: -15px;
+  background-color: var(--vp-c-bg) !important;
 }
 
 @media screen and (min-width: 767px) {
   button.button {
     margin-left: var(--vp-gap);
     height: 36px !important;
-    border: 1px solid var(--vp-c-divider);
     padding: 5px 12px;
     border-radius: var(--vp-border-radius-1);
   }
 }
-
-button.VPNavBarHamburger.hamburger {
-  margin-left: var(--vp-gap);
-  height: 36px !important;
-  border: 1px solid var(--vp-c-divider);
-  padding: 5px 12px;
-  border-radius: var(--vp-border-radius-1);
-}
-
 div.VPNavBarAppearance.appearance::before {
   display: none;
 }
 
 @media screen and (min-width: 1280px) {
   div.VPNavBarAppearance.appearance {
-    border: 1px solid var(--vp-c-divider);
     border-right: 0;
     padding: 5px 12px;
     height: 36px;
     border-radius: var(--vp-border-radius-1) 0 0 var(--vp-border-radius-1);
-    background-color: var(--vp-c-bg);
   }
 
   div.VPSocialLinks.VPNavBarSocialLinks.social-links {
-    border: 1px solid var(--vp-c-divider);
     height: 36px;
     padding: 5px 12px;
-    background-color: var(--vp-c-bg);
     border-radius: 0 var(--vp-border-radius-1) var(--vp-border-radius-1) 0;
   }
 
@@ -478,23 +465,19 @@ div.VPNavBar {
     display: none;
   }
 
+  a.title {
+    margin-right: var(--vp-gap);
+  }
+
   a.title span {
-    display: inline-block;
-    background-color: var(--vp-c-bg);
-    border: 1px solid var(--vp-c-divider);
-    border-right: 0;
-    padding: 5px 16px;
     font-family: var(--vp-font-family-title) !important;
     text-transform: none !important;
     border-radius: var(--vp-border-radius-1) 0 0 var(--vp-border-radius-1);
-    height: 36px;
   }
 
   img.VPImage.logo {
-    height: 36px;
-    width: 36px;
-    border: 1px solid var(--vp-c-divider);
-    border-radius: var(--vp-border-radius-1);
+    height: 28px;
+    width: 28px;
     margin-right: var(--vp-gap);
   }
 }
@@ -508,20 +491,23 @@ div.VPLocalNav {
  * -------------------------------------------------------------------------- */
 
 @media screen and (max-width: 1150px) {
-  .DocSearch.DocSearch-Button {
-    display: none !important;
-  }
-
   div.VPNavBar a.title span {
     border-radius: var(--vp-border-radius-1);
-    border-right: 1px solid var(--vp-c-divider);
+  }
+  .DocSearch.DocSearch-Button {
+    visibility: hidden;
   }
 }
 
 @media screen and (min-width: 768px) {
   div.shell {
     border-radius: var(--vp-border-radius-1) !important;
-    border: 1px solid var(--vp-c-divider);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .DocSearch.DocSearch-Button {
+    visibility: visible;
   }
 }
 
@@ -530,15 +516,18 @@ div.VPLocalNav {
 }
 
 .DocSearch.DocSearch-Button {
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
   padding: 5px 12px;
   justify-self: center;
   align-self: center;
-  border-radius: 0 var(--vp-border-radius-1) var(--vp-border-radius-1) 0 !important;
   height: 36px;
+  background-color: transparent !important;
+  border: none !important;
+  scale: 1.2;
 }
 
+.DocSearch-Button-Placeholder {
+  display: none !important;
+}
 .VPLocalSearchBox {
   backdrop-filter: blur(var(--vp-blur));
 }

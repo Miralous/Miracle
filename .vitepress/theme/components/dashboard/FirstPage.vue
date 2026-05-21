@@ -1,129 +1,46 @@
 <script setup lang="ts">
 import { globalConfig } from "#config";
-import { useCardHover } from "../../utils/useCardHover";
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 </script>
 
 <template>
   <div
     class="first-page"
-    v-if="globalConfig.homePage.modules.banner.type === 'avatar'"
-  >
-    <img
-      :src="globalConfig.homePage.avatar"
-      class="avatar"
-      @mouseenter="handleMouseEnter"
-      @mousemove="handleMouseMove"
-      @mouseleave="handleMouseLeave"
-    />
-    <div class="self">
-      <h1 class="author">{{ globalConfig.author }}</h1>
-      <div class="btns">
-        <div class="location btn">
-          <Icon :icon="globalConfig.icon.location" />
-          {{ globalConfig.homePage.city }}
-        </div>
-        <a
-          :href="`https://github.com/${globalConfig.github}`"
-          class="github btn"
-          ><Icon :icon="globalConfig.icon.github" /> GitHub</a
-        >
-      </div>
-    </div>
-  </div>
-  <div
-    class="image-page"
-    v-else
-    @mouseenter="handleMouseEnter"
-    @mousemove="handleMouseMove"
-    @mouseleave="handleMouseLeave"
-  >
-    <img :src="globalConfig.homePage.modules.banner.imgurl" />
-  </div>
+    :style="{
+      backgroundImage: `url(${globalConfig.homePage.modules.banner.imgurl})`,
+    }"
+  ></div>
 </template>
 
 <style scoped>
 .first-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-  /*margin: 125px 0px;*/
-  height: calc(var(--vp-avatar-home-vh-height) - var(--vp-nav-height));
-}
-
-.iconify {
-  opacity: 0.8;
-}
-
-.avatar {
-  height: 112px;
-  width: 112px;
-  aspect-ratio: 1;
-  border-radius: 100%;
-  border: 1px solid var(--vp-c-divider);
-  padding: 4px;
-  transition: all var(--vp-transition-time);
-}
-
-div.self {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-div.btns {
-  display: flex;
-  gap: 28px;
-}
-
-.iconify {
-  margin-right: 1px;
-}
-
-.btn {
-  color: var(--vp-c-text-1);
-  font-weight: 500;
-}
-
-.image-page {
-  width: 100% !important;
-  margin: 20px 0px;
+  position: relative; /* 1. 为伪元素提供定位基准 */
   height: calc(var(--vp-image-home-vh-height) - var(--vp-nav-height));
-  transition: all var(--vp-transition-time);
-  border-radius: var(--vp-border-radius-1);
-  box-shadow: var(--vp-shadow);
-  border: 1px solid var(--vp-c-divider);
+  background-position: center;
+  background-size: cover;
   background-repeat: no-repeat;
-  padding: 12px;
-  &:hover {
-    box-shadow: var(--vp-shadow-brand);
-    border-color: var(--vp-c-brand);
-  }
+  overflow: hidden; /* 避免遮罩溢出 */
 }
 
-.image-page img {
-  height: 100%;
+/* 底部模糊+颜色过渡遮罩 */
+.first-page::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  border-radius: var(--vp-border-radius-2);
-  object-fit: cover;
-  transition: all var(--vp-transition-time);
-  /* position! bro! here! */
-  object-position: center;
-}
+  height: 150px; /* 模糊和渐变的区域高度，可以根据喜好调整 */
 
-h1.author {
-  color: transparent;
-  background-image: linear-gradient(
-    120deg,
-    var(--vp-c-brand-1) 20%,
-    var(--vp-c-brand-sub)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  font-family: var(--vp-font-family-title);
+  /* 1. 颜色过渡：从透明到背景色 */
+  background: linear-gradient(to bottom, transparent, var(--vp-c-bg));
+
+  /* 2. 背景模糊：使用你指定的变量 */
+  backdrop-filter: var(--vp-blur);
+  -webkit-backdrop-filter: var(--vp-blur); /* 兼容 Safari */
+
+  /* 3. 关键：让模糊效果也呈现渐变过渡，避免模糊边缘太生硬 */
+  mask: linear-gradient(to bottom, transparent, var(--vp-c-bg));
+  -webkit-mask: linear-gradient(to bottom, transparent, var(--vp-c-bg));
+
+  pointer-events: none; /* 防止阻挡下方元素的点击事件 */
 }
 </style>
