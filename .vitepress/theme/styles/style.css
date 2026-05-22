@@ -41,7 +41,7 @@
     var(--vp-c-yellow-soft) 0px 7px 15px -7px;
 
   /* Blur */
-  --vp-blur: blur(5px);
+  --vp-blur: blur(10px);
 
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);

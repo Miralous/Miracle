@@ -37,8 +37,8 @@ export const globalConfig = {
     giteaUrl: "https://gitea.com", // if the type is gitea, fill in the gitea url like: https://gitea.com
     repo: "Miralous/Miracle", // the repo of ur blog
   },
-  dateCreated: "2024-08-23", // date created (YYYY-MM-DD)
-  deepHideNegative: true, // enable press "s" 1s to show negative button
+  dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
+  deepHideNegative: true, // enable press "s(how)" 1s to show negative button
 
   // theme setting
   styles: {
@@ -142,6 +142,7 @@ export const globalConfig = {
       items: [
         { text: languageFile.archives, link: "/archives" },
         { text: languageFile.moments, link: "/moments" },
+        { text: languageFile.timeline, link: "/timeline" },
       ],
     },
     {

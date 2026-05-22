@@ -173,6 +173,10 @@ const isClickable = computed(() => !!clink.value);
 /* ========================================== */
 /* ✅ 新增：Negative 状态下的 Hover 样式覆盖 */
 /* ========================================== */
+.diary.is-negative {
+  border-style: dashed;
+  border-color: var(--vp-c-yellow-1);
+}
 .diary.is-negative:hover {
   border-color: var(--vp-c-yellow-1);
   box-shadow: var(--vp-shadow-negative) !important;

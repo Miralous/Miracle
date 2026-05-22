@@ -19,6 +19,7 @@ import File from "../components/utils/file.vue";
 import Musics from "../components/dashboard/Musics.vue";
 import Pictures from "../components/dashboard/Pictures.vue";
 import Miracle from "../components/miracle/miracle.vue";
+import Timeline from "../components/timeline/timeline.vue";
 
 const components = {
   // Dashboard
@@ -36,6 +37,7 @@ const components = {
   // Pages
   Articles,
   Tags,
+  Timeline,
   Moments,
   Manager,
   // Layout
