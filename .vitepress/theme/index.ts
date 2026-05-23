@@ -77,7 +77,6 @@ async function applyCatppuccin() {
     injectStyle(css);
   });
 }
-
 /* =========================
  * Theme Export
  * ========================= */

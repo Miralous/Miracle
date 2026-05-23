@@ -1,7 +1,7 @@
 <template>
   <div
     class="comment"
-    v-if="globalConfig.comments.enable && globalConfig.comments.type"
+    v-if="globalConfig.comments.enabled && globalConfig.comments.type"
   >
     <div v-if="props.title === 'false'" style="margin-top: 40px"></div>
     <h2 class="styledH2" v-if="props.title !== 'false'">

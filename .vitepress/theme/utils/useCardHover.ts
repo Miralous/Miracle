@@ -80,9 +80,6 @@ function animateCard(el: HTMLElement) {
       : currentRotateY + (targetRotateY - currentRotateY) * easing;
 
   const scale = hovered ? globalConfig.styles.visual.cardHover.scale : 1;
-  const shadowStrength = hovered
-    ? globalConfig.styles.visual.cardHover.shadowStrength
-    : 1;
 
   el.style.transform = `
     perspective(1000px)
@@ -94,16 +91,7 @@ function animateCard(el: HTMLElement) {
   `;
 
   el.style.transformStyle = "preserve-3d";
-  el.style.willChange = "transform, box-shadow";
-  el.style.boxShadow = hovered
-    ? `
-    var(--vp-c-brand-soft) 0px ${12 * shadowStrength}px ${25 * shadowStrength}px -5px,
-    var(--vp-c-brand-soft) 0px ${7 * shadowStrength}px ${15 * shadowStrength}px -7px
-  `
-    : `
-    var(--vp-c-bg-alt) 0px 12px 25px -5px,
-    var(--vp-c-bg-alt) 0px 7px 15px -7px
-  `;
+  el.style.willChange = "transform";
 
   state.currentX = nextX;
   state.currentY = nextY;
@@ -208,10 +196,17 @@ export function useCardHover() {
 
     state.hovered = false;
   };
-
-  return {
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
-  };
+  if (!globalConfig.styles.visual.cardHover.enabled) {
+    return {
+      handleMouseMove: () => {},
+      handleMouseEnter: () => {},
+      handleMouseLeave: () => {},
+    };
+  } else {
+    return {
+      handleMouseMove,
+      handleMouseEnter,
+      handleMouseLeave,
+    };
+  }
 }

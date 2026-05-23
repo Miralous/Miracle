@@ -74,11 +74,11 @@ export const globalConfig = {
       uppercase: false, // CATEGORIES / Categories
       mono: false, // use monospace font for title
       cardHover: {
+        enabled: true, // enable card hover effect
         scale: 1.03,
         maxMove: 8,
         maxRotate: 5, // 3d effect |  set 0 to disable 3D
         easing: 0.5,
-        shadowStrength: 2, // shadow strength when hovered (default: 2)
       },
     },
   },
@@ -163,7 +163,7 @@ export const globalConfig = {
 
   // comments
   comments: {
-    enable: true,
+    enabled: true,
     type: "giscus",
     giscus: {
       repo: "Miralous/Miracle",
