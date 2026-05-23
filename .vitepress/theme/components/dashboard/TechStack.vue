@@ -1,23 +1,24 @@
 <template>
   <div class="tech-grid">
-    <div
+    <TagChip
       v-for="stack in stacks"
-      :key="stack.name"
-      class="tech-card"
       @mouseenter="handleMouseEnter"
       @mousemove="handleMouseMove"
       @mouseleave="handleMouseLeave"
+      :key="stack.name"
+      :label="stack.name"
     >
-      <div class="tech-inner">
+      <template #icon>
         <img :src="stack.icon" alt="" class="tech-icon" />
-        <span class="tech-name">{{ stack.name }}</span>
-      </div>
-    </div>
+      </template>
+    </TagChip>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useCardHover } from "#theme/utils/useCardHover";
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 import { globalConfig } from "#config";
 
 const stacks = ref(globalConfig.homePage.stacks);
@@ -30,9 +31,6 @@ stacks.value = stacks.value.map((stack) => ({
 
 // 自动按首字母排序
 stacks.value.sort((a, b) => a.name.localeCompare(b.name));
-
-import { useCardHover } from "../../utils/useCardHover";
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 </script>
 
 <style scoped>
@@ -43,38 +41,9 @@ const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
   align-items: flex-start;
 }
 
-.tech-card {
-  perspective: 1000px;
-  transition: all var(--vp-transition-time);
-  border-radius: var(--vp-border-radius-1);
-}
-
-.tech-inner {
-  display: flex;
-  transition: all var(--vp-transition-time);
-  align-items: center;
-  gap: var(--vp-gap);
-  padding: 16px;
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: inherit;
-  box-shadow: var(--vp-shadow);
-  will-change: transform;
-  white-space: nowrap; /* 防止文本换行 */
-}
-
-.tech-card:hover .tech-inner {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
-  transform: scale(1.03);
-}
-
 .tech-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.tech-name {
-  font-weight: 600;
+  width: 18px;
+  height: 18px;
+  margin-right: var(--vp-gap);
 }
 </style>

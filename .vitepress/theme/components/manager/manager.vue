@@ -180,53 +180,57 @@ const groupedPhotos = computed(() => {
 
     <!-- Tab 切换 -->
     <div class="tags">
-      <span
-        class="tag"
-        :class="{ active: activeTab === 'posts' }"
+      <TagChip
+        :active="activeTab === 'posts'"
         @click="activeTab = 'posts'"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.posts"
       >
-        <Icon :icon="globalConfig.icon.recentPosts" />
-        <span class="name">{{ globalConfig.lang.posts }}</span>
-      </span>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.recentPosts" />
+        </template>
+      </TagChip>
 
-      <span
-        class="tag"
-        :class="{ active: activeTab === 'moments' }"
+      <TagChip
+        :active="activeTab === 'moments'"
         @click="activeTab = 'moments'"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.moments"
       >
-        <Icon :icon="globalConfig.icon.moment" />
-        <span class="name">{{ globalConfig.lang.moments }}</span>
-      </span>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.moment" />
+        </template>
+      </TagChip>
 
-      <span
-        class="tag"
-        :class="{ active: activeTab === 'photos' }"
+      <TagChip
+        :active="activeTab === 'photos'"
         @click="activeTab = 'photos'"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.photos"
       >
-        <Icon :icon="globalConfig.icon.photos" />
-        <span class="name">{{ globalConfig.lang.photos }}</span>
-      </span>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.photos" />
+        </template>
+      </TagChip>
 
-      <span
-        class="tag"
-        :class="{ active: activeTab === 'friends' }"
+      <TagChip
+        :active="activeTab === 'friends'"
         @click="activeTab = 'friends'"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.friends"
       >
-        <Icon :icon="globalConfig.icon.friends" />
-        <span class="name">{{ globalConfig.lang.friends }}</span>
-      </span>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.friends" />
+        </template>
+      </TagChip>
     </div>
 
     <h1 class="year">{{ globalConfig.lang.contents }}</h1>
@@ -579,21 +583,6 @@ const groupedPhotos = computed(() => {
   flex-wrap: wrap;
   gap: var(--vp-gap);
 }
-.tag {
-  font-family: var(--vp-use-mono);
-  text-transform: var(--vp-title-uppercase);
-  transition: all var(--vp-transition-time);
-  padding: 12px 24px;
-  color: var(--vp-c-text-1);
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: inherit;
-  box-shadow: var(--vp-shadow);
-  text-decoration: none;
-  font-size: 16px;
-  margin: 0;
-  will-change: transform;
-}
 span.name {
   font-weight: 600;
 }
@@ -601,48 +590,6 @@ span.name,
 span.count,
 span.anchor {
   transition: all var(--vp-transition-time);
-}
-.tag:hover:not(.active) {
-  border-color: var(--vp-c-brand-1);
-  cursor: pointer;
-  span.name,
-  span.count,
-  span.anchor {
-    color: var(--vp-c-brand-2);
-  }
-}
-.active {
-  cursor: pointer;
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
-  span.name,
-  span.count,
-  span.anchor {
-    color: var(--vp-c-brand-2);
-  }
-}
-.active .iconify {
-  color: var(--vp-c-brand-2);
-}
-.tag:hover .iconify {
-  color: var(--vp-c-brand-2);
-}
-.iconify {
-  margin-left: 0px !important;
-  margin-right: 10px;
-}
-.count {
-  margin-left: 12px;
-  border-radius: 100%;
-  opacity: 0.7;
-}
-span.anchor {
-  opacity: 0.4;
-  margin-right: 4px;
-}
-div.tags,
-.posts-grid {
-  margin-bottom: 30px;
 }
 .iconify {
   margin-left: 8px;

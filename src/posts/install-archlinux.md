@@ -1,6 +1,6 @@
 ---
 title: 使用命令行安装单系统 Arch Linux
-published: 2025-02-25
+published: 2024-02-25
 description: 论加入 Arch 教的第一步——安装
 tags: [Arch, Linux, Terminal]
 category: Linux

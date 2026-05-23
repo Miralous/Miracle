@@ -69,7 +69,7 @@ export const globalConfig = {
       transition: 10, // x[s(second(s))] / 100 | e.g. 10 -> 0.1s (default)
       gap: 12, // x[px]
       radius: 26, // x[px]
-      enableCardTitle: true, // show title in custom card (warning, danger...)
+      enableCardTitle: false, // show title in custom card (warning, danger...)
       transparent: false, // transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
       mono: false, // use monospace font for title

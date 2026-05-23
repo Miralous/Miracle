@@ -201,51 +201,48 @@ watch(showNegative, (val) => {
 
     <!-- Categories Section -->
     <div class="tags">
-      <a
-        class="tag"
+      <TagChip
         href="/tags"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.tags"
       >
-        <Icon
-          :icon="globalConfig.icon.tag"
-          style="opacity: 0.4; margin-right: 10px"
-        />
-        <span class="name">{{ globalConfig.lang.tags }}</span>
-      </a>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.tag" />
+        </template>
+      </TagChip>
 
       <!-- Negative Button -->
-      <span
+      <TagChip
         v-if="showNegativeButton"
-        class="tag negative"
+        negative
         @click="toggleNegative"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        :class="{ active: showNegative }"
+        :active="showNegative"
+        :label="globalConfig.lang.negative"
       >
-        <Icon
-          :icon="globalConfig.icon.negative"
-          style="opacity: 0.4; margin-right: 10px"
-        />
-        <span class="name">{{ globalConfig.lang.negative }}</span>
-      </span>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.negative" />
+        </template>
+      </TagChip>
 
       <!-- Categories -->
-      <span
+      <TagChip
         v-for="category in categories"
         :key="category"
-        class="tag"
         @click="handleCategoryClick(category)"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        :class="{ active: selectedCategory === category }"
-      >
-        <span class="name"><span class="anchor">※</span>{{ category }}</span>
-        <span class="count">{{ categoryCounts[category] }}</span>
-      </span>
+        anchorIcon="@"
+        :active="selectedCategory === category"
+        :label="category"
+        :count="categoryCounts[category]"
+        showAnchor
+      />
     </div>
 
     <!-- Articles Grouped by Year -->

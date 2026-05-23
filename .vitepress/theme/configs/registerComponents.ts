@@ -4,6 +4,7 @@ import type { App } from "vue";
 import Articles from "../components/article/article.vue";
 import PostCard from "../components/article/postCard.vue";
 import Tags from "../components/article/tags.vue";
+import TagChip from "../components/utils/TagChip.vue";
 import FirstPage from "../components/dashboard/FirstPage.vue";
 import Friends from "../components/dashboard/Friends.vue";
 import LastMoment from "../components/dashboard/LastMoment.vue";
@@ -34,6 +35,7 @@ const components = {
   PostCard,
   Pictures,
   FriendCard,
+  TagChip,
   // Pages
   Articles,
   Tags,

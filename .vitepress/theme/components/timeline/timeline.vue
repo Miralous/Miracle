@@ -17,6 +17,12 @@ interface CombinedTimelineItem {
   timestamp: number;
   url?: string;
   negative?: boolean;
+  globalIndex: number;
+}
+
+interface YearGroup {
+  year: string;
+  items: CombinedTimelineItem[];
 }
 
 const isMounted = ref(false);
@@ -29,7 +35,7 @@ onMounted(() => {
   });
 });
 
-const sortedTimeline = computed<CombinedTimelineItem[]>(() => {
+const sortedFlatTimeline = computed(() => {
   const normalizedPosts = postsData.map((post) => ({
     id: post.url,
     type: "post" as const,
@@ -66,7 +72,30 @@ const sortedTimeline = computed<CombinedTimelineItem[]>(() => {
   return filtered.sort((a, b) => b.timestamp - a.timestamp);
 });
 
-// 辅助函数：精准映射出对应节点的 CSS 变量名
+const groupedTimeline = computed<YearGroup[]>(() => {
+  const groups: Record<string, CombinedTimelineItem[]> = {};
+
+  sortedFlatTimeline.value.forEach((item, index) => {
+    const year = new Date(item.timestamp).getFullYear().toString();
+
+    if (!groups[year]) {
+      groups[year] = [];
+    }
+
+    groups[year].push({
+      ...item,
+      globalIndex: index,
+    });
+  });
+
+  return Object.keys(groups)
+    .sort((a, b) => Number(b) - Number(a))
+    .map((year) => ({
+      year,
+      items: groups[year],
+    }));
+});
+
 const getLineColorVar = (item?: CombinedTimelineItem) => {
   if (!item) return "";
   return `var(--line-color-${item.type}${item.negative ? "-negative" : ""})`;
@@ -75,29 +104,37 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 
 <template>
   <div class="timeline-wrapper">
-    <component
-      :is="item.type === 'post' ? 'a' : 'div'"
-      v-for="(item, index) in sortedTimeline"
-      :key="item.id"
-      :href="item.type === 'post' ? item.url : undefined"
-      class="timeline-item"
-      :class="[item.type, { 'is-negative': item.negative }]"
-      :style="{
-        '--prev-color':
-          getLineColorVar(sortedTimeline[index - 1]) || getLineColorVar(item),
-        '--next-color':
-          getLineColorVar(sortedTimeline[index + 1]) || getLineColorVar(item),
-      }"
-    >
-      <div class="timeline-content-box">
-        <span class="timeline-text-content">
-          {{ item.title }}
-        </span>
-        <span class="time-text">
-          {{ isMounted ? formatRelativeDate(item.dateString) : "..." }}
-        </span>
+    <div v-for="group in groupedTimeline" :key="group.year" class="year-group">
+      <h1 class="year">{{ group.year }}</h1>
+
+      <div class="year-timeline-content">
+        <component
+          :is="item.type === 'post' ? 'a' : 'div'"
+          v-for="item in group.items"
+          :key="item.id"
+          :href="item.type === 'post' ? item.url : undefined"
+          class="timeline-item"
+          :class="[item.type, { 'is-negative': item.negative }]"
+          :style="{
+            '--prev-color':
+              getLineColorVar(sortedFlatTimeline[item.globalIndex - 1]) ||
+              getLineColorVar(item),
+            '--next-color':
+              getLineColorVar(sortedFlatTimeline[item.globalIndex + 1]) ||
+              getLineColorVar(item),
+          }"
+        >
+          <div class="timeline-content-box">
+            <span class="timeline-text-content">
+              {{ item.title }}
+            </span>
+            <span class="time-text">
+              {{ isMounted ? formatRelativeDate(item.dateString) : "..." }}
+            </span>
+          </div>
+        </component>
       </div>
-    </component>
+    </div>
   </div>
 </template>
 
@@ -108,8 +145,19 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 .timeline-wrapper {
   display: flex;
   flex-direction: column;
-  margin: 2rem 0;
   border-left: none;
+}
+
+.year-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 纯净的内容包裹区 */
+.year-timeline-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .timeline-item {
@@ -122,20 +170,17 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   transition: all var(--vp-transition-time);
   cursor: default;
 
-  /* 基础颜色池 */
   --line-color-post: var(--vp-c-brand-1);
   --line-color-post-negative: var(--vp-c-red-1);
   --line-color-moment: var(--vp-c-gray-1);
   --line-color-moment-negative: var(--vp-c-yellow-1);
 
-  /* 默认当前节点颜色 */
   --line-color: var(--line-color-post);
 }
 .dark .timeline-item {
   --line-color-moment: var(--vp-c-text-3);
 }
 
-/* 动态覆盖当前节点的纯色变量 */
 .timeline-item.moment {
   --line-color: var(--line-color-moment);
 }
@@ -164,28 +209,20 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   background-color: var(--vp-c-red-soft) !important;
 }
 
-/* ⚡ 轴线（通过满高 + color-mix 边界色彩融合，完美收官） */
+/* ⚡ 轴线基础样式 */
 .timeline-item::after {
   content: "";
   position: absolute;
   left: 20px;
-  top: 0; /* 🚀 顶天 */
-  bottom: 0; /* 🚀 立地，保证绝对不会出现任何物理断层 */
+  top: 0;
+  bottom: 0;
   width: 2px;
   opacity: 0.5;
   z-index: 1;
 
-  /* 🎨 核心色彩计算：
-     利用 color-mix 动态算出跟上一个节点、下一个节点在碰撞边界处的“完美过渡中间色”
-  */
   --boundary-prev: color-mix(in srgb, var(--prev-color), var(--line-color));
   --boundary-next: color-mix(in srgb, var(--line-color), var(--next-color));
 
-  /* ✨ 完美的双向流动渐变：
-     - [0% 到 50%]：由边界交汇色平滑流入自己的小圆点。
-     - [50% 到 100%]：由小圆点平滑流出到下一个边界交汇色。
-     由于 A 卡片的 boundary-next 变量在数学上等同于 B 卡片的 boundary-prev，两片碰头处的颜色像素级一致！
-  */
   background: linear-gradient(
     to bottom,
     var(--boundary-prev) 0%,
@@ -194,8 +231,10 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   );
 }
 
-/* ⚡ 首尾边界裁剪（防止第一项向上冒尖，最后一项向下漏尾巴） */
-.timeline-wrapper .timeline-item:first-child::after {
+/* ⚡ 黄金修复点：在纯净容器下，使用 :first-child 和 :last-child 完美收尾
+   每一年的第一条和最后一项会绝对精准地缩回圆点心，中途绝不断开！
+*/
+.year-timeline-content .timeline-item:first-child::after {
   top: 50%;
   background: linear-gradient(
     to bottom,
@@ -203,7 +242,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
     var(--boundary-next) 100%
   );
 }
-.timeline-wrapper .timeline-item:last-child::after {
+.year-timeline-content .timeline-item:last-child::after {
   bottom: 50%;
   background: linear-gradient(
     to bottom,
@@ -224,7 +263,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   border-radius: 50%;
   background-color: var(--line-color);
   transition: all var(--vp-transition-time);
-  z-index: 2; /* 圆点稳稳压在轴线交汇处上方 */
+  z-index: 2;
 }
 
 .timeline-item:hover::before {
@@ -232,7 +271,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 }
 
 /* ==========================================================================
-   ⚡ 布局结构
+    布局结构
    ========================================================================== */
 .timeline-content-box {
   display: flex;
@@ -280,5 +319,23 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 }
 .timeline-item.is-negative:hover .timeline-text-content {
   opacity: 0.8;
+}
+
+/* 年份样式保持原样 */
+.year {
+  margin-top: 30px;
+  line-height: 110px;
+  font-size: 100px;
+  position: relative;
+  top: 30px;
+  font-weight: bold !important;
+  color: var(--vp-c-gutter);
+  opacity: 0.7;
+  z-index: -1;
+  mask-image: linear-gradient(var(--vp-c-gutter) 20%, transparent);
+  text-transform: var(--vp-title-uppercase);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

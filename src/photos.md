@@ -81,29 +81,25 @@ const handleCategoryClick = (category: string) => {
 <h1 class="artist">{{globalConfig.lang.photos}}</h1>
 
 <div class="tags">
-  <div
-    class="tag"
+  <TagChip
     @click="handleCategoryClick('')"
-    :class="{ active: !selectedCategory }"
+    :active="!selectedCategory"
     @mouseenter="handleMouseEnter"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
-  >
-    <span class="name">{{globalConfig.lang.allPhotos}}</span>
-  </div>
+    :label="globalConfig.lang.allPhotos"
+  />
 
-  <div
+  <TagChip
     v-for="category in categories"
     :key="category"
-    class="tag"
     @click="handleCategoryClick(category)"
-    :class="{ active: selectedCategory === category }"
+    :active="selectedCategory === category"
     @mouseenter="handleMouseEnter"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
-  >
-    <span class="name">{{ category }}</span>
-  </div>
+    :label="category"
+  />
 </div>
 
 <div class="allPhotos">
@@ -144,31 +140,6 @@ const handleCategoryClick = (category: string) => {
   flex-wrap: wrap;
   gap: var(--vp-gap);
   margin-bottom: 30px;
-}
-
-.tag {
-  font-family: var(--vp-use-mono);
-  text-transform: var(--vp-title-uppercase);
-  font-weight: 600;
-  padding: 12px 24px;
-  color: var(--vp-c-text-1);
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: var(--vp-border-radius-1);
-  box-shadow: var(--vp-shadow);
-  cursor: pointer;
-  transition: all var(--vp-transition-time);
-}
-
-.tag:hover:not(.active) {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-2);
-}
-
-.active {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
-  color: var(--vp-c-brand-2);
 }
 
 .songs-grid {

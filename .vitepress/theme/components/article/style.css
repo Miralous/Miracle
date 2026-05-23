@@ -107,22 +107,6 @@
   gap: var(--vp-gap);
 }
 
-.tag {
-  font-family: var(--vp-use-mono);
-  text-transform: var(--vp-title-uppercase);
-  transition: all var(--vp-transition-time);
-  padding: 12px 24px;
-  color: var(--vp-c-text-1);
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: inherit;
-  box-shadow: var(--vp-shadow);
-  text-decoration: none;
-  font-size: 16px;
-  margin: 0;
-  will-change: transform;
-}
-
 span.name {
   font-weight: 600;
 }
@@ -133,56 +117,7 @@ span.anchor {
   transition: all var(--vp-transition-time);
 }
 
-.tag:hover:not(.active) {
-  border-color: var(--vp-c-brand-1);
-  cursor: pointer;
-
-  span.name,
-  span.count,
-  span.anchor {
-    color: var(--vp-c-brand-2);
-  }
-}
-
-.active {
-  cursor: pointer;
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
-
-  span.name,
-  span.count,
-  span.anchor {
-    color: var(--vp-c-brand-2);
-  }
-}
-
-.count {
-  margin-left: 12px;
-  border-radius: 100%;
-  opacity: 0.7;
-}
-
-span.anchor {
-  opacity: 0.4;
-  margin-right: 4px;
-}
-
 div.tags,
 .posts-grid {
   margin-bottom: 30px;
-}
-
-/* negative 默认保持普通样式，仅选中后变黄 */
-
-.tag.negative.active,
-.tag.negative:hover {
-  border-color: var(--vp-c-yellow-1);
-  box-shadow: var(--vp-shadow-negative) !important;
-
-  span.name,
-  span.count,
-  span.anchor,
-  svg {
-    color: var(--vp-c-yellow-1);
-  }
 }

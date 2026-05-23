@@ -120,28 +120,24 @@ const handleSingerClick = (singer: string) => {
 
 <h1 class="artist">{{ globalConfig.lang.artists }}</h1>
 <div class="tags">
-  <span
-    class="tag"
+  <TagChip
     @click="handleSingerClick('')"
-    :class="{ active: !selectedSinger }"
+    :active="!selectedSinger"
     @mouseenter="handleMouseEnter"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
->
-    <span class="name">{{ globalConfig.lang.allArtists }}</span>
-  </span>
-  <span
+    :label="globalConfig.lang.allArtists"
+  />
+  <TagChip
     v-for="singer in singers"
     :key="singer"
-    class="tag"
     @click="handleSingerClick(singer)"
-    :class="{ active: selectedSinger === singer }"
+    :active="selectedSinger === singer"
     @mouseenter="handleMouseEnter"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
-  >
-    <span class="name">{{ singer }}</span>
-  </span>
+    :label="singer"
+  />
 </div>
 
 <div class="allSongs">
@@ -175,28 +171,6 @@ const handleSingerClick = (singer: string) => {
   flex-wrap: wrap;
   gap: var(--vp-gap);
   margin-bottom: 30px;
-}
-.tag {
-  font-family: var(--vp-use-mono) !important;
-  text-transform: var(--vp-title-uppercase);
-  font-weight: 600;
-  padding: 12px 24px;
-  color: var(--vp-c-text-1);
-  background-color: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: var(--vp-border-radius-1);
-  box-shadow: var(--vp-shadow);
-  cursor: pointer;
-  transition: all var(--vp-transition-time);
-}
-.tag:hover:not(.active) {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-2);
-}
-.active {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
-  color: var(--vp-c-brand-2);
 }
 
 .songs-grid {

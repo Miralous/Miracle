@@ -207,51 +207,48 @@ const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
     <!-- Tags -->
     <div class="tags">
-      <a
-        class="tag"
+      <TagChip
         href="/archives"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.categories"
       >
-        <Icon
-          :icon="globalConfig.icon.category"
-          style="opacity: 0.4; margin-right: 10px"
-        />
-        <span class="name">{{ globalConfig.lang.categories }}</span>
-      </a>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.category" />
+        </template>
+      </TagChip>
 
       <!-- negative button -->
-      <span
+      <TagChip
         v-if="showNegativeButton"
-        class="tag negative"
+        negative
         @click="toggleNegative"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        :class="{ active: showNegative }"
+        :active="showNegative"
+        :label="globalConfig.lang.negative"
       >
-        <Icon
-          :icon="globalConfig.icon.negative"
-          style="opacity: 0.4; margin-right: 10px"
-        />
-        <span class="name">{{ globalConfig.lang.negative }}</span>
-      </span>
+        <template #icon>
+          <Icon :icon="globalConfig.icon.negative" />
+        </template>
+      </TagChip>
 
       <!-- tags -->
-      <span
+      <TagChip
         v-for="tag in tags"
         :key="tag"
-        class="tag"
         @click="handleTagClick(tag)"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        :class="{ active: selectedTag === tag }"
-      >
-        <span class="name"> <span class="anchor">#</span>{{ tag }} </span>
-        <span class="count">{{ tagCounts[tag] }}</span>
-      </span>
+        :active="selectedTag === tag"
+        :label="tag"
+        :count="tagCounts[tag]"
+        anchorIcon="#"
+        showAnchor
+      />
     </div>
 
     <!-- posts -->
