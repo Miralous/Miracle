@@ -87,10 +87,6 @@ export const globalConfig = {
   homePage: {
     avatar:
       "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=3", // your avatar
-    city: "Fangxing Avenue, Wuling", // your location
-    // introduce: (you cannot use it now)
-    // "Awa middle schowol stuwudent whowo is leawarning frowont-end develowopment~!", // introduce your self
-
     // modules
     modules: {
       banner: {
@@ -143,6 +139,7 @@ export const globalConfig = {
         { text: languageFile.archives, link: "/archives" },
         { text: languageFile.moments, link: "/moments" },
         { text: languageFile.timeline, link: "/timeline" },
+        { text: languageFile.about, link: "/about" },
       ],
     },
     {
@@ -160,6 +157,110 @@ export const globalConfig = {
       ],
     },
   ],
+
+  // abouts
+  about: {
+    desc: "A student who is learning frontend development",
+    tags: [
+      {
+        icon: "ph:city-duotone",
+        title: "Location",
+        content: "Tianjin",
+      },
+      {
+        icon: "ph:cake-duotone",
+        title: "Birthday",
+        content: "May 30, 2013",
+      },
+      {
+        icon: "ph:ruler-duotone",
+        title: "Height",
+        content: "144 CM",
+      },
+      {
+        icon: "ph:feather-duotone",
+        title: "Weight",
+        content: "43 KG",
+      },
+    ],
+    todo: [
+      { complete: true, text: "Write more articles" },
+      { complete: false, text: "Miracle v2" },
+      { complete: false, text: "Make more friends" },
+    ],
+    schedule: {
+      enabled: true,
+      monday: [
+        { time: "07:30-07:50", name: "English" },
+        { time: "08:00-08:45", name: "Chinese" },
+        { time: "09:15-10:00", name: "Biology" },
+        { time: "10:15-11:00", name: "Geography" },
+        { time: "11:15-12:00", name: "English" },
+        { time: "13:30-14:15", name: "Maths" },
+        { time: "14:30-15:15", name: "Physical Education" },
+        { time: "15:30-16:15", name: "English" },
+        { time: "16:45-17:30", name: "English" },
+        { time: "17:45-18:20", name: "Drama" },
+      ],
+      tuesday: [
+        { time: "07:30-07:50", name: "Maths" },
+        { time: "08:00-08:45", name: "Maths" },
+        { time: "09:15-10:00", name: "English" },
+        { time: "10:15-11:00", name: "Physical Education" },
+        { time: "11:15-12:00", name: "Biology" },
+        { time: "13:30-14:15", name: "Political Education" },
+        { time: "14:30-15:15", name: "Labor" },
+        { time: "15:30-16:15", name: "Chinese" },
+        { time: "16:45-17:30", name: "Geography" },
+        { time: "17:45-18:20", name: "History" },
+      ],
+      wednesday: [
+        { time: "07:30-07:50", name: "Geography" },
+        { time: "08:00-08:45", name: "Chinese" },
+        { time: "09:15-10:00", name: "Political Education" },
+        { time: "10:15-11:00", name: "Maths" },
+        { time: "11:15-12:00", name: "Maths" },
+        { time: "13:30-14:15", name: "Chinese" },
+        { time: "14:30-15:15", name: "Physical Education (Public)" },
+        { time: "15:30-16:15", name: "Geography" },
+        { time: "16:45-17:30", name: "Maths" },
+        { time: "17:45-18:20", name: "Maths" },
+      ],
+      thursday: [
+        { time: "07:30-07:50", name: "Chinese" },
+        { time: "08:00-08:45", name: "English" },
+        { time: "09:15-10:00", name: "Information Technology" },
+        { time: "10:15-11:00", name: "Music" },
+        { time: "11:15-12:00", name: "History" },
+        { time: "13:30-14:15", name: "Physical Education" },
+        { time: "14:30-15:15", name: "Chinese" },
+        { time: "15:30-16:15", name: "Chinese" },
+        { time: "16:45-17:30", name: "Chinese" },
+        { time: "17:45-18:20", name: "Chinese" },
+      ],
+      friday: [
+        { time: "07:30-07:50", name: "English" },
+        { time: "08:00-08:45", name: "Art" },
+        { time: "09:15-10:00", name: "Biology" },
+        { time: "10:15-11:00", name: "Political Education" },
+        { time: "11:15-12:00", name: "History" },
+        { time: "13:30-14:15", name: "English" },
+        { time: "14:30-15:15", name: "Maths" },
+        { time: "15:30-16:15", name: "Physical Education (Public)" },
+        { time: "16:45-17:30", name: "English" },
+        { time: "17:45-18:20", name: "English" },
+      ],
+      saturday: [
+        { time: "09:30-12:00", name: "Maths" },
+        { time: "14:00-15:00", name: "Physical Education (Kick Boxing)" },
+        { time: "19:00-21:30", name: "Chinese / Drama" },
+      ],
+      sunday: [
+        { time: "09:30-12:00", name: "English" },
+        { time: "15:00-16:00", name: "Instrument" },
+      ],
+    },
+  },
 
   // comments
   comments: {
@@ -196,8 +297,11 @@ export const globalConfig = {
   },
 
   // netease music list
-  musicList: "17942010185",
-  musicSlice: 20, // how many singer to display in music list (default: 20, set 0 to display all)
+  netease: {
+    musicList: "17942010185",
+    metingApi: "https://api.injahow.cn/meting",
+    musicSlice: 20, // how many singer to display in music list (default: 20, set 0 to display all)
+  },
 
   // DO NOT EDIT THESE VALUES!!!!!
   friends: friendList,

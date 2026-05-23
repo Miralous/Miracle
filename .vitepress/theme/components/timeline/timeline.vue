@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { globalConfig } from "#config";
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { formatRelativeDate } from "../../utils/formatRelativeDate";
 import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
 import { data as postsData } from "#theme/data/posts.data";
 
@@ -34,6 +33,13 @@ onMounted(() => {
     if (cleanup) cleanup();
   });
 });
+
+const formatToMMDD = (timestamp: number) => {
+  const d = new Date(timestamp);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${mm}/${dd}`;
+};
 
 const sortedFlatTimeline = computed(() => {
   const normalizedPosts = postsData.map((post) => ({
@@ -124,12 +130,12 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
               getLineColorVar(item),
           }"
         >
+          <span class="time-text">
+            {{ isMounted ? formatToMMDD(item.timestamp) : "..." }}
+          </span>
           <div class="timeline-content-box">
             <span class="timeline-text-content">
               {{ item.title }}
-            </span>
-            <span class="time-text">
-              {{ isMounted ? formatRelativeDate(item.dateString) : "..." }}
             </span>
           </div>
         </component>
@@ -154,7 +160,6 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   flex-direction: column;
 }
 
-/* 纯净的内容包裹区 */
 .year-timeline-content {
   display: flex;
   flex-direction: column;
@@ -163,7 +168,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 .timeline-item {
   display: flex;
   position: relative;
-  padding: 0.6rem 0 0.6rem 45px;
+  padding: 0.6rem 0 0.6rem 90px;
   border-radius: var(--vp-border-radius-3);
   text-decoration: none !important;
   color: inherit;
@@ -209,11 +214,10 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   background-color: var(--vp-c-red-soft) !important;
 }
 
-/* ⚡ 轴线基础样式 */
 .timeline-item::after {
   content: "";
   position: absolute;
-  left: 20px;
+  left: 65px;
   top: 0;
   bottom: 0;
   width: 2px;
@@ -231,9 +235,6 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   );
 }
 
-/* ⚡ 黄金修复点：在纯净容器下，使用 :first-child 和 :last-child 完美收尾
-   每一年的第一条和最后一项会绝对精准地缩回圆点心，中途绝不断开！
-*/
 .year-timeline-content .timeline-item:first-child::after {
   top: 50%;
   background: linear-gradient(
@@ -251,11 +252,10 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   );
 }
 
-/* ⚡ 小圆点 */
 .timeline-item::before {
   content: "";
   position: absolute;
-  left: 21px;
+  left: 66px;
   top: 50%;
   transform: translate(-50%, -50%);
   width: 8px;
@@ -270,9 +270,6 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   transform: translate(-50%, -50%) scale(1.3);
 }
 
-/* ==========================================================================
-    布局结构
-   ========================================================================== */
 .timeline-content-box {
   display: flex;
   justify-content: space-between;
@@ -306,8 +303,16 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 }
 
 .time-text {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 45px;
+  text-align: right;
   font-size: 0.875rem;
   color: var(--vp-c-text-3);
+  opacity: 0.8;
+  font-family: var(--vp-use-mono);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   flex-shrink: 0;
@@ -321,7 +326,6 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   opacity: 0.8;
 }
 
-/* 年份样式保持原样 */
 .year {
   margin-top: 30px;
   line-height: 110px;

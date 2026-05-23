@@ -29,7 +29,12 @@ const props = withDefaults(defineProps<CardProps>(), {
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
   >
-    <a :href="props.link" target="_blank" class="card-link" rel="nofollow">
+    <a
+      :href="props.link"
+      :target="props.type == 'square' ? '' : '_blank'"
+      class="card-link"
+      :rel="props.type == 'follow' ? undefined : 'nofollow'"
+    >
       <div class="cardInfo" :class="props.type">
         <div
           class="img-container"

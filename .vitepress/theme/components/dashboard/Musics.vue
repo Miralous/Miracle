@@ -12,7 +12,7 @@ const defaultImg =
 onMounted(async () => {
   try {
     const response = await fetch(
-      `https://api.injahow.cn/meting/?type=playlist&id=${globalConfig.musicList}`,
+      `${globalConfig.netease.metingApi}/?type=playlist&id=${globalConfig.netease.musicList}`,
     );
     const data = await response.json();
     playlist.value = data;
@@ -35,6 +35,8 @@ const limitedSongs = computed(() => {
   if (!playlist.value.length) return [];
   return shuffle(playlist.value).slice(0, 6);
 });
+
+import { getSongId } from "#theme/utils/getSongId";
 </script>
 
 <template>
@@ -43,7 +45,7 @@ const limitedSongs = computed(() => {
       <div v-for="song in limitedSongs" :key="song.url" class="song-card">
         <FriendCard
           :title="song.name"
-          :link="song.url"
+          :link="'/player?id=' + getSongId(song.url)"
           :desc="song.artist"
           :img="song.pic || defaultImg"
           type="square"

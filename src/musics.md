@@ -25,7 +25,7 @@ onMounted(async () => {
 
   // 获取歌单数据
   try {
-    const response = await fetch(`https://api.injahow.cn/meting/?type=playlist&id=${globalConfig.musicList}`);
+    const response = await fetch(`${globalConfig.netease.metingApi}/?type=playlist&id=${globalConfig.netease.musicList}`);
     const data = await response.json();
     playlist.value = data;
     console.log('歌单数据:', playlist.value);
@@ -66,30 +66,32 @@ const singers = computed(() => {
     .sort((a, b) => a.sort - b.sort)
     .map(({ a }) => a);
 
-    if(globalConfig.musicSlice == 0) {
+    if(globalConfig.netease.musicSlice == 0) {
         return shuffled;
     } else {
-  return shuffled.slice(0, globalConfig.musicSlice);
+  return shuffled.slice(0, globalConfig.netease.musicSlice);
 
     }
 });
 
-// 🔹 处理歌手分组（仅显示这 20 个随机歌手的歌曲）
 const groupedByArtist = computed(() => {
   const filterSinger = selectedSinger.value?.trim().toLowerCase();
-  const visibleSingers = singers.value.map(s => s.toLowerCase()); // ✅ 当前可见歌手名单
+  const visibleSingers = singers.value.map(s => s.toLowerCase()); 
   const processedItems: Array<{ artist: string; song: any }> = [];
 
   playlist.value.forEach(song => {
     if (!song.artist) return;
 
+    // ✨ 核心修正：如果 song 本身没有 id，但是有 url，我们就强行提取并赋值给它
+    if (!song.id && song.url) {
+      song.id = getSongId(song.url);
+    }
+
     const artists = song.artist.split('/').map(a => a.trim());
     artists.forEach(artist => {
       const artistLower = artist.toLowerCase();
 
-      // ✅ 只收录“当前随机20位歌手”中的歌曲
       if (visibleSingers.includes(artistLower)) {
-        // ✅ 如果选中了特定歌手，则再过滤
         if (!filterSinger || artistLower === filterSinger) {
           processedItems.push({ artist, song });
         }
@@ -116,6 +118,8 @@ const handleSingerClick = (singer: string) => {
   else url.searchParams.delete("singer");
   window.history.pushState({}, "", url);
 };
+
+import {getSongId} from "#theme/utils/getSongId"
 </script>
 
 <h1 class="artist">{{ globalConfig.lang.artists }}</h1>
@@ -153,7 +157,7 @@ const handleSingerClick = (singer: string) => {
           <div v-for="item in col" :key="item.song.url" class="song-card">
             <FriendCard
               :title="item.song.name"
-              :link="item.song.url"
+              :link="'/player?id=' + item.song.id"
               type="square"
               :desc="item.song.artist"
               :img="item.song.pic || defaultImg"

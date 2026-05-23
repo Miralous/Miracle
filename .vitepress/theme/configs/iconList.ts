@@ -19,4 +19,9 @@ export const data = {
   negative: "ph:smiley-sad-duotone",
   unableFriends: "ph:wifi-slash-duotone",
   photos: "ph:picture-in-picture-duotone",
+  about: "ph:info-duotone",
+  tasks: "ph:list-checks-duotone",
+  taskComplete: "ph:check-circle-fill",
+  taskNotComplete: "ph:circle",
+  schedule: "ph:calendar-blank-duotone",
 };

@@ -40,7 +40,7 @@
   "scripts": {
     "id": "tsx .vitepress/theme/scripts/genId.js",
     "clean": "node .vitepress/theme/scripts/setup.js",
-    "dev": "tsx .vitepress/theme/scripts/genId.js && vitepress dev --port 4321",
+    "dev": "vitepress dev --port 4321",
     "build": "tsx .vitepress/theme/scripts/genId.js && vitepress build",
     "preview": "vitepress preview --port 4321",
     "format": "pnpm exec prettier . --write"

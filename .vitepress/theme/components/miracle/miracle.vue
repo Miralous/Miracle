@@ -36,6 +36,7 @@
                 :title="'#' + friend.id"
                 :link="friend.link"
                 :desc="friend.title"
+                type="follow"
                 :img="friend.img || defaultImg"
                 :style="{
                   '--title': 'var(--vp-font-family-mono)',

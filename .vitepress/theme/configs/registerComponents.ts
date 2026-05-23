@@ -21,6 +21,8 @@ import Musics from "../components/dashboard/Musics.vue";
 import Pictures from "../components/dashboard/Pictures.vue";
 import Miracle from "../components/miracle/miracle.vue";
 import Timeline from "../components/timeline/timeline.vue";
+import About from "../components/about/about.vue";
+import MusicPlayer from "../components/player/player.vue";
 
 const components = {
   // Dashboard
@@ -40,8 +42,10 @@ const components = {
   Articles,
   Tags,
   Timeline,
+  About,
   Moments,
   Manager,
+  MusicPlayer,
   // Layout
   Icon,
   Comments,
