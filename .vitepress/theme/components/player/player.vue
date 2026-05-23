@@ -10,7 +10,6 @@ const props = withDefaults(defineProps<PlayerProps>(), {
 // vars
 const id = props.id;
 const api = globalConfig.netease.metingApi;
-const l = globalConfig.netease.musicList;
 </script>
 
 <template>
@@ -21,6 +20,6 @@ const l = globalConfig.netease.musicList;
     finish this function powered by Mrachritmo.<br />
     <br />
     <h1>DATA</h1>
-    { id: {{ id }}, api: {{ api }}, list: {{ l }} }
+    { id: {{ id }}, api: {{ api }} }
   </div>
 </template>

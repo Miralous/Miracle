@@ -21,7 +21,7 @@ interface RemoteSiteItem {
 }
 
 // 💡 1. 关键修改：改用 /raw 路径，让代理直接返回原汁原味的数据，而不是包装后的 JSON
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+const CORS_PROXY = globalConfig.cors;
 
 export async function getMiracleData(): Promise<LoaderResult> {
   const src = globalConfig.miracle.src;

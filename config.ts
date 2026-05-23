@@ -29,6 +29,7 @@ export const globalConfig = {
   title: "Silvaire's Blog", // title
   description: "Per Aspera Ad Astra", // description
   author: "Silvaire", // your name
+  cors: "https://cors.qwq.blue/?", // DO NOT USE MINE!!!!!
   favicon:
     "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=4&mask=circle", // favicon (suggest: circle mask)
   url: "https://qwq.blue", // main url (https://xxxx.xxx)
