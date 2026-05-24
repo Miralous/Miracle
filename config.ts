@@ -92,10 +92,11 @@ export const globalConfig = {
     // modules
     modules: {
       banner: {
-        imgurl: "https://qwq.blue/data/photos/Endfield/zhuangfangyi.jpg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
+        imgurl:
+          "https://web.hycdn.cn/endfield/special/over-the-frontier/assets/imgs/0414.51a870.jpg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
         image: "600px", // only work when type is "image", e.g. "65vh"
       },
-      pictures: true, // show pictures
+      pictures: false, // show pictures
       lastMoment: true, // last moment
       recentPosts: true, // recent posts
       projects: true, // projects (may be very sloooooow)
