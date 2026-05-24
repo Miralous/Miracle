@@ -10,14 +10,21 @@
 @import url("./default.css");
 @import url("./components.css");
 @import url("./twikoo.css");
-@import url("./font.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css");
+@import url("https://rsms.me/inter/inter.css");
+@import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
 
 /**
  * Variables
  * -------------------------------------------------------------------------- */
 
 :root {
+  /* font family */
+  --vp-font-family-base: "InterVariable", system-ui, sans-serif;
+  --vp-font-family-mono: "IBM Plex Mono", var(--vp-font-family-base);
+  /* only for title !!!!!! */
+  --vp-font-family-title: var(--vp-font-family-base);
+
   /* Border Radius */
   --vp-border-radius-2: calc(var(--vp-border-radius-1) - 6px);
   --vp-border-radius-3: calc(var(--vp-border-radius-2) - 6px);
@@ -38,6 +45,27 @@
 
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);
+
+  font-variant-alternates: styleset(
+    open-digits,
+    disambiguation,
+    round-quotes-and-commas
+  );
+
+  &:dir(rtl) {
+    --start: right;
+    --end: left;
+    --transform-start-far: translateX(100%);
+    --transform-end-far: translateX(-100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    scroll-behavior: auto;
+  }
+  font-synthesis: style;
+  text-autospace: normal;
+  text-size-adjust: none;
 }
 
 .dark {
