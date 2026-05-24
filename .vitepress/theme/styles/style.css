@@ -10,21 +10,14 @@
 @import url("./default.css");
 @import url("./components.css");
 @import url("./twikoo.css");
+@import url("./font.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css");
 
 /**
  * Variables
  * -------------------------------------------------------------------------- */
 
-@import url("https://fonts.osyb.cn/css2?family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Playwrite+SK:wght@100..400&display=swap");
 :root {
-  /* font family */
-  --vp-font-family-base: "Google Sans", system-ui, sans-serif;
-  --vp-font-family-mono: "Google Sans Code", var(--vp-font-family-base);
-  /* only for title !!!!!! */
-  --vp-font-family-title:
-    "Playwrite SK", var(--vp-font-family-mono), var(--vp-font-family-base);
-
   /* Border Radius */
   --vp-border-radius-2: calc(var(--vp-border-radius-1) - 6px);
   --vp-border-radius-3: calc(var(--vp-border-radius-2) - 6px);

@@ -49,7 +49,7 @@ const props = withDefaults(defineProps<CardProps>(), {
           <div class="details">
             <Icon
               :icon="globalConfig.icon.singer"
-              v-if="props.type"
+              v-if="props.type == 'square'"
               style="margin-right: 4px"
             />{{ props.desc }}
           </div>

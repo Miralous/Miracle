@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.cn/css2?family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Playwrite+SK:wght@100..400&display=swap");
+
+:root {
+  /* font family */
+  --vp-font-family-base: "Google Sans", system-ui, sans-serif;
+  --vp-font-family-mono: "Google Sans Code", var(--vp-font-family-base);
+  /* only for title !!!!!! */
+  --vp-font-family-title:
+    "Playwrite SK", var(--vp-font-family-mono), var(--vp-font-family-base);
+}

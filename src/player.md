@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: page
 footer: false
 title: Music Player
 ---

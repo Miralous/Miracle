@@ -61,4 +61,5 @@ export const languageFile = {
   infos: "个人信息",
   tasks: "待办",
   schedule: "课表",
+  trial: "试听",
 };

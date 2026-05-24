@@ -91,7 +91,7 @@ export const globalConfig = {
     // modules
     modules: {
       banner: {
-        imgurl: "https://qwq.blue/data/photos/Neko/8.png", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
+        imgurl: "https://qwq.blue/data/photos/Endfield/physical.jpeg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
         image: "600px", // only work when type is "image", e.g. "65vh"
       },
       pictures: true, // show pictures
@@ -301,6 +301,7 @@ export const globalConfig = {
   netease: {
     musicList: "17942010185",
     metingApi: "https://api.injahow.cn/meting",
+    autoplay: true,
     musicSlice: 20, // how many singer to display in music list (default: 20, set 0 to display all)
   },
 

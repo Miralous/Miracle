@@ -61,4 +61,5 @@ export const languageFile = {
   infos: "Informations",
   tasks: "Tasks",
   schedule: "Schedule",
+  trial: "Trial",
 };

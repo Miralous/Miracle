@@ -1,25 +1,813 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, watch, nextTick } from "vue";
 // prepared
 import { globalConfig } from "#config";
+
 interface PlayerProps {
   id: string;
 }
+
 const props = withDefaults(defineProps<PlayerProps>(), {
   id: "",
 });
+
 // vars
-const id = props.id;
+const currentId = ref(props.id);
 const api = globalConfig.netease.metingApi;
+const list = globalConfig.netease.musicList;
+const autoplay = globalConfig.netease.autoplay ?? true;
+
+// 支持从配置中读取歌单 id 列表（兼容字符串 id 数组 或 对象数组 { id: ... }）
+const getListIds = () =>
+  Array.isArray(list)
+    ? list.map((it: any) => (typeof it === "string" ? it : it.id))
+    : [];
+
+// 如果配置是歌单 id（非数组），则获取歌单曲目
+const playlistTracks = ref<SongData[]>([]);
+
+const loadPlaylist = async () => {
+  try {
+    if (Array.isArray(list) && list.length > 0) {
+      // 支持直接在配置中写入完整曲目列表或 id 列表
+      playlistTracks.value = list.map((it: any) =>
+        typeof it === "string" ? ({ id: it } as SongData) : it,
+      );
+    } else if (list) {
+      const res = await fetch(`${api}/?type=playlist&id=${list}`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        playlistTracks.value = data;
+      }
+    }
+  } catch (e) {
+    console.error("加载歌单失败:", e);
+  }
+};
+
+// Interfaces
+interface SongData {
+  name: string;
+  artist: string;
+  url: string;
+  pic: string;
+  lrc: string;
+  id?: string;
+}
+
+interface LyricLine {
+  time: number;
+  text: string;
+  tlyric?: string; // 增加翻译字段
+}
+
+// State
+const song = ref<SongData | null>(null);
+const lyrics = ref<LyricLine[]>([]);
+const isLoading = ref(true);
+
+// Audio & Playback State
+const audioRef = ref<HTMLAudioElement | null>(null);
+const lyricsContainerRef = ref<HTMLElement | null>(null);
+const canvasRef = ref<HTMLCanvasElement | null>(null);
+
+const isPlaying = ref(false);
+const currentTime = ref(0);
+const duration = ref(0);
+const isTrial = ref(false); // 30秒试听标记
+
+// 音频可视化相关变量
+let audioCtx: AudioContext | null = null;
+let analyser: AnalyserNode | null = null;
+let visualizerFrameId = 0;
+
+// 解析 LRC 并处理双语翻译（支持独立行及括号内翻译格式）
+const parseLrc = (lrcString: string) => {
+  const lines = lrcString.split("\n");
+  const lrcMap = new Map<number, LyricLine>();
+  const timeReg = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+  // 用于提取括号内容的正则
+  const bracketReg = /\((.*?)\)/g;
+
+  for (const line of lines) {
+    const match = line.match(timeReg);
+    if (!match) continue;
+
+    const min = parseInt(match[1], 10);
+    const sec = parseInt(match[2], 10);
+    const ms =
+      match[3].length === 2
+        ? parseInt(match[3], 10) * 10
+        : parseInt(match[3], 10);
+    const timeKey = Math.round((min * 60 + sec + ms / 1000) * 10) / 10;
+
+    // 获取原始文本
+    let rawText = line.replace(timeReg, "").trim();
+    if (!rawText) continue;
+
+    // 提取并处理括号内容作为翻译
+    let tlyric = "";
+    const bracketMatches = rawText.match(bracketReg);
+    if (bracketMatches) {
+      // 提取所有括号内的内容并合并
+      tlyric = bracketMatches.map((m) => m.replace(/[()]/g, "")).join(" ");
+      // 从原文中移除括号部分
+      rawText = rawText.replace(bracketReg, "").trim();
+    }
+
+    if (lrcMap.has(timeKey)) {
+      // 1. 如果已存在，优先合并已有的 tlyric 或将其设为当前文本（处理独立翻译行情况）
+      const existing = lrcMap.get(timeKey)!;
+      if (!existing.tlyric && tlyric) {
+        existing.tlyric = tlyric;
+      } else if (!existing.tlyric) {
+        existing.tlyric = rawText;
+      }
+    } else {
+      // 2. 新时间点，存入原文与提取到的翻译
+      lrcMap.set(timeKey, {
+        time: timeKey,
+        text: rawText,
+        tlyric: tlyric || undefined,
+      });
+    }
+  }
+  return Array.from(lrcMap.values()).sort((a, b) => a.time - b.time);
+};
+
+// 判断是否为纯音乐/无歌词
+const hasLyrics = computed(() => {
+  if (lyrics.value.length === 0) return false;
+  const fullText = lyrics.value.map((l) => l.text).join(" ");
+  return !fullText.includes("纯音乐") && !fullText.includes("请欣赏");
+});
+
+// 获取数据
+const fetchMusicData = async () => {
+  try {
+    isLoading.value = true;
+    // 优先使用已加载的歌单数据（playlist API 返回的对象已包含 url/pic/lrc 等）
+    if (playlistTracks.value.length > 0) {
+      const track = playlistTracks.value.find(
+        (t) => String(t.id) === String(currentId.value),
+      );
+      if (track) {
+        song.value = track as SongData;
+        if (song.value?.lrc) {
+          const lrcRes = await fetch(song.value.lrc);
+          const lrcText = await lrcRes.text();
+          lyrics.value = parseLrc(lrcText);
+        } else {
+          lyrics.value = [];
+        }
+        return;
+      }
+    }
+
+    // 回退到单曲查询
+    const res = await fetch(`${api}/?type=song&id=${currentId.value}`);
+    const data = await res.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      song.value = data[0];
+
+      if (song.value?.lrc) {
+        const lrcRes = await fetch(song.value.lrc);
+        const lrcText = await lrcRes.text();
+        lyrics.value = parseLrc(lrcText);
+      } else {
+        lyrics.value = [];
+      }
+    }
+  } catch (error) {
+    console.error("获取音乐数据失败:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 播放控制
+const togglePlay = () => {
+  if (!audioRef.value) return;
+
+  if (isPlaying.value) {
+    audioRef.value.pause();
+  } else {
+    audioRef.value.play();
+  }
+  isPlaying.value = !isPlaying.value;
+};
+
+const tryAutoplay = async () => {
+  if (!audioRef.value || !autoplay) return;
+  try {
+    await audioRef.value.play();
+    isPlaying.value = true;
+  } catch (error) {
+    isPlaying.value = false;
+  }
+};
+
+const onTimeUpdate = () => {
+  if (audioRef.value) {
+    currentTime.value = audioRef.value.currentTime;
+  }
+};
+
+const onLoadedMetadata = async () => {
+  if (audioRef.value) {
+    duration.value = audioRef.value.duration;
+    // 如果音频长度<=61秒，判定为试听版 (部分VIP歌曲 Meting 只返回 60s)
+    if (duration.value <= 61) {
+      isTrial.value = true;
+    }
+    await tryAutoplay();
+  }
+};
+
+const onAudioEnded = () => {
+  currentTime.value = 0;
+  isPlaying.value = false;
+  const playlistLength =
+    playlistTracks.value.length > 0
+      ? playlistTracks.value.length
+      : getListIds().length;
+  if (playlistLength > 1) {
+    nextSong();
+  }
+};
+
+// 进度条交互
+const seekAudio = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const time = parseFloat(target.value);
+  if (audioRef.value) {
+    audioRef.value.currentTime = time;
+    currentTime.value = time;
+  }
+};
+
+// 计算当前高亮的歌词索引
+const currentLyricIndex = computed(() => {
+  if (lyrics.value.length === 0) return -1;
+  for (let i = lyrics.value.length - 1; i >= 0; i--) {
+    if (currentTime.value >= lyrics.value[i].time) {
+      return i;
+    }
+  }
+  return 0;
+});
+
+// 监听当前歌词索引的变化，平滑滚动
+watch(currentLyricIndex, async (newIndex) => {
+  if (newIndex !== -1 && lyricsContainerRef.value) {
+    await nextTick();
+    const container = lyricsContainerRef.value;
+    const activeEl = container.querySelector(
+      ".lyric-line.active",
+    ) as HTMLElement;
+
+    if (activeEl) {
+      const offsetTop = activeEl.offsetTop;
+      const scrollPosition =
+        offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2;
+
+      container.scrollTo({
+        top: Math.max(0, scrollPosition),
+        behavior: "smooth",
+      });
+
+      if (!isPlaying.value) {
+        togglePlay();
+      }
+    }
+  }
+});
+
+const formatTime = (time: number) => {
+  if (isNaN(time)) return "00:00";
+  const m = Math.floor(time / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = Math.floor(time % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${m}:${s}`;
+};
+
+// 切歌相关逻辑
+const findCurrentIndex = () => {
+  if (playlistTracks.value.length > 0) {
+    return playlistTracks.value.findIndex(
+      (t) => String(t.id) === String(currentId.value),
+    );
+  }
+  const ids = getListIds();
+  return ids.indexOf(String(currentId.value));
+};
+
+const playAtIndex = async (index: number) => {
+  // 如果使用 playlist API 返回的曲目列表，直接从中切换以避免重复请求
+  if (playlistTracks.value.length > 0) {
+    const safeIndex =
+      (index + playlistTracks.value.length) % playlistTracks.value.length;
+    currentId.value = playlistTracks.value[safeIndex].id || currentId.value;
+    await fetchMusicData();
+    await nextTick();
+    if (audioRef.value) {
+      try {
+        await audioRef.value.play();
+        isPlaying.value = true;
+      } catch (e) {
+        isPlaying.value = false;
+      }
+    }
+    return;
+  }
+
+  const ids = getListIds();
+  if (ids.length === 0) return;
+  const safeIndex = (index + ids.length) % ids.length;
+  currentId.value = ids[safeIndex];
+  await fetchMusicData();
+  await nextTick();
+  if (audioRef.value) {
+    try {
+      await audioRef.value.play();
+      isPlaying.value = true;
+    } catch (e) {
+      isPlaying.value = false;
+    }
+  }
+};
+
+const prevSong = () => {
+  const idx = findCurrentIndex();
+  if (idx === -1) return;
+  playAtIndex(idx - 1);
+};
+
+const nextSong = () => {
+  const idx = findCurrentIndex();
+  if (idx === -1) return;
+  playAtIndex(idx + 1);
+};
+
+onMounted(() => {
+  loadPlaylist().then(() => fetchMusicData());
+});
 </script>
 
 <template>
-  <div class="player" style="font-family: var(--vp-font-family-mono)">
-    <br />
-    <h1>DEBUG</h1>
-    This is the debug page. We are waiting for our collaborator Sptanmok to
-    finish this function powered by Mrachritmo.<br />
-    <br />
-    <h1>DATA</h1>
-    { id: {{ id }}, api: {{ api }} }
+  <!-- 核心修改 1: 容器加入 am-no-lyrics 状态支持居中 -->
+  <div
+    class="am-player-wrapper"
+    :class="{ 'am-no-lyrics': !hasLyrics, 'mobile-hide-lyrics': true }"
+    v-if="!isLoading && song"
+  >
+    <!-- 模糊背景 -->
+    <div class="am-bg" :style="{ backgroundImage: `url(${song.pic})` }"></div>
+    <div class="am-glass-overlay"></div>
+
+    <div class="am-content">
+      <!-- 左侧：封面与控制面板 -->
+      <div class="am-control-panel">
+        <div class="am-info">
+          <h2 class="am-title">
+            {{ song.name }}
+            <badge type="warning" v-if="isTrial">
+              {{ globalConfig.lang.trial }}</badge
+            >
+          </h2>
+          <p class="am-artist">{{ song.artist }}</p>
+        </div>
+
+        <div class="am-cover-wrapper" :class="{ 'is-playing': isPlaying }">
+          <img
+            :src="song.pic"
+            alt="Album Cover"
+            class="am-cover"
+            @click="togglePlay"
+          />
+        </div>
+
+        <div class="am-progress-container">
+          <span class="am-time">{{ formatTime(currentTime) }}</span>
+          <input
+            type="range"
+            class="am-progress-bar"
+            :min="0"
+            :max="duration || 100"
+            :value="currentTime"
+            @input="seekAudio"
+          />
+          <span class="am-time">{{ formatTime(duration) }}</span>
+        </div>
+
+        <!-- crossorigin 属性必须存在，否则 Web Audio 无法提取跨域音频数据 -->
+        <audio
+          ref="audioRef"
+          :src="song.url"
+          :autoplay="autoplay"
+          crossorigin="anonymous"
+          @timeupdate="onTimeUpdate"
+          @loadedmetadata="onLoadedMetadata"
+          @ended="onAudioEnded"
+        ></audio>
+      </div>
+
+      <!-- 右侧：歌词面板 -->
+      <!-- 核心修改 3: 当纯音乐时隐藏面板 -->
+      <div class="am-lyrics-panel" ref="lyricsContainerRef" v-if="hasLyrics">
+        <div class="am-lyrics-pad"></div>
+        <div
+          v-for="(line, index) in lyrics"
+          :key="index"
+          class="lyric-line"
+          :class="{ active: index === currentLyricIndex }"
+          @click="seekAudio({ target: { value: line.time } } as any)"
+        >
+          <!-- 核心修改 5: 原文与翻译分层显示 -->
+          <span class="lrc-original">{{ line.text }}</span>
+          <span v-if="line.tlyric" class="lrc-translate">{{
+            line.tlyric
+          }}</span>
+        </div>
+        <div class="am-lyrics-pad"></div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* 核心修改 1: 控制高度在一屏以内 */
+.am-player-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  font-family: var(--vp-font-family-base);
+  height: calc(100vh - var(--vp-nav-height)); /* 使用 clamp 限制最大最小高度 */
+  display: flex;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.am-bg {
+  position: absolute;
+  inset: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.8);
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+.am-glass-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.am-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+/* 核心修改 3: 纯音乐时的居中布局 */
+.am-no-lyrics .am-content {
+  justify-content: center;
+  align-items: center;
+}
+.am-no-lyrics .am-control-panel {
+  flex: none;
+  width: 100%;
+  max-width: 450px; /* 居中时限制最大宽度让排版好看 */
+}
+
+/* 左侧面板 */
+.am-control-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 250px;
+  height: 100%;
+}
+
+.am-cover-wrapper {
+  position: relative;
+  width: clamp(200px, 100%, 320px);
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: scale(0.95);
+  background: #000;
+}
+
+.am-cover-wrapper.is-playing {
+  transform: scale(1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.am-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  position: relative;
+}
+
+/* 核心修改 4: 频谱动画层 */
+.am-visualizer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  z-index: 2;
+  opacity: 0.8;
+  /* 底部淡出边缘效果 */
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    transparent 100%
+  );
+}
+
+.am-info {
+  margin-bottom: calc(var(--vp-gap) * 2);
+  text-align: center;
+  width: 100%;
+}
+
+.am-title {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 700;
+  margin: 0 !important;
+  color: #fff;
+  border: none;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.am-artist {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 0.5rem;
+}
+
+/* 进度条与控制台 */
+.am-progress-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  gap: 1rem;
+  margin-top: calc(var(--vp-gap) * 2);
+}
+
+.am-time {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.am-progress-bar {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.am-progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s;
+}
+
+.am-progress-bar:active::-webkit-slider-thumb {
+  transform: scale(1.3);
+}
+
+.am-controls {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.am-btn-play {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.am-btn-play:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.am-btn-play svg {
+  width: 28px;
+  height: 28px;
+}
+
+.am-btn-prev,
+.am-btn-next {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.75rem;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.am-btn-prev svg,
+.am-btn-next svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 30秒试听限制提示 */
+.am-trial-notice {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #ffcc00;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+}
+
+/* 右侧歌词面板 */
+.am-lyrics-panel {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-right: 1rem;
+  height: 100%; /* 继承外层 clamp 高度 */
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 15%,
+    #000 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 15%,
+    #000 85%,
+    transparent 100%
+  );
+}
+
+.am-lyrics-panel::-webkit-scrollbar {
+  display: none;
+}
+
+.am-lyrics-pad {
+  min-height: 45%;
+}
+
+.lyric-line {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0;
+  transform-origin: left center;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  filter: blur(1px);
+}
+
+/* 核心修改 5: 歌词与翻译文字排版 */
+.lrc-original {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.5s ease;
+}
+
+.lrc-translate {
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 0.4rem;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 0.5s ease;
+}
+
+.lyric-line:hover .lrc-original {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lyric-line.active {
+  filter: blur(0);
+  transform: scale(1.05);
+}
+
+.lyric-line.active .lrc-original {
+  color: #ffffff;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.lyric-line.active .lrc-translate {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.am-loading {
+  text-align: center;
+  padding: 4rem;
+  color: var(--vp-c-text-2);
+}
+
+@media (max-width: 768px) {
+  .am-player-wrapper {
+    height: auto;
+    min-height: 100vh;
+    align-items: center;
+  }
+
+  .am-content {
+    flex-direction: column;
+    padding: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - var(--vp-nav-height));
+  }
+
+  .am-lyrics-panel {
+    height: 400px;
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      #000 10%,
+      #000 90%,
+      transparent 100%
+    );
+  }
+
+  .lyric-line {
+    text-align: center;
+    transform-origin: center center;
+  }
+
+  .mobile-hide-lyrics .am-lyrics-panel {
+    display: none !important;
+  }
+
+  /* 隐藏后让封面内容居中 */
+  .mobile-hide-lyrics .am-content {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  /* 确保控制面板在居中时占满宽度 */
+  .mobile-hide-lyrics .am-control-panel {
+    width: 100% !important;
+    max-width: 400px !important;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+}
+</style>
