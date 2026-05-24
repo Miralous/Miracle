@@ -93,7 +93,7 @@ export const globalConfig = {
     modules: {
       banner: {
         imgurl:
-          "https://web.hycdn.cn/endfield/special/over-the-frontier/assets/imgs/0414.51a870.jpg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
+          "https://telegraph-image-92x.pages.dev/file/fdc05b3512c791d116516-b890b5c738c62e31ca.jpg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
         image: "600px", // only work when type is "image", e.g. "65vh"
       },
       pictures: false, // show pictures
