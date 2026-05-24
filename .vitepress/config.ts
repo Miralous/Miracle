@@ -1,6 +1,7 @@
 import path from "path";
+import { defineConfig } from "vitepress";
 
-import { withMermaid } from "vitepress-plugin-mermaid";
+//import { withMermaid } from "vitepress-plugin-mermaid";
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 import { RssPlugin } from "vitepress-plugin-rss";
 import { globalConfig } from "#config";
@@ -36,7 +37,7 @@ const RSS: RSSOptions = {
 };
 
 // https://vitepress.dev/reference/site-config
-export default withMermaid({
+export default defineConfig({
   title: globalConfig.title,
   description: globalConfig.description,
   // plz use vercel!!!!!!!

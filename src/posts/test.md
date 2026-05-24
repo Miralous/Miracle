@@ -144,12 +144,6 @@ Contents to align right
 Contents to align justify
 :::
 
-```mermaid
-flowchart TD
-  Start --> Stop
-```
-
-asdasda
 
 ![idk =100x100](https://agxcoy.shimakaze.org/assets/bottles_main-DQsJgB38.webp)
 ![2](https://agxcoy.shimakaze.org/assets/bottles_new_venv-Fo3s9gYU.webp)
