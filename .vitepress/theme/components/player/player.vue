@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, h } from "vue";
 // prepared
 import { globalConfig } from "#config";
 
@@ -16,7 +16,6 @@ const currentId = ref(props.id);
 const api = globalConfig.netease.metingApi;
 const list = globalConfig.netease.musicList;
 const autoplay = globalConfig.netease.autoplay ?? true;
-
 // 支持从配置中读取歌单 id 列表（兼容字符串 id 数组 或 对象数组 { id: ... }）
 const getListIds = () =>
   Array.isArray(list)
@@ -58,10 +57,13 @@ interface SongData {
 interface LyricLine {
   time: number;
   text: string;
-  tlyric?: string; // 增加翻译字段
+  pairlyric?: string;
+  romanizationslyric?: string;
+  etext: { Duration: number; start: number; end: number; text: string }[];
 }
 
 // State
+let maindate: any;
 const song = ref<SongData | null>(null);
 const lyrics = ref<LyricLine[]>([]);
 const isLoading = ref(true);
@@ -81,59 +83,113 @@ let audioCtx: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let visualizerFrameId = 0;
 
-// 解析 LRC 并处理双语翻译（支持独立行及括号内翻译格式）
-const parseLrc = (lrcString: string) => {
-  const lines = lrcString.split("\n");
-  const lrcMap = new Map<number, LyricLine>();
-  const timeReg = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
-  // 用于提取括号内容的正则
-  const bracketReg = /\((.*?)\)/g;
-
-  for (const line of lines) {
-    const match = line.match(timeReg);
-    if (!match) continue;
-
-    const min = parseInt(match[1], 10);
-    const sec = parseInt(match[2], 10);
-    const ms =
-      match[3].length === 2
-        ? parseInt(match[3], 10) * 10
-        : parseInt(match[3], 10);
-    const timeKey = Math.round((min * 60 + sec + ms / 1000) * 10) / 10;
-
-    // 获取原始文本
-    let rawText = line.replace(timeReg, "").trim();
-    if (!rawText) continue;
-
-    // 提取并处理括号内容作为翻译
-    let tlyric = "";
-    const bracketMatches = rawText.match(bracketReg);
-    if (bracketMatches) {
-      // 提取所有括号内的内容并合并
-      tlyric = bracketMatches.map((m) => m.replace(/[()]/g, "")).join(" ");
-      // 从原文中移除括号部分
-      rawText = rawText.replace(bracketReg, "").trim();
+async function YrcToJson(musicid: string,meta: any){
+    function prpdl(yrc: any, timesec: number){
+        const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
+        let pairif = false;
+        let romaif = false;
+        let pairtext = "";
+        let min_pairtime = 1;
+        let min_romatime = 1;
+        if(yrc.tlyric.lyric){
+            const pairlyrics = yrc.tlyric.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
+            for(let i = 0; i < pairlyrics.length; i++){
+                let lyricMatch = pairlyrics[i].match(timeTagRegex);
+                if(!lyricMatch) continue;
+                let text = lyricMatch[4]
+                const decimal = lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[3]) / 1000) : 0;
+                let timesecp = parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal
+               if(min_pairtime > Math.abs(timesec - timesecp)){
+                        min_pairtime = Math.abs(timesec - timesecp);
+                        pairtext = text.replace('//', '');
+                }
+            }
+            pairif = true;
+        }
+        let romatext = '';
+        if(yrc.romalrc.lyric){
+            const romalyrics = yrc.romalrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
+            for(let i = 0; i < romalyrics.length; i++){
+                let lyricMatch = romalyrics[i].match(timeTagRegex);
+                if(!lyricMatch) continue;
+                let text = lyricMatch[4]
+                const decimal = lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[3]) / 1000) : 0;
+                let timesecp = parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal
+                if(min_romatime > Math.abs(timesec - timesecp)){
+                    min_romatime = Math.abs(timesec - timesecp);
+                    romatext = text;
+                }
+            }
+            romaif = true;
+        }
+        return {pairtext,pairif,romatext,romaif};
     }
-
-    if (lrcMap.has(timeKey)) {
-      // 1. 如果已存在，优先合并已有的 tlyric 或将其设为当前文本（处理独立翻译行情况）
-      const existing = lrcMap.get(timeKey)!;
-      if (!existing.tlyric && tlyric) {
-        existing.tlyric = tlyric;
-      } else if (!existing.tlyric) {
-        existing.tlyric = rawText;
-      }
-    } else {
-      // 2. 新时间点，存入原文与提取到的翻译
-      lrcMap.set(timeKey, {
-        time: timeKey,
-        text: rawText,
-        tlyric: tlyric || undefined,
-      });
+    const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
+    const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
+    const regex = /\((\d+),(\d+),(\d+)\)(.*?)(?=\(\d+,\d+,\d+\)|$)/g;
+    const response = await fetch(`http://38.76.201.17:3000/api/lyric?id=${musicid}`);
+    //暂时的cors代理
+    console.log(response);
+    const datae = await response.json();
+    console.log(datae);
+    const yrc = datae;
+    let json: any ={metadata: {zq:false,m:2,CLXIIIid: '',nolyric: true}, lyrics: [],};
+    if(!yrc.yrc && !yrc.tlyric){
+        //没有歌词（大概率纯音乐）
+        json.metadata.CLXIIIid = musicid
+        json.metadata.nolyric = true
+        return json;
     }
-  }
-  return Array.from(lrcMap.values()).sort((a, b) => a.time - b.time);
-};
+    let pdjg = {pairtext:"",pairif:false,romatext:"",romaif:false};;
+    if(yrc.yrc && yrc.yrc.lyric){
+        yrc.yrc.lyric = yrc.yrc.lyric.replace(/^\uFEFF/, '');
+        const lyrics = yrc.yrc.lyric.split("\n");
+        for(const lyric of lyrics){
+            let lyricMatch = lyric.match(zqTagRegex);
+            let text;
+            let timesec;
+            if(!lyricMatch) continue;
+            text = lyricMatch[3]
+            timesec = lyricMatch[1] / 1000
+            let eljson = [];
+            if (text.includes('(') && text.includes(')')) {
+                let ttt;
+                while ((ttt = regex.exec(lyric)) !== null) {
+                    const Duration = parseInt(ttt[2]) / 1000
+                    const start = parseInt(ttt[1]) / 1000
+                    const totalSecondsEnd = (parseInt(ttt[1])+parseInt(ttt[2]))/1000
+                    const texte = ttt[4]
+                    eljson.push({ Duration: Duration, start: start, end: totalSecondsEnd, text: texte });
+                }
+                if(eljson[eljson.length-1].text=='&nbsp;') eljson.pop();
+                json.metadata.zq = eljson.length > 0;
+            }
+            text = text.replace(/\(\d+,\d+,\d+\)/g, '')
+            pdjg = prpdl(yrc, timesec)
+            json.lyrics.push({time: timesec,text: text,etext: eljson,pairlyric: pdjg.pairtext,romanizationslyric: pdjg.romatext})
+        }
+    }else if(yrc.lrc.lyric){//没有逐字/词歌词
+        let lyrics = yrc.lrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item))
+        for(const lyric of lyrics){
+            let lyricMatch = lyric.match(timeTagRegex);
+            const decimal = lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[3]) / 1000) : 0;
+            let timesec = parseInt(lyricMatch[1])*60+parseInt(lyricMatch[2])+decimal
+            pdjg = prpdl(yrc, timesec)
+            json.lyrics.push({time:timesec,text:lyricMatch[4],pairlyric: pdjg.pairtext,romanizationslyric: pdjg.romatext})
+        }
+    }else{
+        json.metadata.nolyric = true
+    }
+    json.metadata.nolyric = json.lyrics.length===0
+    json.metadata.CLXIIIid = musicid
+    json.metadata.ti = meta.name
+    json.metadata.ar = meta.artist
+    json.metadata.roma = pdjg.romaif
+    json.metadata.pair = pdjg.pairif
+    console.log(json);
+    return json;
+}
+
 
 // 判断是否为纯音乐/无歌词
 const hasLyrics = computed(() => {
@@ -153,13 +209,8 @@ const fetchMusicData = async () => {
       );
       if (track) {
         song.value = track as SongData;
-        if (song.value?.lrc) {
-          const lrcRes = await fetch(song.value.lrc);
-          const lrcText = await lrcRes.text();
-          lyrics.value = parseLrc(lrcText);
-        } else {
-          lyrics.value = [];
-        }
+        maindate = await YrcToJson(currentId.value, song.value);
+        lyrics.value = maindate.lyrics;
         return;
       }
     }
@@ -170,14 +221,8 @@ const fetchMusicData = async () => {
 
     if (Array.isArray(data) && data.length > 0) {
       song.value = data[0];
-
-      if (song.value?.lrc) {
-        const lrcRes = await fetch(song.value.lrc);
-        const lrcText = await lrcRes.text();
-        lyrics.value = parseLrc(lrcText);
-      } else {
-        lyrics.value = [];
-      }
+      maindate = await YrcToJson(currentId.value, song.value);
+      lyrics.value = maindate.lyrics;
     }
   } catch (error) {
     console.error("获取音乐数据失败:", error);
@@ -208,10 +253,11 @@ const tryAutoplay = async () => {
   }
 };
 
-const onTimeUpdate = () => {
+function onTimeUpdate(){
   if (audioRef.value) {
     currentTime.value = audioRef.value.currentTime;
   }
+  requestAnimationFrame(() => onTimeUpdate());
 };
 
 const onLoadedMetadata = async () => {
@@ -257,16 +303,15 @@ const currentLyricIndex = computed(() => {
   }
   return 0;
 });
-
+let activeEl: HTMLElement | null = null;
 // 监听当前歌词索引的变化，平滑滚动
 watch(currentLyricIndex, async (newIndex) => {
   if (newIndex !== -1 && lyricsContainerRef.value) {
     await nextTick();
     const container = lyricsContainerRef.value;
-    const activeEl = container.querySelector(
+    activeEl = container.querySelector(
       ".lyric-line.active",
     ) as HTMLElement;
-
     if (activeEl) {
       const offsetTop = activeEl.offsetTop;
       const scrollPosition =
@@ -356,6 +401,7 @@ const nextSong = () => {
 onMounted(() => {
   loadPlaylist().then(() => fetchMusicData());
 });
+onTimeUpdate()
 </script>
 
 <template>
@@ -408,9 +454,9 @@ onMounted(() => {
         <audio
           ref="audioRef"
           :src="song.url"
+          id="audio"
           :autoplay="autoplay"
           crossorigin="anonymous"
-          @timeupdate="onTimeUpdate"
           @loadedmetadata="onLoadedMetadata"
           @ended="onAudioEnded"
         ></audio>
@@ -428,9 +474,30 @@ onMounted(() => {
           @click="seekAudio({ target: { value: line.time } } as any)"
         >
           <!-- 核心修改 5: 原文与翻译分层显示 -->
-          <span class="lrc-original">{{ line.text }}</span>
-          <span v-if="line.tlyric" class="lrc-translate">{{
-            line.tlyric
+          <span
+            v-if="index === currentLyricIndex && line.etext && maindate.metadata.zq"
+            class="lrc-original"
+          >
+            <span
+              v-for="(seg, segIdx) in line.etext"
+              :key="segIdx"
+              :style="{ '--progress' :
+                currentTime >= seg.start && currentTime <= seg.end?
+                ((currentTime - seg.start) / seg.Duration) * 100 + '%':
+                (currentTime > seg.end?
+                  '100%':
+                  '0%'
+                )
+              }"
+            >{{ seg.text }}</span>
+          </span>
+          <!-- 非高亮行：保持原有纯文本显示 -->
+          <span v-else class="lrc-original">{{ line.text }}</span>
+          <span v-if="line.romanizationslyric" class="lrc-roman">{{
+            line.romanizationslyric
+          }}</span>
+          <span v-if="line.pairlyric" class="lrc-translate">{{
+            line.pairlyric
           }}</span>
         </div>
         <div class="am-lyrics-pad"></div>
@@ -726,14 +793,30 @@ onMounted(() => {
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.3);
   transition: color 0.5s ease;
-}
 
+}
+.lrc-original span {
+  display: inline-block;
+  background: linear-gradient(to right, #ffffff var(--progress, 0%), rgba(255, 255, 255, 0.6) var(--progress, 0%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: --progress 0.1s ease;
+	white-space: normal;
+}
 .lrc-translate {
   font-size: clamp(0.85rem, 1.5vw, 1.1rem);
   font-weight: 500;
   line-height: 1.4;
   margin-top: 0.4rem;
   color: rgba(255, 255, 255, 0.2);
+  transition: color 0.5s ease;
+}
+.lrc-roman {
+  font-weight: 500;
+  font-size:10px;
+  margin: 0rem;
+  color: rgba(255, 255, 255, 0.6);
   transition: color 0.5s ease;
 }
 
