@@ -44,14 +44,16 @@ div.VPLink.no-icon.VPFeature {
  * h1, h2, h3, h4, h5, h6
  * -------------------------------------------------------------------------- */
 
-.VPHome {
+.VPHome,
+.VPDoc {
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--vp-use-mono), var(--vp-font-family-base);
+    font-family: var(--vp-font-family-title);
+    font-weight: 700;
   }
 }
 

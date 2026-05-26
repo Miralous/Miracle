@@ -18,19 +18,9 @@ const defaultLanguage = "en";
 const languageFile = languageMap[defaultLanguage] || en; // do not edit it
 // CONFIGS ----------------------------------------------------------------------
 export const globalConfig = {
-  // Miracle ID Proj.
-  miracle: {
-    // up to 6 digits. use it before looking https://github.com/Miralous/uid-bucket
-    id: "114514",
-    // file source
-    src: "https://raw.githubusercontent.com/Miralous/uid-bucket/refs/heads/main/data.json",
-  },
-
   title: "Silvaire's Blog", // title
   description: "Per Aspera Ad Astra", // description
   author: "Silvaire", // your name
-  cors: "",
-  //cors: "https://cors.qwq.blue/?", // DO NOT USE MINE!!!!!
   favicon:
     "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=4&mask=circle", // favicon (suggest: circle mask)
   url: "https://qwq.blue", // main url (https://xxxx.xxx)
@@ -45,33 +35,18 @@ export const globalConfig = {
   // theme setting
   styles: {
     color: {
-      // [1] Use your own color scheme by adjusting the hue, intensity, and lightness values.
       hue: 280,
-      intensity: {
-        light: 17, // suggestion: 20
-        dark: 15, // suggestion: 15 ~ 20
-      },
-      lightness: {
-        light: 54, // suggestion: 50
-        dark: 47, // suggestion: 55 (it looks like catppuccin + mauve when hue is 300)
-      },
+      globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
         enabled: false, // hue will be cycled
-        speed: 3, // hue is (getCurrentHue() + x) % 360......(updateHue, 100);
+        speed: 10, // hue is (getCurrentHue() + x) % 360......(updateHue, 100);
       }, // copied from 2nd easter egg updated in 2026. (just for fun).
-      // [2] If you are a catppuccin lover, you can enable catppuccin color scheme (hue will be ignored when enabled).
-      // [WARN] You cannot use it with hue settings.
-      catppuccin: {
-        enabled: true, // use catppuccin color scheme (hue will be ignored when enabled)
-        flavor: "macchiato", // catppuccin flavor when using dark mode (frappe / macchiato / mocha)
-        color: "lavender", // catppuccin color (rosewater / flamingo / pink / mauve / red / maroon / peach / yellow / green / teal / sapphire / blue / lavender)
-      },
     },
     visual: {
       transition: 10, // x[s(second(s))] / 100 | e.g. 10 -> 0.1s (default)
       gap: 12, // x[px]
       radius: 26, // x[px]
-      enableCardTitle: false, // show title in custom card (warning, danger...)
+      enableCardTitle: true, // show title in custom card (warning, danger...)
       transparent: false, // transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
       mono: false, // use monospace font for title
@@ -93,10 +68,10 @@ export const globalConfig = {
     modules: {
       banner: {
         imgurl:
-          "https://telegraph-image-92x.pages.dev/file/fdc05b3512c791d116516-b890b5c738c62e31ca.jpg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
-        image: "600px", // only work when type is "image", e.g. "65vh"
+          "https://i.mji.rip/2026/05/26/b15f373cb4e715b252bb9aa3f5687904.jpeg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
+        image: "70vh", // only work when type is "image", e.g. "65vh"
       },
-      pictures: false, // show pictures
+      pictures: true, // show pictures
       lastMoment: true, // last moment
       recentPosts: true, // recent posts
       projects: true, // projects (may be very sloooooow)
@@ -155,8 +130,6 @@ export const globalConfig = {
         { text: languageFile.manager, link: "/manager" },
         // enable / disable comments
         { text: languageFile.whiteboard, link: "/whiteboard" },
-        // enable / disable Miracle ID
-        { text: languageFile.miracle, link: "/miracle" },
       ],
     },
   ],

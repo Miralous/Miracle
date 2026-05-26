@@ -171,6 +171,8 @@ const groupedPhotos = computed(() => {
   }
   return filtered.sort((a, b) => a.category.localeCompare(b.category));
 });
+
+const showPhotosTab = computed(() => !photos || photos.length === 0);
 </script>
 
 <template>
@@ -207,6 +209,7 @@ const groupedPhotos = computed(() => {
       </TagChip>
 
       <TagChip
+        v-if="showPhotosTab"
         :active="activeTab === 'photos'"
         @click="activeTab = 'photos'"
         @mouseenter="handleMouseEnter"
@@ -359,7 +362,7 @@ const groupedPhotos = computed(() => {
 
       <!-- PHOTOS -->
       <div
-        v-if="activeTab === 'photos'"
+        v-if="activeTab === 'photos' && showPhotosTab"
         class="post-card diary"
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"

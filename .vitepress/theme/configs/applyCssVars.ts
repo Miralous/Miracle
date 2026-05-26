@@ -7,10 +7,7 @@ export function applyCssVars() {
 
   const vars = {
     "--hue": styles.color.hue,
-    "--vp-color-intensity-dark": styles.color.intensity.dark / 100,
-    "--vp-color-intensity-light": styles.color.intensity.light / 100,
-    "--vp-color-lightness-dark": styles.color.lightness.dark / 100,
-    "--vp-color-lightness-light": styles.color.lightness.light / 100,
+    "--chue": styles.color.globalHue ? styles.color.hue : 280,
     "--vp-border-radius-1": `${styles.visual.radius}px`,
     "--vp-gap": `${styles.visual.gap}px`,
     "--vp-transition-time": `${0.1 * (styles.visual.transition / 10)}s`,

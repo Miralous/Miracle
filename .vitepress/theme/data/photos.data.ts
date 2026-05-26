@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from "fs";
+import { existsSync, readFileSync, statSync } from "fs";
 import path from "path";
 import { defineLoader } from "vitepress";
 
@@ -8,32 +8,58 @@ export interface Photo {
   path: string;
 }
 
-let data: Photo[];
-
-export { data };
+export let data: Photo[];
 
 export default defineLoader({
-  watch: "public/data/photos/**/*",
+  watch: ["public/data/photos/**/*", "public/data/photos.json"],
 
   load(files) {
     const result: Photo[] = [];
+    const seenPaths = new Set<string>();
 
-    files.forEach((file) => {
+    // 处理所有匹配到的文件，但跳过 JSON 文件
+    for (const file of files) {
+      // 1. 跳过 JSON 文件本身
+      if (file.endsWith(".json")) continue;
+
       const stats = statSync(file);
-      if (!stats.isFile()) return;
+      if (!stats.isFile()) continue;
 
       const relativePath = path.relative("public/data/photos", file);
-      const [category, fileName] = relativePath.split(path.sep);
+      const parts = relativePath.split(path.sep);
+      if (parts.length < 2) continue; // 确保至少是 category/filename 结构
 
-      const nameWithoutExt = fileName.replace(/\.[^/.]+$/, ""); // 去掉扩展名
-      const formattedName = nameWithoutExt.replace(/[-_]/g, " ").toUpperCase(); // 替换 - 和 _ 为空格
+      const category = parts[0];
+      const fileName = parts[parts.length - 1]; // 取最后一个部分作为文件名
 
-      result.push({
-        fileName, //: formattedName,
-        category,
-        path: `/data/photos/${category}/${fileName}`,
-      });
-    });
+      const photoPath = `/data/photos/${category}/${fileName}`;
+      if (seenPaths.has(photoPath)) continue;
+      seenPaths.add(photoPath);
+
+      result.push({ fileName, category, path: photoPath });
+    }
+
+    // 读取 photos.json 并合并
+    const jsonPath = path.resolve(process.cwd(), "public/data/photos.json");
+    if (existsSync(jsonPath)) {
+      const raw = readFileSync(jsonPath, "utf-8");
+      const jsonData = JSON.parse(raw);
+
+      for (const [category, items] of Object.entries(jsonData)) {
+        if (!Array.isArray(items)) continue;
+        for (const item of items) {
+          const photoPath = item.url;
+          if (!photoPath || seenPaths.has(photoPath)) continue;
+          seenPaths.add(photoPath);
+
+          result.push({
+            fileName: item.name ?? photoPath.split("/").pop() ?? "",
+            category,
+            path: photoPath,
+          });
+        }
+      }
+    }
 
     return result;
   },

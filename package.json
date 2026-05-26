@@ -38,10 +38,9 @@
     "typed.js": "^2.1.0"
   },
   "scripts": {
-    "id": "tsx .vitepress/theme/scripts/genId.js",
     "clean": "node .vitepress/theme/scripts/setup.js",
     "dev": "vitepress dev --port 4321",
-    "build": "tsx .vitepress/theme/scripts/genId.js && vitepress build",
+    "build": "vitepress build",
     "preview": "vitepress preview --port 4321",
     "format": "pnpm exec prettier . --write"
   }

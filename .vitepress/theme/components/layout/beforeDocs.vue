@@ -1,84 +1,71 @@
 <template>
-  <div class="vp-doc layout beforeDocs" v-if="frontmatter.title">
-    <div v-if="frontmatter.image">
+  <div
+    class="vp-doc layout beforeDocs"
+    v-if="frontmatter.title"
+    "
+  >
+
+    <div class="textArea card-style" >
+        
+    <div v-if="frontmatter.image" class="image-container">
       <img
         :src="image"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       />
     </div>
-    <div v-else style="height: 50px"></div>
-    <div class="textArea">
-      <div class="miniBar">
+    <div class="textPlace">
+      <div class="meta-bar">
+        <ClientOnly v-if="frontmatter.published">
+          <div class="meta-item">
+            <Icon
+              class="icon"
+              :icon="globalConfig.icon.calendar || 'lucide:pencil'"
+            />
+            <span>{{ formatRelativeDate(frontmatter.published) }}</span>
+          </div>
+        </ClientOnly>
 
-        <div v-if="frontmatter.negative" class="watch negative negativeAll">
-          <Icon class="miniIcon negative negativeIcon" :icon="globalConfig.icon.negative" />
-          <span class="busuanzi negative negativeText"
-            >{{ globalConfig.lang.negative }}</span
-          >
-        </div>
+        <ClientOnly v-if="frontmatter.updated">
+          <div class="meta-item">
+            <Icon
+              class="icon"
+              :icon="globalConfig.icon.time || 'lucide:clock'"
+            />
+            <span>{{ formatRelativeDate(frontmatter.updated) }}</span>
+          </div>
+        </ClientOnly>
 
-        <!-- 📖 新增：字数 -->
-        <div v-if="postInfo.wordCount" class="words">
-          <Icon class="miniIcon" :icon="globalConfig.icon.words" />
-          <span class="busuanzi"
-            >{{ postInfo.wordCount }} {{ globalConfig.lang.words }}</span
-          >
-        </div>
-
-        <!-- ⏱️ 新增：阅读时间 -->
-        <div v-if="postInfo.readingTime" class="reading">
-          <Icon class="miniIcon" :icon="globalConfig.icon.time" />
-          <span class="busuanzi"
-            >{{ postInfo.readingTime }} {{ globalConfig.lang.minutes }}</span
-          >
-        </div>
-
-        <div v-if="frontmatter.origin" class="watch">
-          <Icon class="miniIcon" :icon="globalConfig.icon.link" />
+        <div class="meta-item" v-if="frontmatter.category">
+          <Icon class="icon" :icon="globalConfig.icon.categoryMeta" />
           <a
-            class="busuanzi"
-            :href="frontmatter.origin"
-            style="font-weight: 400"
-            >{{ formatUrl(frontmatter.origin) }}</a
+            class="hover-link"
+            :href="`/archives?category=${frontmatter.category}`"
+            >{{ frontmatter.category }}</a
           >
+        </div>
+        <div v-if="postInfo?.wordCount" class="meta-item hideOnPhone">
+          <Icon class="icon" :icon="globalConfig.icon.words" />
+          <span
+            >{{ postInfo.wordCount }}
+            {{ globalConfig.lang.words || "字" }}</span
+          >
+        </div>
+
+        <div v-if="frontmatter.origin" class="meta-item">
+          <Icon class="icon" :icon="globalConfig.icon.link" />
+          <a class="hover-link" :href="frontmatter.origin" target="_blank">{{
+            formatUrl(frontmatter.origin)
+          }}</a>
         </div>
       </div>
 
       <h1 class="title">
         {{ frontmatter.title }}
       </h1>
-      <p class="desc">{{ frontmatter.description }}</p>
+    </div>
+    </div>
 
-      <div class="anchorContainer">
-        <Icon class="anchor" :icon="globalConfig.icon.calendar" />
-      </div>
-      <ClientOnly>
-        <span class="categoryIcon">{{
-          formatRelativeDate(frontmatter.published)
-        }}</span>
-      </ClientOnly>
-
-      <div class="anchorContainer">
-        <Icon class="anchor" :icon="globalConfig.icon.category" />
-      </div>
-      <a
-        class="categoryIcon"
-        :href="`/archives?category=${frontmatter.category}`"
-        >{{ frontmatter.category }}</a
-      >
-      <div v-if="frontmatter.tags" style="display: inline-block">
-        <div class="anchorContainer">
-          <Icon class="anchor" :icon="globalConfig.icon.tag" />
-        </div>
-        <div class="tags" v-for="(tag, index) in tags" :key="tag">
-          <a class="tag" :href="`/tags?tag=${tag}`">
-            <span class="content">{{ tag }}</span>
-          </a>
-          <span class="and" v-if="index !== tags.length - 1">/</span>
-        </div>
-      </div>
+    <div class="desc-box" v-if="frontmatter.description">
+      <p class="desc"><Icon :icon="globalConfig.icon.sparcle" style="margin-right: calc(var(--vp-gap) / 1.5); position: relative; top: -1px;"/>{{ frontmatter.description }}</p>
     </div>
   </div>
 </template>
@@ -96,10 +83,6 @@ const frontmatter = page.value?.frontmatter || {};
 const postInfo = posts.find((p) => p.filePath === page.value?.filePath);
 
 const image = frontmatter.image
-  ? /^(https?:\/\/)/.test(frontmatter.image)
-    ? frontmatter.image
-    : `${globalConfig.imgBed}${frontmatter.image}`
-  : "";
 
 const tags = Array.isArray(frontmatter.tags)
   ? frontmatter.tags
@@ -107,132 +90,116 @@ const tags = Array.isArray(frontmatter.tags)
 
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 </script>
+
 <style scoped>
 div.vp-doc.layout.beforeDocs {
   display: block;
   z-index: 9999;
+  margin-bottom: 30px;
+}
 
-  img {
-    width: 100% !important;
-    height: 40vh !important;
-    object-fit: cover;
-    background-repeat: no-repeat;
-  }
+/* 头图样式保持 */
+.image-container img {
+  width: 100% !important;
+  height: 40vh !important;
+  object-fit: cover;
+  background-repeat: no-repeat;
+  border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
+  transition: all var(--vp-transition-time);
+  box-shadow: var(--vp-shadow);
+}
 
-  /* 提高文字区域的空间 */
-  @media screen and (min-width: 600px) {
-    .textArea {
-      margin-top: 30px;
-      margin-bottom: 70px;
-    }
-  }
+/* 🌟 卡片整体样式 */
+.card-style {
+  background-color: var(
+    --vp-c-bg-soft
+  ); /* 匹配 Vitepress 的柔和背景色，浅色灰，深色暗 */
+  border-radius: var(--vp-border-radius-1); /* 圆角 */
+}
 
-  @media screen and (max-width: 600px) {
-    .miniBar {
-      flex-wrap: wrap;
-      gap: 0.5rem 0.5rem;
-    }
-    .textArea {
-      margin-top: 30px;
-      margin-bottom: 48px;
-    }
-  }
-
-  .miniBar {
-    margin-bottom: 16px;
-    display: flex;
-    gap: 0.5rem 1rem;
-
-    .watch,
-    .person,
-    .words,
-    .reading {
-      display: flex;
-      align-items: center !important;
-    }
-    .miniIcon {
-      padding: 2px 4px;
-      height: 24px;
-      width: 24px;
-      margin-right: 7px;
-      aspect-ratio: 1;
-      border-radius: var(--vp-border-radius-4);
-      background-color: var(--vp-mini-bg);
-    }
-    .busuanzi {
-      color: var(--vp-c-text-3);
-      opacity: 0.8;
-    }
-  }
-
-  img {
-    border-radius: var(--vp-border-radius-1);
-    transition: all var(--vp-transition-time);
-    box-shadow: var(--vp-shadow);
-  }
-
-  /* Tag */
-  .tags {
-    margin-top: 10px;
-    display: inline-block;
-    .and {
-      opacity: 0.4;
-      margin: 0px 5px;
-    }
-  }
-
-  .tag,
-  .categoryIcon {
-    color: var(--vp-c-text-3);
-    opacity: 0.8;
-    transition: all var(--vp-transition-time);
-    font-size: 14px;
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .categoryIcon {
-    margin-right: 18px;
-    font-weight: 500;
-  }
-
-  .anchorContainer {
-    margin-right: 8px;
-    display: inline-block;
-    padding: 3px 6px;
-    aspect-ratio: 1;
-    background-color: var(--vp-c-brand-soft);
-    color: var(--vp-c-brand-2);
-    border-radius: var(--vp-border-radius-4);
-  }
-
-  /* Descriptions */
-  p.desc {
-    margin: 7px 0 14px 0;
-    color: var(--vp-c-text-3);
-    font-weight: 500;
-    line-height: 24px;
-  }
-
-  .title {
-    display: flex;
-    align-items: center; /* 垂直居中 */
-    margin: 10px 0px;
-  }
-
-  .title:before {
-    content: "‎";
-    display: block;
-    height: 28px;
-    border-radius: 100px;
-    border: 3px solid var(--vp-c-brand);
-    margin-right: 14px;
+/* 调整移动端间距 */
+@media screen and (max-width: 600px) {
+  .card-style {
   }
 }
 
-.negativeIcon {
-  color: var(--vp-c-warning-1);
-  background-color: var(--vp-c-warning-soft) !important;
+/* 顶部元数据栏 */
+.meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px calc(var(--vp-gap) * 1.25);
+  margin-bottom: 28px;
+  span, a {
+  color: var(--vp-c-text-2); /* 柔和的次级文字颜色 */
+  opacity: .8;}
+  font-size: 14.5px;
+   * {font-weight: 400 !important;}
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 重置 Icon 的背景和大小，使其变得极简 */
+.meta-item .icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+}
+
+.hover-link {
+    color: var(--vp-c-text-1);
+    &:hover {
+        opacity: 1 !important;
+        color: var(--vp-c-brand-1) !important;
+    }
+}
+.separator {
+  margin: 0 4px;
+  opacity: 0.4;
+}
+
+/* 📰 标题样式 */
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--vp-c-text-1);
+  /* 使用衬线体来模拟图片里的优雅质感 */
+  font-family: var(--vp-font-family-title);
+  letter-spacing: 0.5px;
+}
+
+/* ✨ 描述区域样式 */
+.desc-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vp-gap);
+  padding: 0 calc(var(--vp-gap) / 2);
+  color: var(--vp-c-text-3);
+  opacity: .8;
+}
+
+.iconify {
+    opacity: 1 !important;
+}
+
+p.desc {
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+.textPlace {
+    
+  padding: calc(var(--vp-gap) * 1.5); /* 增加留白 */
+}
+
+@media screen and (max-width: 700px) {
+    .hideOnPhone {
+        display: none;
+    }
 }
 </style>
