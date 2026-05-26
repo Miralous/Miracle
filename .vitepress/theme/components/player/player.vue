@@ -83,113 +83,155 @@ let audioCtx: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let visualizerFrameId = 0;
 
-async function YrcToJson(musicid: string,meta: any){
-    function prpdl(yrc: any, timesec: number){
-        const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
-        let pairif = false;
-        let romaif = false;
-        let pairtext = "";
-        let min_pairtime = 1;
-        let min_romatime = 1;
-        if(yrc.tlyric.lyric){
-            const pairlyrics = yrc.tlyric.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
-            for(let i = 0; i < pairlyrics.length; i++){
-                let lyricMatch = pairlyrics[i].match(timeTagRegex);
-                if(!lyricMatch) continue;
-                let text = lyricMatch[4]
-                const decimal = lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[3]) / 1000) : 0;
-                let timesecp = parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal
-               if(min_pairtime > Math.abs(timesec - timesecp)){
-                        min_pairtime = Math.abs(timesec - timesecp);
-                        pairtext = text.replace('//', '');
-                }
-            }
-            pairif = true;
-        }
-        let romatext = '';
-        if(yrc.romalrc.lyric){
-            const romalyrics = yrc.romalrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
-            for(let i = 0; i < romalyrics.length; i++){
-                let lyricMatch = romalyrics[i].match(timeTagRegex);
-                if(!lyricMatch) continue;
-                let text = lyricMatch[4]
-                const decimal = lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[3]) / 1000) : 0;
-                let timesecp = parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal
-                if(min_romatime > Math.abs(timesec - timesecp)){
-                    min_romatime = Math.abs(timesec - timesecp);
-                    romatext = text;
-                }
-            }
-            romaif = true;
-        }
-        return {pairtext,pairif,romatext,romaif};
-    }
+async function YrcToJson(musicid: string, meta: any) {
+  function prpdl(yrc: any, timesec: number) {
     const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
-    const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
-    const regex = /\((\d+),(\d+),(\d+)\)(.*?)(?=\(\d+,\d+,\d+\)|$)/g;
-    const response = await fetch(`https://cors.emnasop.cn/api/lyric?id=${musicid}`);
-    //暂时的cors代理
-    console.log(response);
-    const datae = await response.json();
-    console.log(datae);
-    const yrc = datae;
-    let json: any ={metadata: {zq:false,m:2,CLXIIIid: '',nolyric: true}, lyrics: [],};
-    if(!yrc.yrc && !yrc.tlyric){
-        //没有歌词（大概率纯音乐）
-        json.metadata.CLXIIIid = musicid
-        json.metadata.nolyric = true
-        return json;
-    }
-    let pdjg = {pairtext:"",pairif:false,romatext:"",romaif:false};;
-    if(yrc.yrc && yrc.yrc.lyric){
-        yrc.yrc.lyric = yrc.yrc.lyric.replace(/^\uFEFF/, '');
-        const lyrics = yrc.yrc.lyric.split("\n");
-        for(const lyric of lyrics){
-            let lyricMatch = lyric.match(zqTagRegex);
-            let text;
-            let timesec;
-            if(!lyricMatch) continue;
-            text = lyricMatch[3]
-            timesec = lyricMatch[1] / 1000
-            let eljson = [];
-            if (text.includes('(') && text.includes(')')) {
-                let ttt;
-                while ((ttt = regex.exec(lyric)) !== null) {
-                    const Duration = parseInt(ttt[2]) / 1000
-                    const start = parseInt(ttt[1]) / 1000
-                    const totalSecondsEnd = (parseInt(ttt[1])+parseInt(ttt[2]))/1000
-                    const texte = ttt[4]
-                    eljson.push({ Duration: Duration, start: start, end: totalSecondsEnd, text: texte });
-                }
-                if(eljson[eljson.length-1].text=='&nbsp;') eljson.pop();
-                json.metadata.zq = eljson.length > 0;
-            }
-            text = text.replace(/\(\d+,\d+,\d+\)/g, '')
-            pdjg = prpdl(yrc, timesec)
-            json.lyrics.push({time: timesec,text: text,etext: eljson,pairlyric: pdjg.pairtext,romanizationslyric: pdjg.romatext})
+    let pairif = false;
+    let romaif = false;
+    let pairtext = "";
+    let min_pairtime = 1;
+    let min_romatime = 1;
+    if (yrc.tlyric.lyric) {
+      const pairlyrics = yrc.tlyric.lyric
+        .split("\n")
+        .filter((item: string) => timeTagRegex.test(item));
+      for (let i = 0; i < pairlyrics.length; i++) {
+        let lyricMatch = pairlyrics[i].match(timeTagRegex);
+        if (!lyricMatch) continue;
+        let text = lyricMatch[4];
+        const decimal = lyricMatch[3]
+          ? lyricMatch[3].toString().length === 2
+            ? parseInt(lyricMatch[3]) / 100
+            : parseInt(lyricMatch[3]) / 1000
+          : 0;
+        let timesecp =
+          parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal;
+        if (min_pairtime > Math.abs(timesec - timesecp)) {
+          min_pairtime = Math.abs(timesec - timesecp);
+          pairtext = text.replace("//", "");
         }
-    }else if(yrc.lrc.lyric){//没有逐字/词歌词
-        let lyrics = yrc.lrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item))
-        for(const lyric of lyrics){
-            let lyricMatch = lyric.match(timeTagRegex);
-            const decimal = lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[3]) / 1000) : 0;
-            let timesec = parseInt(lyricMatch[1])*60+parseInt(lyricMatch[2])+decimal
-            pdjg = prpdl(yrc, timesec)
-            json.lyrics.push({time:timesec,text:lyricMatch[4],pairlyric: pdjg.pairtext,romanizationslyric: pdjg.romatext})
-        }
-    }else{
-        json.metadata.nolyric = true
+      }
+      pairif = true;
     }
-    json.metadata.nolyric = json.lyrics.length===0
-    json.metadata.CLXIIIid = musicid
-    json.metadata.ti = meta.name
-    json.metadata.ar = meta.artist
-    json.metadata.roma = pdjg.romaif
-    json.metadata.pair = pdjg.pairif
-    console.log(json);
+    let romatext = "";
+    if (yrc.romalrc.lyric) {
+      const romalyrics = yrc.romalrc.lyric
+        .split("\n")
+        .filter((item: string) => timeTagRegex.test(item));
+      for (let i = 0; i < romalyrics.length; i++) {
+        let lyricMatch = romalyrics[i].match(timeTagRegex);
+        if (!lyricMatch) continue;
+        let text = lyricMatch[4];
+        const decimal = lyricMatch[3]
+          ? lyricMatch[3].toString().length === 2
+            ? parseInt(lyricMatch[3]) / 100
+            : parseInt(lyricMatch[3]) / 1000
+          : 0;
+        let timesecp =
+          parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal;
+        if (min_romatime > Math.abs(timesec - timesecp)) {
+          min_romatime = Math.abs(timesec - timesecp);
+          romatext = text;
+        }
+      }
+      romaif = true;
+    }
+    return { pairtext, pairif, romatext, romaif };
+  }
+  const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
+  const zqTagRegex = /\[(\d+),(\d+)?\](.*)/;
+  const regex = /\((\d+),(\d+),(\d+)\)(.*?)(?=\(\d+,\d+,\d+\)|$)/g;
+  const response = await fetch(
+    `https://cors.emnasop.cn/api/lyric?id=${musicid}`,
+  );
+  //暂时的cors代理
+  console.log(response);
+  const datae = await response.json();
+  console.log(datae);
+  const yrc = datae;
+  let json: any = {
+    metadata: { zq: false, m: 2, CLXIIIid: "", nolyric: true },
+    lyrics: [],
+  };
+  if (!yrc.yrc && !yrc.tlyric) {
+    //没有歌词（大概率纯音乐）
+    json.metadata.CLXIIIid = musicid;
+    json.metadata.nolyric = true;
     return json;
+  }
+  let pdjg = { pairtext: "", pairif: false, romatext: "", romaif: false };
+  if (yrc.yrc && yrc.yrc.lyric) {
+    yrc.yrc.lyric = yrc.yrc.lyric.replace(/^\uFEFF/, "");
+    const lyrics = yrc.yrc.lyric.split("\n");
+    for (const lyric of lyrics) {
+      let lyricMatch = lyric.match(zqTagRegex);
+      let text;
+      let timesec;
+      if (!lyricMatch) continue;
+      text = lyricMatch[3];
+      timesec = lyricMatch[1] / 1000;
+      let eljson = [];
+      if (text.includes("(") && text.includes(")")) {
+        let ttt;
+        while ((ttt = regex.exec(lyric)) !== null) {
+          const Duration = parseInt(ttt[2]) / 1000;
+          const start = parseInt(ttt[1]) / 1000;
+          const totalSecondsEnd = (parseInt(ttt[1]) + parseInt(ttt[2])) / 1000;
+          const texte = ttt[4];
+          eljson.push({
+            Duration: Duration,
+            start: start,
+            end: totalSecondsEnd,
+            text: texte,
+          });
+        }
+        if (eljson[eljson.length - 1].text == "&nbsp;") eljson.pop();
+        json.metadata.zq = eljson.length > 0;
+      }
+      text = text.replace(/\(\d+,\d+,\d+\)/g, "");
+      pdjg = prpdl(yrc, timesec);
+      json.lyrics.push({
+        time: timesec,
+        text: text,
+        etext: eljson,
+        pairlyric: pdjg.pairtext,
+        romanizationslyric: pdjg.romatext,
+      });
+    }
+  } else if (yrc.lrc.lyric) {
+    //没有逐字/词歌词
+    let lyrics = yrc.lrc.lyric
+      .split("\n")
+      .filter((item: string) => timeTagRegex.test(item));
+    for (const lyric of lyrics) {
+      let lyricMatch = lyric.match(timeTagRegex);
+      const decimal = lyricMatch[3]
+        ? lyricMatch[3].toString().length === 2
+          ? parseInt(lyricMatch[3]) / 100
+          : parseInt(lyricMatch[3]) / 1000
+        : 0;
+      let timesec =
+        parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal;
+      pdjg = prpdl(yrc, timesec);
+      json.lyrics.push({
+        time: timesec,
+        text: lyricMatch[4],
+        pairlyric: pdjg.pairtext,
+        romanizationslyric: pdjg.romatext,
+      });
+    }
+  } else {
+    json.metadata.nolyric = true;
+  }
+  json.metadata.nolyric = json.lyrics.length === 0;
+  json.metadata.CLXIIIid = musicid;
+  json.metadata.ti = meta.name;
+  json.metadata.ar = meta.artist;
+  json.metadata.roma = pdjg.romaif;
+  json.metadata.pair = pdjg.pairif;
+  console.log(json);
+  return json;
 }
-
 
 // 判断是否为纯音乐/无歌词
 const hasLyrics = computed(() => {
@@ -253,12 +295,12 @@ const tryAutoplay = async () => {
   }
 };
 
-function onTimeUpdate(){
+function onTimeUpdate() {
   if (audioRef.value) {
     currentTime.value = audioRef.value.currentTime;
   }
   requestAnimationFrame(() => onTimeUpdate());
-};
+}
 
 const onLoadedMetadata = async () => {
   if (audioRef.value) {
@@ -309,9 +351,7 @@ watch(currentLyricIndex, async (newIndex) => {
   if (newIndex !== -1 && lyricsContainerRef.value) {
     await nextTick();
     const container = lyricsContainerRef.value;
-    activeEl = container.querySelector(
-      ".lyric-line.active",
-    ) as HTMLElement;
+    activeEl = container.querySelector(".lyric-line.active") as HTMLElement;
     if (activeEl) {
       const offsetTop = activeEl.offsetTop;
       const scrollPosition =
@@ -401,7 +441,7 @@ const nextSong = () => {
 onMounted(() => {
   loadPlaylist().then(() => fetchMusicData());
 });
-onTimeUpdate()
+onTimeUpdate();
 </script>
 
 <template>
@@ -475,21 +515,24 @@ onTimeUpdate()
         >
           <!-- 核心修改 5: 原文与翻译分层显示 -->
           <span
-            v-if="index === currentLyricIndex && line.etext && maindate.metadata.zq"
+            v-if="
+              index === currentLyricIndex && line.etext && maindate.metadata.zq
+            "
             class="lrc-original"
           >
             <span
               v-for="(seg, segIdx) in line.etext"
               :key="segIdx"
-              :style="{ '--progress' :
-                currentTime >= seg.start && currentTime <= seg.end?
-                ((currentTime - seg.start) / seg.Duration) * 100 + '%':
-                (currentTime > seg.end?
-                  '100%':
-                  '0%'
-                )
+              :style="{
+                '--progress':
+                  currentTime >= seg.start && currentTime <= seg.end
+                    ? ((currentTime - seg.start) / seg.Duration) * 100 + '%'
+                    : currentTime > seg.end
+                      ? '100%'
+                      : '0%',
               }"
-            >{{ seg.text }}</span>
+              >{{ seg.text }}</span
+            >
           </span>
           <!-- 非高亮行：保持原有纯文本显示 -->
           <span v-else class="lrc-original">{{ line.text }}</span>
@@ -505,7 +548,6 @@ onTimeUpdate()
     </div>
   </div>
 </template>
-
 <style scoped>
 /* 核心修改 1: 控制高度在一屏以内 */
 .am-player-wrapper {
@@ -513,7 +555,7 @@ onTimeUpdate()
   width: 100%;
   overflow: hidden;
   font-family: var(--vp-font-family-base);
-  height: calc(100vh - var(--vp-nav-height)); /* 使用 clamp 限制最大最小高度 */
+  height: 100vh; /* 使用 clamp 限制最大最小高度 */
   display: flex;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
@@ -793,16 +835,19 @@ onTimeUpdate()
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.3);
   transition: color 0.5s ease;
-
 }
 .lrc-original span {
   display: inline-block;
-  background: linear-gradient(to right, #ffffff var(--progress, 0%), rgba(255, 255, 255, 0.6) var(--progress, 0%));
+  background: linear-gradient(
+    to right,
+    #ffffff var(--progress, 0%),
+    rgba(255, 255, 255, 0.6) var(--progress, 0%)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   transition: --progress 0.1s ease;
-	white-space: normal;
+  white-space: normal;
 }
 .lrc-translate {
   font-size: clamp(0.85rem, 1.5vw, 1.1rem);
@@ -814,7 +859,7 @@ onTimeUpdate()
 }
 .lrc-roman {
   font-weight: 500;
-  font-size:10px;
+  font-size: 10px;
   margin: 0rem;
   color: rgba(255, 255, 255, 0.6);
   transition: color 0.5s ease;
