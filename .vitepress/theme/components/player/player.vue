@@ -127,7 +127,7 @@ async function YrcToJson(musicid: string,meta: any){
     const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
     const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
     const regex = /\((\d+),(\d+),(\d+)\)(.*?)(?=\(\d+,\d+,\d+\)|$)/g;
-    const response = await fetch(`http://38.76.201.17:3000/api/lyric?id=${musicid}`);
+    const response = await fetch(`https://cors.emnasop.cn/api/lyric?id=${musicid}`);
     //暂时的cors代理
     console.log(response);
     const datae = await response.json();
