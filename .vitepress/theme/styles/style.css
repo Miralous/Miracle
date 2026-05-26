@@ -10,7 +10,7 @@
 @import url("./default.css");
 @import url("./components.css");
 @import url("./twikoo.css");
-@import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css");
+@import url("katex/dist/katex.min.css");
 @import url("https://rsms.me/inter/inter.css");
 @import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
 
