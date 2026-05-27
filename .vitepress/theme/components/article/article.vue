@@ -237,7 +237,7 @@ watch(showNegative, (val) => {
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        anchorIcon="£"
+        anchorIcon="~/"
         :active="selectedCategory === category"
         :label="category"
         :count="categoryCounts[category]"
