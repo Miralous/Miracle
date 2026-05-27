@@ -342,4 +342,37 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@media (max-width: 768px) {
+  .timeline-item {
+    padding: 0.8rem 1rem 0.8rem 28px;
+    flex-direction: column;
+  }
+  .timeline-item::after {
+    left: 13px;
+  }
+  .year-timeline-content .timeline-item:first-child::after {
+    top: 1.25rem;
+  }
+  .year-timeline-content .timeline-item:last-child::after {
+    bottom: calc(100% - 1.25rem);
+  }
+  .timeline-item::before {
+    left: 14px;
+    top: 1.25rem;
+  }
+  .time-text {
+    position: relative;
+    transform: none;
+    top: auto;
+    left: auto;
+    width: auto;
+    text-align: left;
+    margin-bottom: 0.3rem;
+    line-height: 1;
+  }
+  .timeline-content-box {
+    padding-right: 0;
+  }
+}
 </style>
