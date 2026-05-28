@@ -276,7 +276,11 @@ export const globalConfig = {
   netease: {
     musicList: "17942010185",
     metingApi: "https://api.qijieya.cn/meting",
-    autoplay: true,
+    demoMode: true, // hide control buttons
+    showTranslation: true, // show translation of lyrics (default: false, set true to show)
+    showRoman: false, // show romanization of lyrics (default: false, set true to show)
+    autoplay: true, // auto play music when page loaded
+    visualizer: false, // show visualizer at the bottom of player (default: false, set true to show)
     musicSlice: 20, // how many singer to display in music list (default: 20, set 0 to display all)
   },
 

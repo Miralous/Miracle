@@ -17,17 +17,19 @@ const api = globalConfig.netease.metingApi;
 const list = globalConfig.netease.musicList;
 const autoplay = globalConfig.netease.autoplay ?? true;
 // 支持从配置中读取歌单 id 列表（兼容字符串 id 数组 或 对象数组 { id: ... }）
-async function getListIds(){
+async function getListIds() {
   try {
-    const date = await fetch(`${api}/?type=playlist&id=${list}`)
+    const date = await fetch(`${api}/?type=playlist&id=${list}`);
     return Array.isArray(date)
-      ? date.map((it: any) => (typeof it === "string" ? it : it.url.match(/\d+$/)?.[0] || ""))
+      ? date.map((it: any) =>
+          typeof it === "string" ? it : it.url.match(/\d+$/)?.[0] || "",
+        )
       : [];
   } catch (e) {
     console.error("getListIds失败:", e);
     return [];
   }
-};
+}
 // 如果配置是歌单 id（非数组），则获取歌单曲目
 const playlistTracks = ref<SongData[]>([]);
 
@@ -264,7 +266,7 @@ const fetchMusicData = async () => {
         song.value = track as SongData;
         maindate = await YrcToJson(currentId.value, song.value);
         lyrics.value = maindate.lyrics;
-        mediaSession()
+        mediaSession();
         return;
       }
     }
@@ -277,7 +279,7 @@ const fetchMusicData = async () => {
       song.value = data[0];
       maindate = await YrcToJson(currentId.value, song.value);
       lyrics.value = maindate.lyrics;
-      mediaSession()
+      mediaSession();
     }
   } catch (error) {
     console.error("获取音乐数据失败:", error);
@@ -292,12 +294,12 @@ function mediaSession() {
       artist: song.value?.artist || "Unknown Artist",
       //album: song.value?.album || "Unknown Album", 部分meting接口没有返回专辑信息，暂不使用
       artwork: [
-      {
-        src: song.value?.pic || "",
-        sizes: "1400x1400",
-        type: "image/jpeg"
-      }
-      ]
+        {
+          src: song.value?.pic || "",
+          sizes: "1400x1400",
+          type: "image/jpeg",
+        },
+      ],
     });
   }
 }
@@ -376,19 +378,22 @@ const currentLyricIndex = computed(() => {
 });
 function document_title_change() {
   const main_title = `${song.value?.name || "Unknown Title"} - ${song.value?.artist || "Unknown Artist"} | ${globalConfig.author}'s Music Player`;
-	if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
-		if(currentLyricIndex.value !== -1 && document.title !== lyrics.value[currentLyricIndex.value].text){
-			document.title = lyrics.value[currentLyricIndex.value].text;
-		}
-	}else if (document.title !== main_title){
-		document.title = main_title;
-	}
+  if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
+    if (
+      currentLyricIndex.value !== -1 &&
+      document.title !== lyrics.value[currentLyricIndex.value].text
+    ) {
+      document.title = lyrics.value[currentLyricIndex.value].text;
+    }
+  } else if (document.title !== main_title) {
+    document.title = main_title;
+  }
 }
 let activeEl: HTMLElement | null = null;
 // 监听当前歌词索引的变化，平滑滚动
 watch(currentLyricIndex, async (newIndex) => {
   if (newIndex !== -1 && lyricsContainerRef.value) {
-    console.log(dataArray)
+    console.log(dataArray);
     await nextTick();
     const container = lyricsContainerRef.value;
     activeEl = container.querySelector(".lyric-line.active") as HTMLElement;
@@ -425,8 +430,8 @@ const findCurrentIndex = async () => {
   if (playlistTracks.value.length > 0) {
     const date = playlistTracks.value.findIndex(
       (t) => String(t.url.match(/\d+$/)) == String(currentId.value),
-    )
-    if(date !== -1){
+    );
+    if (date !== -1) {
       return date;
     }
   }
@@ -440,11 +445,12 @@ const playAtIndex = async (index: number) => {
   if (playlistTracks.value.length > 0) {
     const safeIndex =
       (index + playlistTracks.value.length) % playlistTracks.value.length;
-    currentId.value = playlistTracks.value[safeIndex].url.match(/\d+$/)?.[0] || currentId.value;
+    currentId.value =
+      playlistTracks.value[safeIndex].url.match(/\d+$/)?.[0] || currentId.value;
     console.log("切换到歌单中的歌曲，ID:", currentId.value);
     await fetchMusicData();
     await nextTick();
-    history.pushState(null, '', '/player?id=' + currentId.value);
+    history.pushState(null, "", "/player?id=" + currentId.value);
     if (audioRef.value) {
       try {
         await audioRef.value.play();
@@ -484,17 +490,20 @@ const nextSong = async () => {
   playAtIndex(idx + 1);
 };
 let visualizerInitialized = false;
-watch(() => song.value?.url, async () => {
-  // 断开旧连接
-  if (sourceNode) {
-    sourceNode.disconnect();
-    sourceNode = null;
-  }
-  visualizerInitialized = false;
-  analyser = null;
-  await nextTick();
-  draw();
-});
+watch(
+  () => song.value?.url,
+  async () => {
+    // 断开旧连接
+    if (sourceNode) {
+      sourceNode.disconnect();
+      sourceNode = null;
+    }
+    visualizerInitialized = false;
+    analyser = null;
+    await nextTick();
+    draw();
+  },
+);
 
 function draw() {
   if (!audioRef.value || !canvasRef.value) {
@@ -521,9 +530,12 @@ function draw() {
   canvasRef.value.width = window.innerWidth;
   if (!ctx || !analyser) return;
   bufferLength = analyser.frequencyBinCount;
-  dataArray = new (window.Uint8Array as { new(length: number): Uint8Array })(bufferLength);
+  dataArray = new (window.Uint8Array as { new (length: number): Uint8Array })(
+    bufferLength,
+  );
   function a_draw() {
-    if (!audioRef.value || !canvasRef.value || !ctx || !analyser || !dataArray) return;
+    if (!audioRef.value || !canvasRef.value || !ctx || !analyser || !dataArray)
+      return;
     let barWidth = (canvasRef.value.width / bufferLength) * 1.5;
     analyser.getByteFrequencyData(dataArray);
     barWidth = 25;
@@ -531,7 +543,7 @@ function draw() {
     let barHeight;
     let x = 0;
     for (let i = 0; i < bufferLength; i++) {
-      barHeight = dataArray[i]/2.7;
+      barHeight = dataArray[i] / 2.7;
       ctx.fillStyle = "white";
       ctx.fillRect(x, canvasRef.value.height - barHeight, barWidth, barHeight);
       x += barWidth + 1;
@@ -542,9 +554,12 @@ function draw() {
 }
 
 // 每次音频切换都重新初始化可视化
-watch(() => song.value?.url, () => {
-  nextTick(() => draw());
-});
+watch(
+  () => song.value?.url,
+  () => {
+    nextTick(() => draw());
+  },
+);
 
 // 组件挂载时初始化
 onMounted(() => {
@@ -599,7 +614,10 @@ onTimeUpdate();
           />
           <span class="am-time">{{ formatTime(duration) }}</span>
         </div>
-        <div class="am-control-button-container">
+        <div
+          class="am-control-button-container"
+          v-if="globalConfig.netease.demoMode"
+        >
           <button class="am-control-button" @click="prevSong">
             <icon :icon="globalConfig.icon.previous_song" />
           </button>
@@ -655,24 +673,40 @@ onTimeUpdate();
               >{{ seg.text }}</span
             >
           </span>
-          <span v-else-if="index < currentLyricIndex" class="lrc-original-passed">
+          <span
+            v-else-if="index < currentLyricIndex"
+            class="lrc-original-passed"
+          >
             {{ line.text }}
           </span>
           <span v-else class="lrc-original">{{ line.text }}</span>
-          <span v-if="line.romanizationslyric" class="lrc-roman">{{
-            line.romanizationslyric
-          }}</span>
-          <span v-if="line.pairlyric" class="lrc-translate">{{
-            line.pairlyric
-          }}</span>
+          <span
+            v-if="line.romanizationslyric && globalConfig.netease.showRoman"
+            class="lrc-roman"
+            >{{ line.romanizationslyric }}</span
+          >
+          <span
+            v-if="line.pairlyric && globalConfig.netease.showTranslation"
+            class="lrc-translate"
+            >{{ line.pairlyric }}</span
+          >
         </div>
         <div class="am-lyrics-pad"></div>
       </div>
-      <canvas ref="canvasRef" class="am-visualizer" width="100%" height="150"></canvas>
+      <canvas
+        ref="canvasRef"
+        class="am-visualizer"
+        width="100%"
+        height="150"
+        v-if="globalConfig.netease.visualizer"
+      ></canvas>
     </div>
   </div>
 </template>
 <style scoped>
+* {
+  user-select: none;
+}
 /* 核心修改 1: 控制高度在一屏以内 */
 .am-player-wrapper {
   position: relative;
@@ -768,11 +802,9 @@ onTimeUpdate();
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 30%;
+  height: 20%;
   z-index: -1;
-  opacity: 0.8;
-  /* 底部淡出边缘效果 */
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, transparent 100%);
+  opacity: 0.5;
   -webkit-mask-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 1) 0%,
@@ -810,19 +842,23 @@ onTimeUpdate();
   gap: 1rem;
   margin-top: calc(var(--vp-gap) * 2);
 }
-.am-control-button-container{
-  margin-top: 10px;
+.am-control-button-container {
+  margin-top: calc(var(--vp-gap) * 2);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   max-width: 320px;
-  gap: 1rem;
+  gap: 2.5rem;
 }
-.am-control-button{
+.am-control-button {
   background: transparent;
   border: none;
   font-size: 30px;
+  transition: all calc(var(--vp-transition-time) * 1.5);
+  &:hover {
+    scale: 1.07;
+  }
 }
 .am-time {
   font-size: 0.8rem;
@@ -962,13 +998,13 @@ onTimeUpdate();
   transform-origin: left center;
   transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: pointer;
-  filter: blur(1px);
+  filter: blur(2px);
 }
 
 /* 核心修改 5: 歌词与翻译文字排版 */
 .lrc-original {
   font-size: clamp(1.2rem, 3vw, 1.8rem);
-  font-weight: 700;
+  font-weight: 700 !important;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.3);
   transition: color 0.5s ease;
@@ -990,7 +1026,7 @@ onTimeUpdate();
   font-size: clamp(1.2rem, 3vw, 1.8rem);
   font-weight: 700;
   line-height: 1.4;
-  color: #cccccc;
+  color: rgba(255, 255, 255, 0.3);
   transition: color 0.5s ease;
 }
 .lrc-translate {
@@ -1016,11 +1052,19 @@ onTimeUpdate();
 .lyric-line.active {
   filter: blur(0);
   transform: scale(1.05);
+  &,
+  span {
+    font-weight: 700 !important;
+  }
 }
 
 .lyric-line.active .lrc-original {
   color: #ffffff;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  &,
+  span {
+    font-weight: 700 !important;
+  }
 }
 
 .lyric-line.active .lrc-translate {
@@ -1081,5 +1125,8 @@ onTimeUpdate();
     margin-top: auto;
     margin-bottom: auto;
   }
+}
+.iconify {
+  color: #fff !important;
 }
 </style>
