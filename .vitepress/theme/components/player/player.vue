@@ -17,11 +17,17 @@ const api = globalConfig.netease.metingApi;
 const list = globalConfig.netease.musicList;
 const autoplay = globalConfig.netease.autoplay ?? true;
 // 支持从配置中读取歌单 id 列表（兼容字符串 id 数组 或 对象数组 { id: ... }）
-const getListIds = () =>
-  Array.isArray(list)
-    ? list.map((it: any) => (typeof it === "string" ? it : it.id))
-    : [];
-
+async function getListIds(){
+  try {
+    const date = await fetch(`${api}/?type=playlist&id=${list}`)
+    return Array.isArray(date)
+      ? date.map((it: any) => (typeof it === "string" ? it : it.url.match(/\d+$/)?.[0] || ""))
+      : [];
+  } catch (e) {
+    console.error("getListIds失败:", e);
+    return [];
+  }
+};
 // 如果配置是歌单 id（非数组），则获取歌单曲目
 const playlistTracks = ref<SongData[]>([]);
 
@@ -79,8 +85,12 @@ const duration = ref(0);
 const isTrial = ref(false); // 30秒试听标记
 
 // 音频可视化相关变量
-let audioCtx: AudioContext | null = null;
+let audioContext: (AudioContext & { close?: () => void }) | null = null;
 let analyser: AnalyserNode | null = null;
+let sourceNode: MediaElementAudioSourceNode | null = null;
+let bufferLength = 0;
+let dataArray: Uint8Array | null = null;
+let ctx: CanvasRenderingContext2D | null = null;
 let visualizerFrameId = 0;
 
 async function YrcToJson(musicid: string, meta: any) {
@@ -246,6 +256,7 @@ const fetchMusicData = async () => {
     isLoading.value = true;
     // 优先使用已加载的歌单数据（playlist API 返回的对象已包含 url/pic/lrc 等）
     if (playlistTracks.value.length > 0) {
+      console.log(playlistTracks.value);
       const track = playlistTracks.value.find(
         (t) => String(t.id) === String(currentId.value),
       );
@@ -253,6 +264,7 @@ const fetchMusicData = async () => {
         song.value = track as SongData;
         maindate = await YrcToJson(currentId.value, song.value);
         lyrics.value = maindate.lyrics;
+        mediaSession()
         return;
       }
     }
@@ -265,6 +277,7 @@ const fetchMusicData = async () => {
       song.value = data[0];
       maindate = await YrcToJson(currentId.value, song.value);
       lyrics.value = maindate.lyrics;
+      mediaSession()
     }
   } catch (error) {
     console.error("获取音乐数据失败:", error);
@@ -272,7 +285,22 @@ const fetchMusicData = async () => {
     isLoading.value = false;
   }
 };
-
+function mediaSession() {
+  if ("mediaSession" in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.value?.name || "Unknown Title",
+      artist: song.value?.artist || "Unknown Artist",
+      //album: song.value?.album || "Unknown Album", 部分meting接口没有返回专辑信息，暂不使用
+      artwork: [
+      {
+        src: song.value?.pic || "",
+        sizes: "1400x1400",
+        type: "image/jpeg"
+      }
+      ]
+    });
+  }
+}
 // 播放控制
 const togglePlay = () => {
   if (!audioRef.value) return;
@@ -310,6 +338,7 @@ const onLoadedMetadata = async () => {
       isTrial.value = true;
     }
     await tryAutoplay();
+    draw();
   }
 };
 
@@ -345,10 +374,21 @@ const currentLyricIndex = computed(() => {
   }
   return 0;
 });
+function document_title_change() {
+  const main_title = `${song.value?.name || "Unknown Title"} - ${song.value?.artist || "Unknown Artist"} | ${globalConfig.author}'s Music Player`;
+	if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
+		if(currentLyricIndex.value !== -1 && document.title !== lyrics.value[currentLyricIndex.value].text){
+			document.title = lyrics.value[currentLyricIndex.value].text;
+		}
+	}else if (document.title !== main_title){
+		document.title = main_title;
+	}
+}
 let activeEl: HTMLElement | null = null;
 // 监听当前歌词索引的变化，平滑滚动
 watch(currentLyricIndex, async (newIndex) => {
   if (newIndex !== -1 && lyricsContainerRef.value) {
+    console.log(dataArray)
     await nextTick();
     const container = lyricsContainerRef.value;
     activeEl = container.querySelector(".lyric-line.active") as HTMLElement;
@@ -381,24 +421,30 @@ const formatTime = (time: number) => {
 };
 
 // 切歌相关逻辑
-const findCurrentIndex = () => {
+const findCurrentIndex = async () => {
   if (playlistTracks.value.length > 0) {
-    return playlistTracks.value.findIndex(
-      (t) => String(t.id) === String(currentId.value),
-    );
+    const date = playlistTracks.value.findIndex(
+      (t) => String(t.url.match(/\d+$/)) == String(currentId.value),
+    )
+    if(date !== -1){
+      return date;
+    }
   }
-  const ids = getListIds();
+  const ids = await getListIds();
   return ids.indexOf(String(currentId.value));
 };
 
 const playAtIndex = async (index: number) => {
+  console.log("请求切歌，目标索引:", index);
   // 如果使用 playlist API 返回的曲目列表，直接从中切换以避免重复请求
   if (playlistTracks.value.length > 0) {
     const safeIndex =
       (index + playlistTracks.value.length) % playlistTracks.value.length;
-    currentId.value = playlistTracks.value[safeIndex].id || currentId.value;
+    currentId.value = playlistTracks.value[safeIndex].url.match(/\d+$/)?.[0] || currentId.value;
+    console.log("切换到歌单中的歌曲，ID:", currentId.value);
     await fetchMusicData();
     await nextTick();
+    history.pushState(null, '', '/player?id=' + currentId.value);
     if (audioRef.value) {
       try {
         await audioRef.value.play();
@@ -426,20 +472,84 @@ const playAtIndex = async (index: number) => {
   }
 };
 
-const prevSong = () => {
-  const idx = findCurrentIndex();
+const prevSong = async () => {
+  const idx = await findCurrentIndex();
   if (idx === -1) return;
   playAtIndex(idx - 1);
 };
 
-const nextSong = () => {
-  const idx = findCurrentIndex();
+const nextSong = async () => {
+  const idx = await findCurrentIndex();
   if (idx === -1) return;
   playAtIndex(idx + 1);
 };
+let visualizerInitialized = false;
+watch(() => song.value?.url, async () => {
+  // 断开旧连接
+  if (sourceNode) {
+    sourceNode.disconnect();
+    sourceNode = null;
+  }
+  visualizerInitialized = false;
+  analyser = null;
+  await nextTick();
+  draw();
+});
 
+function draw() {
+  if (!audioRef.value || !canvasRef.value) {
+    setTimeout(() => draw(), 500);
+    return;
+  }
+  if (!visualizerInitialized) {
+    audioContext = new window.AudioContext();
+    sourceNode = audioContext.createMediaElementSource(audioRef.value);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    sourceNode.connect(analyser);
+    analyser.connect(audioContext.destination);
+    visualizerInitialized = true;
+  } else {
+    if (!analyser && audioContext) {
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      sourceNode && sourceNode.connect(analyser);
+      analyser.connect(audioContext.destination);
+    }
+  }
+  ctx = canvasRef.value.getContext("2d");
+  canvasRef.value.width = window.innerWidth;
+  if (!ctx || !analyser) return;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new (window.Uint8Array as { new(length: number): Uint8Array })(bufferLength);
+  function a_draw() {
+    if (!audioRef.value || !canvasRef.value || !ctx || !analyser || !dataArray) return;
+    let barWidth = (canvasRef.value.width / bufferLength) * 1.5;
+    analyser.getByteFrequencyData(dataArray);
+    barWidth = 25;
+    ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+    let barHeight;
+    let x = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      barHeight = dataArray[i]/2.7;
+      ctx.fillStyle = "white";
+      ctx.fillRect(x, canvasRef.value.height - barHeight, barWidth, barHeight);
+      x += barWidth + 1;
+    }
+    requestAnimationFrame(a_draw);
+  }
+  a_draw();
+}
+
+// 每次音频切换都重新初始化可视化
+watch(() => song.value?.url, () => {
+  nextTick(() => draw());
+});
+
+// 组件挂载时初始化
 onMounted(() => {
   loadPlaylist().then(() => fetchMusicData());
+  setTimeout(() => draw(), 500);
 });
 onTimeUpdate();
 </script>
@@ -489,12 +599,24 @@ onTimeUpdate();
           />
           <span class="am-time">{{ formatTime(duration) }}</span>
         </div>
+        <div class="am-control-button-container">
+          <button class="am-control-button" @click="prevSong">
+            <icon :icon="globalConfig.icon.previous_song" />
+          </button>
+          <button class="am-control-button" @click="togglePlay">
+            <icon :icon="globalConfig.icon.stop" v-if="isPlaying" />
+            <icon :icon="globalConfig.icon.play" v-else />
+          </button>
+          <button class="am-control-button" @click="nextSong">
+            <icon :icon="globalConfig.icon.next_song" />
+          </button>
+        </div>
 
         <!-- crossorigin 属性必须存在，否则 Web Audio 无法提取跨域音频数据 -->
         <audio
+          v-show="song"
           ref="audioRef"
           :src="song.url"
-          id="audio"
           :autoplay="autoplay"
           crossorigin="anonymous"
           @loadedmetadata="onLoadedMetadata"
@@ -513,7 +635,6 @@ onTimeUpdate();
           :class="{ active: index === currentLyricIndex }"
           @click="seekAudio({ target: { value: line.time } } as any)"
         >
-          <!-- 核心修改 5: 原文与翻译分层显示 -->
           <span
             v-if="
               index === currentLyricIndex && line.etext && maindate.metadata.zq
@@ -534,7 +655,9 @@ onTimeUpdate();
               >{{ seg.text }}</span
             >
           </span>
-          <!-- 非高亮行：保持原有纯文本显示 -->
+          <span v-else-if="index < currentLyricIndex" class="lrc-original-passed">
+            {{ line.text }}
+          </span>
           <span v-else class="lrc-original">{{ line.text }}</span>
           <span v-if="line.romanizationslyric" class="lrc-roman">{{
             line.romanizationslyric
@@ -545,6 +668,7 @@ onTimeUpdate();
         </div>
         <div class="am-lyrics-pad"></div>
       </div>
+      <canvas ref="canvasRef" class="am-visualizer" width="100%" height="150"></canvas>
     </div>
   </div>
 </template>
@@ -645,7 +769,7 @@ onTimeUpdate();
   left: 0;
   width: 100%;
   height: 30%;
-  z-index: 2;
+  z-index: -1;
   opacity: 0.8;
   /* 底部淡出边缘效果 */
   mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, transparent 100%);
@@ -686,7 +810,20 @@ onTimeUpdate();
   gap: 1rem;
   margin-top: calc(var(--vp-gap) * 2);
 }
-
+.am-control-button-container{
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  gap: 1rem;
+}
+.am-control-button{
+  background: transparent;
+  border: none;
+  font-size: 30px;
+}
 .am-time {
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
@@ -848,6 +985,13 @@ onTimeUpdate();
   color: transparent;
   transition: --progress 0.1s ease;
   white-space: normal;
+}
+.lrc-original-passed {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #cccccc;
+  transition: color 0.5s ease;
 }
 .lrc-translate {
   font-size: clamp(0.85rem, 1.5vw, 1.1rem);
