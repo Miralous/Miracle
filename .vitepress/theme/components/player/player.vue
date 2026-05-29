@@ -189,7 +189,7 @@ async function YrcToJson(musicid: string, meta: any) {
           const Duration = parseInt(ttt[2]) / 1000;
           const start = parseInt(ttt[1]) / 1000;
           const totalSecondsEnd = (parseInt(ttt[1]) + parseInt(ttt[2])) / 1000;
-          const texte = ttt[4];
+          const texte = ttt[4].replace(' ','\u00A0');
           eljson.push({
             Duration: Duration,
             start: start,
@@ -552,6 +552,12 @@ function draw() {
   }
   a_draw();
 }
+//键盘监测区
+document.addEventListener('keydown', function(event) {
+  if (event.key === ' ') {
+    togglePlay();
+  }
+});
 
 // 每次音频切换都重新初始化可视化
 watch(
