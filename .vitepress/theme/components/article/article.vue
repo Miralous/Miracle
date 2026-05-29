@@ -16,6 +16,8 @@ import { columnCount, updateColumns } from "../../utils/dynamicColumns";
 import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
 
+console.log(posts);
+
 const props = defineProps({
   maxItems: {
     type: Number,
