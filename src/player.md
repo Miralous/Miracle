@@ -54,16 +54,5 @@ onUnmounted(() => {
     .VPNavBar {
         backdrop-filter: blur(0px) !important;
     }
-
-    /* ヘッダーを絶対配置にしてコンテンツの上に重ね、透明にする */
-    .VPNav {
-        position: absolute !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: transparent !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-    }
 }
 </style>

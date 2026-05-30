@@ -86,43 +86,6 @@ const currentTime = ref(0);
 const duration = ref(0);
 const isTrial = ref(false); // 30秒试听标记
 
-// 手机版歌词预览
-const showMobileLyrics = ref(false);
-const mobileLyricsContainerRef = ref<HTMLElement | null>(null);
-const isMobile = ref(false);
-
-function toggleMobileLyrics() {
-  showMobileLyrics.value = !showMobileLyrics.value;
-  // 打开时自动滚动到当前歌词
-  if (showMobileLyrics.value) {
-    nextTick(() => {
-      const container = mobileLyricsContainerRef.value;
-      if (!container) return;
-      const activeEl = container.querySelector(
-        ".mobile-lyric-line.active",
-      ) as HTMLElement;
-      if (activeEl) {
-        container.scrollTo({
-          top: activeEl.offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2,
-          behavior: "instant",
-        });
-      } else {
-        // 如果还没渲染出 active，根据 currentLyricIndex 计算
-        const lines = container.querySelectorAll(".mobile-lyric-line");
-        if (lines.length > 0 && currentLyricIndex.value >= 0) {
-          const target = lines[currentLyricIndex.value] as HTMLElement;
-          if (target) {
-            container.scrollTo({
-              top: target.offsetTop - container.clientHeight / 2 + target.clientHeight / 2,
-              behavior: "instant",
-            });
-          }
-        }
-      }
-    });
-  }
-}
-
 // 音频可视化相关变量
 let audioContext: (AudioContext & { close?: () => void }) | null = null;
 let analyser: AnalyserNode | null = null;
@@ -226,7 +189,7 @@ async function YrcToJson(musicid: string, meta: any) {
           const Duration = parseInt(ttt[2]) / 1000;
           const start = parseInt(ttt[1]) / 1000;
           const totalSecondsEnd = (parseInt(ttt[1]) + parseInt(ttt[2])) / 1000;
-          const texte = ttt[4].replace(" ", "\u00A0");
+          const texte = ttt[4].replace(' ','\u00A0');
           eljson.push({
             Duration: Duration,
             start: start,
@@ -590,8 +553,8 @@ function draw() {
   a_draw();
 }
 //键盘监测区
-document.addEventListener("keydown", function (event) {
-  if (event.key === " ") {
+document.addEventListener('keydown', function(event) {
+  if (event.key === ' ') {
     togglePlay();
   }
 });
@@ -604,46 +567,11 @@ watch(
   },
 );
 
-// 手机版歌词滚动
-watch(currentLyricIndex, async (newIndex) => {
-  if (
-    newIndex !== -1 &&
-    showMobileLyrics.value &&
-    mobileLyricsContainerRef.value
-  ) {
-    await nextTick();
-    const container = mobileLyricsContainerRef.value;
-    const activeEl = container.querySelector(
-      ".mobile-lyric-line.active",
-    ) as HTMLElement;
-    if (activeEl) {
-      const offsetTop = activeEl.offsetTop;
-      const scrollPosition =
-        offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2;
-      container.scrollTo({
-        top: Math.max(0, scrollPosition),
-        behavior: "smooth",
-      });
-    }
-  }
-});
-
 // 组件挂载时初始化
 onMounted(() => {
-  isMobile.value = window.innerWidth <= 768;
-  window.addEventListener("resize", () => {
-    isMobile.value = window.innerWidth <= 768;
-  });
   loadPlaylist().then(() => fetchMusicData());
   setTimeout(() => draw(), 500);
 });
-
-onMounted(() => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") showMobileLyrics.value = false;
-  });
-});
-
 onTimeUpdate();
 </script>
 
@@ -779,96 +707,6 @@ onTimeUpdate();
         v-if="globalConfig.netease.visualizer"
       ></canvas>
     </div>
-
-    <!-- 手机端歌词按钮 -->
-    <button
-      class="mobile-lyrics-btn"
-      v-if="isMobile && hasLyrics"
-      @click="toggleMobileLyrics"
-    >
-      <icon :icon="globalConfig.icon.musics" />
-    </button>
-
-    <!-- 手机端全屏歌词覆盖层（Apple Music 风格） -->
-    <Teleport to="body">
-      <Transition name="lyrics-fade">
-        <div
-          class="mobile-lyrics-overlay"
-          v-if="showMobileLyrics"
-          @click.self="showMobileLyrics = false"
-        >
-          <!-- 毛玻璃背景：歌曲封面 -->
-          <div
-            class="mobile-lyrics-bg"
-            :style="{ backgroundImage: `url(${song?.pic})` }"
-          ></div>
-          <div class="mobile-lyrics-glass"></div>
-
-          <!-- 顶部栏 -->
-          <div class="mobile-lyrics-header">
-            <button
-              class="mobile-lyrics-close"
-              @click="showMobileLyrics = false"
-            >
-              <icon :icon="globalConfig.icon.close" :rotate="2" />
-            </button>
-            <div class="mobile-lyrics-header-info">
-              <div class="mobile-lyrics-header-title">{{ song?.name }}</div>
-              <div class="mobile-lyrics-header-artist">{{ song?.artist }}</div>
-            </div>
-            <div class="mobile-lyrics-header-spacer"></div>
-          </div>
-
-          <!-- 歌词区域 -->
-          <div class="mobile-lyrics-body" ref="mobileLyricsContainerRef">
-            <div class="mobile-lyrics-pad"></div>
-            <div
-              v-for="(line, index) in lyrics"
-              :key="'mob-' + index"
-              class="mobile-lyric-line"
-              :class="{ active: index === currentLyricIndex }"
-              @click="seekAudio({ target: { value: line.time } } as any)"
-            >
-              <span
-                v-if="
-                  index === currentLyricIndex &&
-                  line.etext &&
-                  maindate?.metadata?.zq
-                "
-                class="mobile-lrc-original"
-              >
-                <span
-                  v-for="(seg, segIdx) in line.etext"
-                  :key="segIdx"
-                  :style="{
-                    '--progress':
-                      currentTime >= seg.start && currentTime <= seg.end
-                        ? ((currentTime - seg.start) / seg.Duration) * 100 + '%'
-                        : currentTime > seg.end
-                          ? '100%'
-                          : '0%',
-                  }"
-                >
-                  {{ seg.text }}
-                </span>
-              </span>
-              <span v-else class="mobile-lrc-text">{{ line.text }}</span>
-              <span
-                v-if="line.pairlyric && globalConfig.netease.showTranslation"
-                class="mobile-lrc-translate"
-                >{{ line.pairlyric }}</span
-              >
-              <span
-                v-if="line.romanizationslyric && globalConfig.netease.showRoman"
-                class="mobile-lrc-roman"
-                >{{ line.romanizationslyric }}</span
-              >
-            </div>
-            <div class="mobile-lyrics-pad"></div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 <style scoped>
@@ -1293,259 +1131,7 @@ onTimeUpdate();
     margin-top: auto;
     margin-bottom: auto;
   }
-
-  /* 手机端歌词触发按钮（Apple Music 风格） */
-  .mobile-lyrics-btn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 100;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #fff;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .mobile-lyrics-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.08);
-  }
-
-  .mobile-lyrics-btn:active {
-    transform: scale(0.95);
-  }
 }
-
-/* ===== 手机端全屏歌词覆盖层（Apple Music 风格） ===== */
-.mobile-lyrics-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.mobile-lyrics-bg {
-  position: absolute;
-  inset: -30px;
-  background-size: cover;
-  background-position: center;
-  filter: blur(60px) brightness(0.3);
-  transform: scale(1.05);
-  z-index: 0;
-}
-
-.mobile-lyrics-glass {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(40px) saturate(150%);
-  -webkit-backdrop-filter: blur(40px) saturate(150%);
-  z-index: 1;
-}
-
-/* 顶部栏 */
-.mobile-lyrics-header {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  padding: 16px 20px;
-  padding-top: max(16px, env(safe-area-inset-top, 16px));
-  gap: 16px;
-}
-
-.mobile-lyrics-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 22px;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s;
-}
-
-.mobile-lyrics-close:hover {
-  opacity: 0.7;
-}
-
-.mobile-lyrics-header-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.mobile-lyrics-header-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mobile-lyrics-header-artist {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 2px;
-}
-
-.mobile-lyrics-header-spacer {
-  width: 38px;
-}
-
-/* 歌词主体 */
-.mobile-lyrics-body {
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 24px;
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    #000 12%,
-    #000 88%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    #000 12%,
-    #000 88%,
-    transparent 100%
-  );
-}
-
-.mobile-lyrics-body::-webkit-scrollbar {
-  display: none;
-}
-
-.mobile-lyrics-pad {
-  min-height: calc(50vh - 60px);
-}
-
-.mobile-lyric-line {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin: 18px 0;
-  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  cursor: pointer;
-  opacity: 0.35;
-  filter: blur(1px);
-}
-
-.mobile-lyric-line.active {
-  opacity: 1;
-  filter: blur(0);
-  transform: scale(1.04);
-}
-
-.mobile-lrc-text {
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
-  font-weight: 600;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.7);
-  transition:
-    color 0.5s ease,
-    font-weight 0.5s ease;
-}
-
-.mobile-lyric-line.active .mobile-lrc-text {
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-}
-
-/* 逐词高亮 */
-.mobile-lrc-original {
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
-  font-weight: 600;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.mobile-lrc-original span {
-  display: inline-block;
-  background: linear-gradient(
-    to right,
-    #ffffff var(--progress, 0%),
-    rgba(255, 255, 255, 0.45) var(--progress, 0%)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  transition: --progress 0.1s ease;
-  white-space: normal;
-}
-
-.mobile-lyric-line.active .mobile-lrc-original {
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-}
-
-.mobile-lrc-translate {
-  font-size: clamp(0.8rem, 2.5vw, 1rem);
-  font-weight: 500;
-  line-height: 1.4;
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.25);
-  transition: color 0.5s ease;
-}
-
-.mobile-lyric-line.active .mobile-lrc-translate {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.mobile-lrc-roman {
-  font-size: 10px;
-  font-weight: 500;
-  margin-top: 2px;
-  color: rgba(255, 255, 255, 0.4);
-  transition: color 0.5s ease;
-}
-
-.mobile-lyric-line.active .mobile-lrc-roman {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-/* 歌词覆盖层过渡动画 */
-.lyrics-fade-enter-active,
-.lyrics-fade-leave-active {
-  transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.lyrics-fade-enter-active .mobile-lyrics-body,
-.lyrics-fade-leave-active .mobile-lyrics-body {
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.lyrics-fade-enter-from,
-.lyrics-fade-leave-to {
-  opacity: 0;
-}
-
-.lyrics-fade-enter-from .mobile-lyrics-body,
-.lyrics-fade-leave-to .mobile-lyrics-body {
-  transform: translateY(30px);
-}
-
 .iconify {
   color: #fff !important;
 }
