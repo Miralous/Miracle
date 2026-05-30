@@ -147,9 +147,13 @@ async function YrcToJson(musicid: string, meta: any) {
     let min_pairtime = 1;
     let min_romatime = 1;
     if (yrc.tlyric.lyric) {
-      const pairlyrics = yrc.tlyric.lyric
+      let pairlyrics = yrc.tlyric.lyric
         .split("\n")
         .filter((item: string) => timeTagRegex.test(item));
+        if(yrc.ytlrc&&yrc.ytlrc.lyric){
+              pairlyrics = yrc.ytlrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
+              min_pairtime = 0.01;
+        }
       for (let i = 0; i < pairlyrics.length; i++) {
         let lyricMatch = pairlyrics[i].match(timeTagRegex);
         if (!lyricMatch) continue;
@@ -170,9 +174,13 @@ async function YrcToJson(musicid: string, meta: any) {
     }
     let romatext = "";
     if (yrc.romalrc.lyric) {
-      const romalyrics = yrc.romalrc.lyric
+      let romalyrics = yrc.romalrc.lyric
         .split("\n")
         .filter((item: string) => timeTagRegex.test(item));
+        if(yrc.yromalrc&&yrc.yromalrc.lyric){
+            romalyrics = yrc.yromalrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
+            min_romatime = 0.01;
+        }
       for (let i = 0; i < romalyrics.length; i++) {
         let lyricMatch = romalyrics[i].match(timeTagRegex);
         if (!lyricMatch) continue;
@@ -199,10 +207,8 @@ async function YrcToJson(musicid: string, meta: any) {
   const response = await fetch(
     `https://cors.emnasop.cn/api/lyric?id=${musicid}`,
   );
-  //暂时的cors代理
-  console.log(response);
+  //暂时的cors代理,原为“https://music.163.com/api/song/lyric?os=pc&id=${musicid}&yv=-1&tv=-1&rv=-1&lv=-1”
   const datae = await response.json();
-  console.log(datae);
   const yrc = datae;
   let json: any = {
     metadata: { zq: false, m: 2, CLXIIIid: "", nolyric: true },
@@ -232,7 +238,7 @@ async function YrcToJson(musicid: string, meta: any) {
           const Duration = parseInt(ttt[2]) / 1000;
           const start = parseInt(ttt[1]) / 1000;
           const totalSecondsEnd = (parseInt(ttt[1]) + parseInt(ttt[2])) / 1000;
-          const texte = ttt[4].replace(" ", "\u00A0");
+          const texte = ttt[4].replace(' ','\u00A0');
           eljson.push({
             Duration: Duration,
             start: start,
@@ -287,6 +293,165 @@ async function YrcToJson(musicid: string, meta: any) {
   console.log(json);
   return json;
 }
+async function QQJsonGET(name: string, artist: string, album: string, yrcjson: any) {
+  console.log("正在使用QQ音乐API进行补充查询...");
+  function stringSimilarity(a: string, b: string) {
+    //vibe coding函数uwu
+    const strA = a == null ? '' : String(a);
+    const strB = b == null ? '' : String(b);
+    const lenA = strA.length, lenB = strB.length;
+    // 空串情况
+    if (lenA === 0 && lenB === 0) return 1;
+    if (lenA === 0 || lenB === 0) return 0;
+
+    // 前一行的编辑距离数组，初始为0..lenB
+    let prev = Array.from({ length: lenB + 1 }, (_, i) => i);
+    let curr = new Array(lenB + 1);
+
+    for (let i = 1; i <= lenA; i++) {
+      curr[0] = i; // 第一列值 = i（删除a的字符数）
+      for (let j = 1; j <= lenB; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        // 插入、删除、替换的最小代价
+        curr[j] = Math.min(
+          curr[j - 1] + 1,   // 插入
+          prev[j] + 1,       // 删除
+          prev[j - 1] + cost // 替换
+        );
+      }
+      // 交换当前行与前行，复用数组
+      [prev, curr] = [curr, prev];
+    }
+
+    const distance = prev[lenB]; // 最终编辑距离
+    return 1 - distance / Math.max(lenA, lenB);
+  }
+  let nmed = await fetch(`https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name)} ${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}`)
+  let nme = await nmed.json();
+  if(!nme.data||!Array.isArray(nme.data)||nme.data.length === 0) {
+    console.log("未找到匹配的歌曲，使用原生歌词");
+    return;
+  }
+  let aru = stringSimilarity(nme.data[0].singer,artist)
+  let tiu = stringSimilarity(nme.data[0].name,name)
+  let alu = stringSimilarity(nme.data[0].album,album)
+  if(aru<0.3&&tiu<0.8&&alu<0.3){
+    console.log("QQ音乐API查询结果相似度不足，使用原生歌词");
+    return {metadata:{zq:false}};
+  }
+  let datae = await fetch(`https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`)
+  let dataejson = await datae.json();
+  if(!dataejson.data) return;
+  let qrc={orig: null, ts: null, roma: null};
+  qrc.orig = dataejson.data.yrc
+  qrc.ts = dataejson.data.trans
+  qrc.roma = dataejson.data.roma
+  let qrcjson = QrcToJson(qrc,nme.data[0].id,0)
+  if(qrcjson){
+    console.log("QQ音乐API查询成功，使用QQ音乐歌词");
+    return qrcjson
+  }
+  return qrcjson
+}
+function QrcToJson(qrcd: any,id: number, apinu: number){
+  let qrc = qrcd;
+  const metadataRegex = /^\s*\[([a-zA-Z]+)\s*:\s*(.*?)\]\s*$/;
+  const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
+  const regex = /(.*?)\((\d+),(\d+)\)/g;
+  function prpdlq(qrc: any, timesec: number, apinu: number){
+    const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
+    const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
+    let pairif = false;
+    let romaif = false;
+    let pairtext = "";
+    let min_pairtime = 3;
+    let min_romatime = 3;
+    if(qrc.ts){
+      let pairlyrics;
+      let lyricMatch;
+      if(apinu===0){
+        pairlyrics = qrc.ts.split("\n").filter((item: string) => timeTagRegex.test(item));
+      }
+      if(apinu===1){
+        pairlyrics = qrc.ts.split("\n").filter((item: string) => zqTagRegex.test(item));
+      }
+      for(let i = 0; i < pairlyrics.length; i++){
+        lyricMatch = apinu===0?pairlyrics[i].match(timeTagRegex):pairlyrics[i].match(zqTagRegex);
+        if(!lyricMatch) continue;
+        let text = apinu===0?lyricMatch[4]:lyricMatch[3]
+        const decimal = apinu===0?(lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[1])/1000):0):0
+        let timesecp = apinu===0?parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal:lyricMatch[1]/1000
+        if(min_pairtime > Math.abs(timesec - timesecp)){
+          min_pairtime = Math.abs(timesec - timesecp);
+          pairtext = text.replace('//', '');//TX特有的局部无翻译文本的替换字符
+        }
+      }
+      pairif = true;
+    }
+    let romatext = '';
+    if(qrc.roma){
+      const romalyrics = qrc.roma.split("\n").filter((item: string) => zqTagRegex.test(item));
+      for(let i = 0; i < romalyrics.length; i++){
+        let lyricMatch = romalyrics[i].match(zqTagRegex);
+        if(!lyricMatch) continue;
+        let text = lyricMatch[3].replace(/\([^)]*\)/g, '')
+        let timesecp = parseInt(lyricMatch[1])/1000
+        if(min_romatime > Math.abs(timesec - timesecp)){
+          min_romatime = Math.abs(timesec - timesecp);
+          romatext = text;
+        }
+      }
+      romaif = true;
+    }
+    return {pairtext,pairif,romatext,romaif};
+  }
+  let json: any={metadata: {zq:false,m:2}, lyrics: [],};
+  if(qrc.orig){
+    let pdjg;
+    qrc.orig = qrc.orig.replace(/^\uFEFF/, '');
+    const lyrics = qrc.orig.split("\n");
+    for(const lyric of lyrics){
+      const metadataMatch = lyric.match(metadataRegex);
+      if (metadataMatch) {
+        json.metadata[metadataMatch[1].toLowerCase()] = metadataMatch[2].trim();
+        continue;
+      }
+      let lyricMatch = lyric.match(zqTagRegex);
+      let text;
+      let timesec;
+      if(!lyricMatch) continue;
+      text = lyricMatch[3]
+      timesec = lyricMatch[1] / 1000
+      let eljson = [];
+      if (text.includes('(') && text.includes(')')) {
+        let ttt;
+        let i = 0;
+        while ((ttt = regex.exec(lyric.replace(/\[.*?\]/g, '')))) {
+          const Duration = parseInt(ttt[3]) / 1000
+          const start = parseInt(ttt[2]) / 1000
+          const totalSecondsEnd = (parseInt(ttt[2])+parseInt(ttt[3]))/1000
+          const texte = ttt[1].replace(/ /g, '\u00A0');
+          eljson.push({ Duration: Duration, start: start, end: totalSecondsEnd, text: texte });
+        }
+        json.metadata.zq = eljson.length > 0;
+      }
+      text = text.replace(/\(\d+,\d+\)/g, '')
+      pdjg = prpdlq(qrc, timesec, apinu)
+      json.lyrics.push({time: timesec,text: text,etext: eljson,pairlyric: pdjg.pairtext,romanizationslyric: pdjg.romatext})
+    }
+    json.metadata.nolyric = json.lyrics.length === 0;
+    json.metadata.roma = pdjg?pdjg.romaif:false
+    json.metadata.pair = pdjg?pdjg.pairif:false
+  }else{
+    json.metadata.nolyric =true;
+    json.metadata.zq = false;
+    json.metadata.roma = false;
+    json.metadata.pair = false;
+  }
+  json.metadata.qqmusicid = id;
+  console.log(json);
+  return json;
+}
 import { LYRIC_METADATA_KW } from "./words";
 
 // 核心关键词（长词优先，请确保已加入 "单位" 或 "举办单位"）
@@ -336,7 +501,6 @@ const fetchMusicData = async () => {
     isLoading.value = true;
     // 优先使用已加载的歌单数据（playlist API 返回的对象已包含 url/pic/lrc 等）
     if (playlistTracks.value.length > 0) {
-      console.log(playlistTracks.value);
       const track = playlistTracks.value.find(
         (t) => String(t.id) === String(currentId.value),
       );
@@ -346,6 +510,12 @@ const fetchMusicData = async () => {
         maindate.lyrics = maindate.lyrics.filter(
           (l: LyricLine) => !isLyricMetadata(l.text),
         );
+        if(!maindate.metadata.zq&&globalConfig.netease.QQMusicLyricsSource){
+          const qqdata = await QQJsonGET(song.value.name, song.value.artist, '', maindate);
+          if(qqdata&&qqdata.metadata&&qqdata.metadata.zq){
+            maindate = qqdata;
+          }
+        }
         lyrics.value = maindate.lyrics;
         mediaSession();
         return;
@@ -362,6 +532,12 @@ const fetchMusicData = async () => {
       maindate.lyrics = maindate.lyrics.filter(
         (l: LyricLine) => !isLyricMetadata(l.text),
       );
+      if(!maindate.metadata.zq&&globalConfig.netease.QQMusicLyricsSource){
+        const qqdata = await QQJsonGET(song.value.name, song.value.artist, '', maindate);
+        if(qqdata&&qqdata.metadata&&qqdata.metadata.zq){
+          maindate = qqdata;
+        }
+      }
       lyrics.value = maindate.lyrics;
       mediaSession();
     }
@@ -477,7 +653,6 @@ let activeEl: HTMLElement | null = null;
 // 监听当前歌词索引的变化，平滑滚动
 watch(currentLyricIndex, async (newIndex) => {
   if (newIndex !== -1 && lyricsContainerRef.value) {
-    console.log(dataArray);
     await nextTick();
     const container = lyricsContainerRef.value;
     activeEl = container.querySelector(".lyric-line.active") as HTMLElement;
@@ -683,6 +858,7 @@ onMounted(() => {
   });
   loadPlaylist().then(() => fetchMusicData());
   setTimeout(() => draw(), 500);
+  setInterval(document_title_change, 200);
 });
 
 onMounted(() => {

@@ -282,6 +282,7 @@ export const globalConfig = {
     autoplay: true, // auto play music when page loaded
     visualizer: false, // show visualizer at the bottom of player (default: false, set true to show)
     musicSlice: 20, // how many singer to display in music list (default: 20, set 0 to display all)
+    QQMusicLyricsSource: true, // use QQ Music API to get lyrics (default: true, set true to enable), Can greatly increase the coverage of songs with word-by-word lyrics,But there is also a small probability of matching the wrong song
   },
 
   // DO NOT EDIT THESE VALUES!!!!!
