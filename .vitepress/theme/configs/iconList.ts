@@ -29,4 +29,5 @@ export const data = {
   taskComplete: "ph:check-circle-fill",
   taskNotComplete: "ph:circle",
   schedule: "ph:calendar-blank-duotone",
+  close: "ph:x-bold",
 };
