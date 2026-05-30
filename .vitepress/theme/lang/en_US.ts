@@ -62,4 +62,11 @@ export const languageFile = {
   tasks: "Tasks",
   schedule: "Schedule",
   trial: "Trial",
+  playModeList: "List Loop",
+  playModeSingle: "Single Loop",
+  playModeShuffle: "Shuffle",
+  songUnit: "songs",
+  unknownTitle: "Unknown Title",
+  unknownArtist: "Unknown Artist",
+  musicPlayerSuffix: "'s Music Player",
 };

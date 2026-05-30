@@ -62,4 +62,11 @@ export const languageFile = {
   tasks: "待办",
   schedule: "课表",
   trial: "试听",
+  playModeList: "列表循环",
+  playModeSingle: "单曲循环",
+  playModeShuffle: "随机播放",
+  songUnit: "首",
+  unknownTitle: "未知歌曲",
+  unknownArtist: "未知歌手",
+  musicPlayerSuffix: "的音乐播放器",
 };

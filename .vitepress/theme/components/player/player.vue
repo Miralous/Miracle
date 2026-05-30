@@ -45,6 +45,7 @@ const loadPlaylist = async () => {
       const data = await res.json();
       if (Array.isArray(data)) {
         playlistTracks.value = data;
+        playOrder.value = [...data];
       }
     }
   } catch (e) {
@@ -91,6 +92,13 @@ const showMobileLyrics = ref(false);
 const mobileLyricsContainerRef = ref<HTMLElement | null>(null);
 const isMobile = ref(false);
 
+// 播放模式 & 歌单面板
+const playMode = ref<"list" | "single" | "shuffle">("list");
+const showPlaylist = ref(false);
+const shuffledOrder = ref<number[]>([]);
+const shufflePos = ref(-1);
+const playOrder = ref<SongData[]>([]);
+
 function toggleMobileLyrics() {
   showMobileLyrics.value = !showMobileLyrics.value;
   // 打开时自动滚动到当前歌词
@@ -129,6 +137,64 @@ function toggleMobileLyrics() {
   }
 }
 
+// 播放模式切换
+function togglePlayMode() {
+  const modes = ["list", "single", "shuffle"] as const;
+  const idx = modes.indexOf(playMode.value);
+  playMode.value = modes[(idx + 1) % 3];
+  if (playMode.value === "shuffle") {
+    initShuffleOrder();
+  } else {
+    shuffledOrder.value = [];
+    shufflePos.value = -1;
+  }
+}
+
+function initShuffleOrder() {
+  const total = playOrder.value.length;
+  if (total === 0) return;
+  const curId = currentId.value;
+  const curIdx = playOrder.value.findIndex(
+    (t) => String(t.url.match(/\d+$/)) === String(curId),
+  );
+  const indices = Array.from({ length: total }, (_, i) => i).filter(
+    (i) => i !== curIdx,
+  );
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  shuffledOrder.value = curIdx >= 0 ? [curIdx, ...indices] : indices;
+  shufflePos.value = curIdx >= 0 ? 0 : -1;
+}
+
+const currentPlayOrder = computed(() => {
+  if (playMode.value === "shuffle" && shuffledOrder.value.length > 0) {
+    return shuffledOrder.value.map((i) => playOrder.value[i]);
+  }
+  return playOrder.value;
+});
+
+function togglePlaylist() {
+  showPlaylist.value = !showPlaylist.value;
+}
+
+// 歌单面板拖拽相关
+let dragIdx = -1;
+function onDragStart(i: number) {
+  if (playMode.value === "shuffle") return;
+  dragIdx = i;
+}
+function onDragOver(e: DragEvent) {
+  e.preventDefault();
+}
+function onDrop(i: number) {
+  if (dragIdx < 0 || dragIdx === i) return;
+  const item = playOrder.value.splice(dragIdx, 1)[0];
+  playOrder.value.splice(i > dragIdx ? i - 1 : i, 0, item);
+  dragIdx = -1;
+}
+
 // 音频可视化相关变量
 let audioContext: (AudioContext & { close?: () => void }) | null = null;
 let analyser: AnalyserNode | null = null;
@@ -150,10 +216,12 @@ async function YrcToJson(musicid: string, meta: any) {
       let pairlyrics = yrc.tlyric.lyric
         .split("\n")
         .filter((item: string) => timeTagRegex.test(item));
-        if(yrc.ytlrc&&yrc.ytlrc.lyric){
-              pairlyrics = yrc.ytlrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
-              min_pairtime = 0.01;
-        }
+      if (yrc.ytlrc && yrc.ytlrc.lyric) {
+        pairlyrics = yrc.ytlrc.lyric
+          .split("\n")
+          .filter((item: string) => timeTagRegex.test(item));
+        min_pairtime = 0.01;
+      }
       for (let i = 0; i < pairlyrics.length; i++) {
         let lyricMatch = pairlyrics[i].match(timeTagRegex);
         if (!lyricMatch) continue;
@@ -177,10 +245,12 @@ async function YrcToJson(musicid: string, meta: any) {
       let romalyrics = yrc.romalrc.lyric
         .split("\n")
         .filter((item: string) => timeTagRegex.test(item));
-        if(yrc.yromalrc&&yrc.yromalrc.lyric){
-            romalyrics = yrc.yromalrc.lyric.split("\n").filter((item: string) => timeTagRegex.test(item));
-            min_romatime = 0.01;
-        }
+      if (yrc.yromalrc && yrc.yromalrc.lyric) {
+        romalyrics = yrc.yromalrc.lyric
+          .split("\n")
+          .filter((item: string) => timeTagRegex.test(item));
+        min_romatime = 0.01;
+      }
       for (let i = 0; i < romalyrics.length; i++) {
         let lyricMatch = romalyrics[i].match(timeTagRegex);
         if (!lyricMatch) continue;
@@ -238,7 +308,7 @@ async function YrcToJson(musicid: string, meta: any) {
           const Duration = parseInt(ttt[2]) / 1000;
           const start = parseInt(ttt[1]) / 1000;
           const totalSecondsEnd = (parseInt(ttt[1]) + parseInt(ttt[2])) / 1000;
-          const texte = ttt[4].replace(' ','\u00A0');
+          const texte = ttt[4].replace(" ", "\u00A0");
           eljson.push({
             Duration: Duration,
             start: start,
@@ -293,13 +363,19 @@ async function YrcToJson(musicid: string, meta: any) {
   console.log(json);
   return json;
 }
-async function QQJsonGET(name: string, artist: string, album: string, yrcjson: any) {
+async function QQJsonGET(
+  name: string,
+  artist: string,
+  album: string,
+  yrcjson: any,
+) {
   console.log("正在使用QQ音乐API进行补充查询...");
   function stringSimilarity(a: string, b: string) {
     //vibe coding函数uwu
-    const strA = a == null ? '' : String(a);
-    const strB = b == null ? '' : String(b);
-    const lenA = strA.length, lenB = strB.length;
+    const strA = a == null ? "" : String(a);
+    const strB = b == null ? "" : String(b);
+    const lenA = strA.length,
+      lenB = strB.length;
     // 空串情况
     if (lenA === 0 && lenB === 0) return 1;
     if (lenA === 0 || lenB === 0) return 0;
@@ -314,9 +390,9 @@ async function QQJsonGET(name: string, artist: string, album: string, yrcjson: a
         const cost = a[i - 1] === b[j - 1] ? 0 : 1;
         // 插入、删除、替换的最小代价
         curr[j] = Math.min(
-          curr[j - 1] + 1,   // 插入
-          prev[j] + 1,       // 删除
-          prev[j - 1] + cost // 替换
+          curr[j - 1] + 1, // 插入
+          prev[j] + 1, // 删除
+          prev[j - 1] + cost, // 替换
         );
       }
       // 交换当前行与前行，复用数组
@@ -326,99 +402,122 @@ async function QQJsonGET(name: string, artist: string, album: string, yrcjson: a
     const distance = prev[lenB]; // 最终编辑距离
     return 1 - distance / Math.max(lenA, lenB);
   }
-  let nmed = await fetch(`https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name)} ${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}`)
-  if(!nmed.ok){
+  let nmed = await fetch(
+    `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name)} ${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}`,
+  );
+  if (!nmed.ok) {
     console.log("QQ音乐API查询失败，使用原生歌词");
     return;
   }
   let nme = await nmed.json();
-  if(!nme.data||!Array.isArray(nme.data)||nme.data.length === 0) {
+  if (!nme.data || !Array.isArray(nme.data) || nme.data.length === 0) {
     console.log("未找到匹配的歌曲，使用原生歌词");
     return;
   }
-  let aru = stringSimilarity(nme.data[0].singer,artist)
-  let tiu = stringSimilarity(nme.data[0].name,name)
-  let alu = stringSimilarity(nme.data[0].album,album)
-  if(aru<0.3&&tiu<0.8&&alu<0.3){
+  let aru = stringSimilarity(nme.data[0].singer, artist);
+  let tiu = stringSimilarity(nme.data[0].name, name);
+  let alu = stringSimilarity(nme.data[0].album, album);
+  if (aru < 0.3 && tiu < 0.8 && alu < 0.3) {
     console.log("QQ音乐API查询结果相似度不足，使用原生歌词");
-    return {metadata:{zq:false}};
+    return { metadata: { zq: false } };
   }
-  let datae = await fetch(`https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`)
-  if(!datae.ok){
+  let datae = await fetch(
+    `https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`,
+  );
+  if (!datae.ok) {
     console.log("QQ音乐API查询歌词失败，使用原生歌词");
     return;
   }
   let dataejson = await datae.json();
-  if(!dataejson.data) return;
-  let qrc={orig: null, ts: null, roma: null};
-  qrc.orig = dataejson.data.yrc
-  qrc.ts = dataejson.data.trans
-  qrc.roma = dataejson.data.roma
-  let qrcjson = QrcToJson(qrc,nme.data[0].id,0)
-  if(qrcjson){
+  if (!dataejson.data) return;
+  let qrc = { orig: null, ts: null, roma: null };
+  qrc.orig = dataejson.data.yrc;
+  qrc.ts = dataejson.data.trans;
+  qrc.roma = dataejson.data.roma;
+  let qrcjson = QrcToJson(qrc, nme.data[0].id, 0);
+  if (qrcjson) {
     console.log("QQ音乐API查询成功，使用QQ音乐歌词");
-    return qrcjson
+    return qrcjson;
   }
-  return qrcjson
+  return qrcjson;
 }
-function QrcToJson(qrcd: any,id: number, apinu: number){
+function QrcToJson(qrcd: any, id: number, apinu: number) {
   let qrc = qrcd;
   const metadataRegex = /^\s*\[([a-zA-Z]+)\s*:\s*(.*?)\]\s*$/;
-  const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
+  const zqTagRegex = /\[(\d+),(\d+)?\](.*)/;
   const regex = /(.*?)\((\d+),(\d+)\)/g;
-  function prpdlq(qrc: any, timesec: number, apinu: number){
+  function prpdlq(qrc: any, timesec: number, apinu: number) {
     const timeTagRegex = /\[(\d+):(\d+)(?:[.:](\d+))?\](.*)/;
-    const zqTagRegex = /\[(\d+),(\d+)?\](.*)/
+    const zqTagRegex = /\[(\d+),(\d+)?\](.*)/;
     let pairif = false;
     let romaif = false;
     let pairtext = "";
     let min_pairtime = 3;
     let min_romatime = 3;
-    if(qrc.ts){
+    if (qrc.ts) {
       let pairlyrics;
       let lyricMatch;
-      if(apinu===0){
-        pairlyrics = qrc.ts.split("\n").filter((item: string) => timeTagRegex.test(item));
+      if (apinu === 0) {
+        pairlyrics = qrc.ts
+          .split("\n")
+          .filter((item: string) => timeTagRegex.test(item));
       }
-      if(apinu===1){
-        pairlyrics = qrc.ts.split("\n").filter((item: string) => zqTagRegex.test(item));
+      if (apinu === 1) {
+        pairlyrics = qrc.ts
+          .split("\n")
+          .filter((item: string) => zqTagRegex.test(item));
       }
-      for(let i = 0; i < pairlyrics.length; i++){
-        lyricMatch = apinu===0?pairlyrics[i].match(timeTagRegex):pairlyrics[i].match(zqTagRegex);
-        if(!lyricMatch) continue;
-        let text = apinu===0?lyricMatch[4]:lyricMatch[3]
-        const decimal = apinu===0?(lyricMatch[3] ? (lyricMatch[3].toString().length === 2 ? parseInt(lyricMatch[3]) / 100 : parseInt(lyricMatch[1])/1000):0):0
-        let timesecp = apinu===0?parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal:lyricMatch[1]/1000
-        if(min_pairtime > Math.abs(timesec - timesecp)){
+      for (let i = 0; i < pairlyrics.length; i++) {
+        lyricMatch =
+          apinu === 0
+            ? pairlyrics[i].match(timeTagRegex)
+            : pairlyrics[i].match(zqTagRegex);
+        if (!lyricMatch) continue;
+        let text = apinu === 0 ? lyricMatch[4] : lyricMatch[3];
+        const decimal =
+          apinu === 0
+            ? lyricMatch[3]
+              ? lyricMatch[3].toString().length === 2
+                ? parseInt(lyricMatch[3]) / 100
+                : parseInt(lyricMatch[1]) / 1000
+              : 0
+            : 0;
+        let timesecp =
+          apinu === 0
+            ? parseInt(lyricMatch[1]) * 60 + parseInt(lyricMatch[2]) + decimal
+            : lyricMatch[1] / 1000;
+        if (min_pairtime > Math.abs(timesec - timesecp)) {
           min_pairtime = Math.abs(timesec - timesecp);
-          pairtext = text.replace('//', '');//TX特有的局部无翻译文本的替换字符
+          pairtext = text.replace("//", ""); //TX特有的局部无翻译文本的替换字符
         }
       }
       pairif = true;
     }
-    let romatext = '';
-    if(qrc.roma){
-      const romalyrics = qrc.roma.split("\n").filter((item: string) => zqTagRegex.test(item));
-      for(let i = 0; i < romalyrics.length; i++){
+    let romatext = "";
+    if (qrc.roma) {
+      const romalyrics = qrc.roma
+        .split("\n")
+        .filter((item: string) => zqTagRegex.test(item));
+      for (let i = 0; i < romalyrics.length; i++) {
         let lyricMatch = romalyrics[i].match(zqTagRegex);
-        if(!lyricMatch) continue;
-        let text = lyricMatch[3].replace(/\([^)]*\)/g, '')
-        let timesecp = parseInt(lyricMatch[1])/1000
-        if(min_romatime > Math.abs(timesec - timesecp)){
+        if (!lyricMatch) continue;
+        let text = lyricMatch[3].replace(/\([^)]*\)/g, "");
+        let timesecp = parseInt(lyricMatch[1]) / 1000;
+        if (min_romatime > Math.abs(timesec - timesecp)) {
           min_romatime = Math.abs(timesec - timesecp);
           romatext = text;
         }
       }
       romaif = true;
     }
-    return {pairtext,pairif,romatext,romaif};
+    return { pairtext, pairif, romatext, romaif };
   }
-  let json: any={metadata: {zq:false,m:2}, lyrics: [],};
-  if(qrc.orig){
+  let json: any = { metadata: { zq: false, m: 2 }, lyrics: [] };
+  if (qrc.orig) {
     let pdjg;
-    qrc.orig = qrc.orig.replace(/^\uFEFF/, '');
+    qrc.orig = qrc.orig.replace(/^\uFEFF/, "");
     const lyrics = qrc.orig.split("\n");
-    for(const lyric of lyrics){
+    for (const lyric of lyrics) {
       const metadataMatch = lyric.match(metadataRegex);
       if (metadataMatch) {
         json.metadata[metadataMatch[1].toLowerCase()] = metadataMatch[2].trim();
@@ -427,31 +526,42 @@ function QrcToJson(qrcd: any,id: number, apinu: number){
       let lyricMatch = lyric.match(zqTagRegex);
       let text;
       let timesec;
-      if(!lyricMatch) continue;
-      text = lyricMatch[3]
-      timesec = lyricMatch[1] / 1000
+      if (!lyricMatch) continue;
+      text = lyricMatch[3];
+      timesec = lyricMatch[1] / 1000;
       let eljson = [];
-      if (text.includes('(') && text.includes(')')) {
+      if (text.includes("(") && text.includes(")")) {
         let ttt;
         let i = 0;
-        while ((ttt = regex.exec(lyric.replace(/\[.*?\]/g, '')))) {
-          const Duration = parseInt(ttt[3]) / 1000
-          const start = parseInt(ttt[2]) / 1000
-          const totalSecondsEnd = (parseInt(ttt[2])+parseInt(ttt[3]))/1000
-          const texte = ttt[1].replace(/ /g, '\u00A0');
-          eljson.push({ Duration: Duration, start: start, end: totalSecondsEnd, text: texte });
+        while ((ttt = regex.exec(lyric.replace(/\[.*?\]/g, "")))) {
+          const Duration = parseInt(ttt[3]) / 1000;
+          const start = parseInt(ttt[2]) / 1000;
+          const totalSecondsEnd = (parseInt(ttt[2]) + parseInt(ttt[3])) / 1000;
+          const texte = ttt[1].replace(/ /g, "\u00A0");
+          eljson.push({
+            Duration: Duration,
+            start: start,
+            end: totalSecondsEnd,
+            text: texte,
+          });
         }
         json.metadata.zq = eljson.length > 0;
       }
-      text = text.replace(/\(\d+,\d+\)/g, '')
-      pdjg = prpdlq(qrc, timesec, apinu)
-      json.lyrics.push({time: timesec,text: text,etext: eljson,pairlyric: pdjg.pairtext,romanizationslyric: pdjg.romatext})
+      text = text.replace(/\(\d+,\d+\)/g, "");
+      pdjg = prpdlq(qrc, timesec, apinu);
+      json.lyrics.push({
+        time: timesec,
+        text: text,
+        etext: eljson,
+        pairlyric: pdjg.pairtext,
+        romanizationslyric: pdjg.romatext,
+      });
     }
     json.metadata.nolyric = json.lyrics.length === 0;
-    json.metadata.roma = pdjg?pdjg.romaif:false
-    json.metadata.pair = pdjg?pdjg.pairif:false
-  }else{
-    json.metadata.nolyric =true;
+    json.metadata.roma = pdjg ? pdjg.romaif : false;
+    json.metadata.pair = pdjg ? pdjg.pairif : false;
+  } else {
+    json.metadata.nolyric = true;
     json.metadata.zq = false;
     json.metadata.roma = false;
     json.metadata.pair = false;
@@ -519,13 +629,18 @@ const fetchMusicData = async () => {
         maindate.lyrics = maindate.lyrics.filter(
           (l: LyricLine) => !isLyricMetadata(l.text),
         );
-        if(!maindate.metadata.zq&&globalConfig.netease.QQMusicLyricsSource){
-          const qqdata = await QQJsonGET(song.value.name, song.value.artist, '', maindate);
-          if(qqdata&&qqdata.metadata&&qqdata.metadata.zq){
+        if (!maindate.metadata.zq && globalConfig.netease.QQMusicLyricsSource) {
+          const qqdata = await QQJsonGET(
+            song.value.name,
+            song.value.artist,
+            "",
+            maindate,
+          );
+          if (qqdata && qqdata.metadata && qqdata.metadata.zq) {
             maindate.lyrics = qqdata.lyrics.filter(
               (l: LyricLine) => !isLyricMetadata(l.text),
             );
-            maindate.metadata = qqdata.metadata
+            maindate.metadata = qqdata.metadata;
           }
         }
         console.log("歌词元数据过滤完成，最终:", maindate);
@@ -545,13 +660,18 @@ const fetchMusicData = async () => {
       maindate.lyrics = maindate.lyrics.filter(
         (l: LyricLine) => !isLyricMetadata(l.text),
       );
-      if(!maindate.metadata.zq&&globalConfig.netease.QQMusicLyricsSource){
-        const qqdata = await QQJsonGET(song.value.name, song.value.artist, '', maindate);
-        if(qqdata&&qqdata.metadata&&qqdata.metadata.zq){
+      if (!maindate.metadata.zq && globalConfig.netease.QQMusicLyricsSource) {
+        const qqdata = await QQJsonGET(
+          song.value.name,
+          song.value.artist,
+          "",
+          maindate,
+        );
+        if (qqdata && qqdata.metadata && qqdata.metadata.zq) {
           maindate.lyrics = qqdata.lyrics.filter(
             (l: LyricLine) => !isLyricMetadata(l.text),
           );
-          maindate.metadata = qqdata.metadata
+          maindate.metadata = qqdata.metadata;
         }
       }
       console.log("歌词元数据过滤完成，最终:", maindate);
@@ -567,8 +687,8 @@ const fetchMusicData = async () => {
 function mediaSession() {
   if ("mediaSession" in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.value?.name || "Unknown Title",
-      artist: song.value?.artist || "Unknown Artist",
+      title: song.value?.name || globalConfig.lang.unknownTitle,
+      artist: song.value?.artist || globalConfig.lang.unknownArtist,
       //album: song.value?.album || "Unknown Album", 部分meting接口没有返回专辑信息，暂不使用
       artwork: [
         {
@@ -622,11 +742,19 @@ const onLoadedMetadata = async () => {
 
 const onAudioEnded = () => {
   currentTime.value = 0;
+  if (playMode.value === "single") {
+    if (audioRef.value) {
+      audioRef.value.currentTime = 0;
+      audioRef.value.play();
+      isPlaying.value = true;
+    }
+    return;
+  }
   isPlaying.value = false;
   const playlistLength =
-    playlistTracks.value.length > 0
-      ? playlistTracks.value.length
-      : getListIds().length;
+    playOrder.value.length > 0
+      ? playOrder.value.length
+      : playlistTracks.value.length;
   if (playlistLength > 1) {
     nextSong();
   }
@@ -653,7 +781,7 @@ const currentLyricIndex = computed(() => {
   return 0;
 });
 function document_title_change() {
-  const main_title = `${song.value?.name || "Unknown Title"} - ${song.value?.artist || "Unknown Artist"} | ${globalConfig.author}'s Music Player`;
+  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist} | ${globalConfig.author}${globalConfig.lang.musicPlayerSuffix}`;
   if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
     if (
       currentLyricIndex.value !== -1 &&
@@ -716,12 +844,14 @@ const findCurrentIndex = async () => {
 
 const playAtIndex = async (index: number) => {
   console.log("请求切歌，目标索引:", index);
-  // 如果使用 playlist API 返回的曲目列表，直接从中切换以避免重复请求
-  if (playlistTracks.value.length > 0) {
-    const safeIndex =
-      (index + playlistTracks.value.length) % playlistTracks.value.length;
+  if (playOrder.value.length > 0) {
+    const safeIndex = (index + playOrder.value.length) % playOrder.value.length;
     currentId.value =
-      playlistTracks.value[safeIndex].url.match(/\d+$/)?.[0] || currentId.value;
+      playOrder.value[safeIndex].url.match(/\d+$/)?.[0] || currentId.value;
+    if (playMode.value === "shuffle") {
+      const so = shuffledOrder.value.findIndex((i) => i === safeIndex);
+      if (so !== -1) shufflePos.value = so;
+    }
     console.log("切换到歌单中的歌曲，ID:", currentId.value);
     await fetchMusicData();
     await nextTick();
@@ -754,12 +884,37 @@ const playAtIndex = async (index: number) => {
 };
 
 const prevSong = async () => {
+  if (playMode.value === "shuffle" && shuffledOrder.value.length > 0) {
+    const total = shuffledOrder.value.length;
+    shufflePos.value = (shufflePos.value - 1 + total) % total;
+    playAtIndex(shuffledOrder.value[shufflePos.value]);
+    return;
+  }
   const idx = await findCurrentIndex();
   if (idx === -1) return;
   playAtIndex(idx - 1);
 };
 
 const nextSong = async () => {
+  if (playMode.value === "single") {
+    await fetchMusicData();
+    await nextTick();
+    if (audioRef.value) {
+      try {
+        await audioRef.value.play();
+        isPlaying.value = true;
+      } catch (e) {
+        isPlaying.value = false;
+      }
+    }
+    return;
+  }
+  if (playMode.value === "shuffle" && shuffledOrder.value.length > 0) {
+    const total = shuffledOrder.value.length;
+    shufflePos.value = (shufflePos.value + 1) % total;
+    playAtIndex(shuffledOrder.value[shufflePos.value]);
+    return;
+  }
   const idx = await findCurrentIndex();
   if (idx === -1) return;
   playAtIndex(idx + 1);
@@ -934,6 +1089,28 @@ setInterval(onTimeUpdate, 15);
           class="am-control-button-container"
           v-if="globalConfig.netease.demoMode"
         >
+          <button
+            class="am-control-button am-mode-btn"
+            :class="{ 'am-mode-active': playMode !== 'list' }"
+            @click="togglePlayMode"
+            :title="
+              playMode === 'list'
+                ? globalConfig.lang.playModeList
+                : playMode === 'single'
+                  ? globalConfig.lang.playModeSingle
+                  : globalConfig.lang.playModeShuffle
+            "
+          >
+            <icon
+              :icon="
+                playMode === 'shuffle'
+                  ? globalConfig.icon.shuffle
+                  : playMode === 'single'
+                    ? globalConfig.icon.repeatOnce
+                    : globalConfig.icon.repeat
+              "
+            />
+          </button>
           <button class="am-control-button" @click="prevSong">
             <icon :icon="globalConfig.icon.previous_song" />
           </button>
@@ -943,6 +1120,18 @@ setInterval(onTimeUpdate, 15);
           </button>
           <button class="am-control-button" @click="nextSong">
             <icon :icon="globalConfig.icon.next_song" />
+          </button>
+          <button
+            class="am-control-button am-playlist-btn"
+            @click="togglePlaylist"
+          >
+            <icon
+              :icon="globalConfig.icon.playlist"
+              style="z-index: 4; opacity: 0.8"
+            />
+            <span class="am-playlist-badge" style="z-index: 5">{{
+              playOrder.length
+            }}</span>
           </button>
         </div>
 
@@ -1024,7 +1213,7 @@ setInterval(onTimeUpdate, 15);
       v-if="isMobile && hasLyrics"
       @click="toggleMobileLyrics"
     >
-      <icon :icon="globalConfig.icon.musics" />
+      <icon :icon="globalConfig.icon.musicsBold" />
     </button>
 
     <!-- 手机端全屏歌词覆盖层（Apple Music 风格） -->
@@ -1103,6 +1292,85 @@ setInterval(onTimeUpdate, 15);
               >
             </div>
             <div class="mobile-lyrics-pad"></div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- 歌单面板 -->
+    <Teleport to="body">
+      <Transition name="playlist-fade">
+        <div
+          class="am-playlist-overlay"
+          v-if="showPlaylist"
+          @click.self="showPlaylist = false"
+        >
+          <div
+            class="am-playlist-bg"
+            :style="{ backgroundImage: `url(${song?.pic})` }"
+          ></div>
+          <div class="am-playlist-glass"></div>
+          <div class="am-playlist-panel">
+            <div class="am-playlist-header">
+              <div class="am-playlist-header-info">
+                <h3 class="am-playlist-title">
+                  <icon
+                    :icon="
+                      playMode === 'shuffle'
+                        ? 'ph:shuffle'
+                        : playMode === 'single'
+                          ? 'ph:repeat-once'
+                          : 'ph:repeat'
+                    "
+                  />
+                  {{
+                    playMode === "list"
+                      ? globalConfig.lang.playModeList
+                      : playMode === "single"
+                        ? globalConfig.lang.playModeSingle
+                        : globalConfig.lang.playModeShuffle
+                  }}
+                </h3>
+                <span class="am-playlist-count">{{ playOrder.length }} {{ globalConfig.lang.songUnit }}</span>
+              </div>
+              <button class="am-playlist-close" @click="showPlaylist = false">
+                <icon :icon="globalConfig.icon.close" />
+              </button>
+            </div>
+            <div class="am-playlist-body">
+              <div
+                v-for="(track, idx) in currentPlayOrder"
+                :key="track.url + idx"
+                class="am-playlist-item"
+                :class="{
+                  'am-playlist-item-active':
+                    String(track.url.match(/\d+$/)) === String(currentId),
+                  'am-playlist-item-drag': playMode !== 'shuffle',
+                }"
+                :draggable="playMode !== 'shuffle'"
+                @dragstart="onDragStart(idx)"
+                @dragover="onDragOver"
+                @drop="onDrop(idx)"
+                @click="
+                  playAtIndex(idx);
+                  showPlaylist = false;
+                "
+              >
+                <span
+                  class="am-playlist-drag-handle"
+                  v-if="playMode !== 'shuffle'"
+                >
+                  <icon icon="ph:dots-six-vertical" />
+                </span>
+                <img :src="track.pic" class="am-playlist-item-cover" />
+                <div class="am-playlist-item-info">
+                  <span class="am-playlist-item-name">{{ track.name }}</span>
+                  <span class="am-playlist-item-artist">{{
+                    track.artist
+                  }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </Transition>
@@ -1786,5 +2054,239 @@ setInterval(onTimeUpdate, 15);
 
 .iconify {
   color: #fff !important;
+}
+
+/* ===== 播放模式 & 歌单按钮 ===== */
+.am-mode-btn {
+  opacity: 0.5;
+  font-size: 24px;
+}
+.am-mode-btn.am-mode-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+.am-playlist-btn {
+  position: relative;
+}
+.am-playlist-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  padding: 0 4px;
+  min-width: 14px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* ===== 手机端歌单按钮 ===== */
+.mobile-playlist-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 100;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.mobile-playlist-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+.mobile-playlist-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== 歌单面板 ===== */
+.am-playlist-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+}
+.am-playlist-bg {
+  position: absolute;
+  inset: -30px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(60px) brightness(0.3);
+  transform: scale(1.05);
+  z-index: 0;
+}
+.am-playlist-glass {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  z-index: 1;
+}
+.am-playlist-panel {
+  position: relative;
+  z-index: 2;
+  width: min(400px, 85vw);
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+.am-playlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.am-playlist-header-info {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.am-playlist-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  border: none;
+}
+.am-playlist-count {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.am-playlist-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+.am-playlist-close:hover {
+  opacity: 0.7;
+}
+.am-playlist-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+.am-playlist-body::-webkit-scrollbar {
+  display: none;
+}
+.am-playlist-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.am-playlist-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.am-playlist-item-active {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.am-playlist-item-active .am-playlist-item-name {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.am-playlist-drag-handle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.25);
+  cursor: grab;
+  flex-shrink: 0;
+}
+.am-playlist-drag-handle:active {
+  cursor: grabbing;
+}
+.am-playlist-item-cover {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.am-playlist-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.am-playlist-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.am-playlist-item-artist {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== 歌单面板过渡动画 ===== */
+.playlist-fade-enter-active,
+.playlist-fade-leave-active {
+  transition: opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.playlist-fade-enter-active .am-playlist-panel,
+.playlist-fade-leave-active .am-playlist-panel {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.playlist-fade-enter-from,
+.playlist-fade-leave-to {
+  opacity: 0;
+}
+.playlist-fade-enter-from .am-playlist-panel,
+.playlist-fade-leave-to .am-playlist-panel {
+  transform: translateX(100%);
+}
+
+/* ===== 移动端歌单面板调整 ===== */
+@media (max-width: 768px) {
+  .am-playlist-panel {
+    width: 100%;
+  }
+  .am-playlist-overlay {
+    align-items: flex-end;
+  }
+  .am-playlist-panel {
+    max-height: 75vh;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px 16px 0 0;
+  }
+  .playlist-fade-enter-from .am-playlist-panel,
+  .playlist-fade-leave-to .am-playlist-panel {
+    transform: translateY(100%);
+  }
 }
 </style>

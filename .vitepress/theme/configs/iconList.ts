@@ -30,4 +30,9 @@ export const data = {
   taskNotComplete: "ph:circle",
   schedule: "ph:calendar-blank-duotone",
   close: "ph:x-bold",
+  playlist: "ph:list-bullets-bold",
+  musicsBold: "ph:music-notes-bold",
+  shuffle: "ph:shuffle-bold",
+  repeatOnce: "ph:repeat-once-bold",
+  repeat: "ph:repeat-bold",
 };

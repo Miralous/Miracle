@@ -276,7 +276,7 @@ export const globalConfig = {
   netease: {
     musicList: "17942010185",
     metingApi: "https://api.qijieya.cn/meting",
-    demoMode: true, // hide control buttons
+    demoMode: true, // if false, it will hide control buttons
     showTranslation: true, // show translation of lyrics (default: false, set true to show)
     showRoman: false, // show romanization of lyrics (default: false, set true to show)
     autoplay: true, // auto play music when page loaded

@@ -44,12 +44,12 @@ const components = {
   About,
   Moments,
   Manager,
-  MusicPlayer,
   // Layout
   Icon,
   Comments,
   Twikoo,
   File,
+  MusicPlayer,
 };
 
 type GlobalComponentTypes = typeof components;
