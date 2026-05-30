@@ -103,7 +103,10 @@ function toggleMobileLyrics() {
       ) as HTMLElement;
       if (activeEl) {
         container.scrollTo({
-          top: activeEl.offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2,
+          top:
+            activeEl.offsetTop -
+            container.clientHeight / 2 +
+            activeEl.clientHeight / 2,
           behavior: "instant",
         });
       } else {
@@ -113,7 +116,10 @@ function toggleMobileLyrics() {
           const target = lines[currentLyricIndex.value] as HTMLElement;
           if (target) {
             container.scrollTo({
-              top: target.offsetTop - container.clientHeight / 2 + target.clientHeight / 2,
+              top:
+                target.offsetTop -
+                container.clientHeight / 2 +
+                target.clientHeight / 2,
               behavior: "instant",
             });
           }
@@ -282,6 +288,38 @@ async function YrcToJson(musicid: string, meta: any) {
   return json;
 }
 
+// 歌词元数据关键词（多语言），用于过滤 "作词：", "Lyrics by:" 等非歌词行
+const LYRIC_METADATA_KW = new Set([
+  "accompaniment","arr.","arranged","arranged by","arranger","composers",
+  "composed by","composer","composing","cover by","guitar","interlude",
+  "lrc by","lyric","lyrics","lyrics by","mastered by","mastering",
+  "mixed by","mixing","music by","mv","originally by","piano",
+  "produced by","producer","rap","recording","translated by","translation",
+  "transliteration","trombone","trumpet","violin","vocal","words by",
+  "独白","發行","發行日期","發行時間","后期","和声","和聲","吉他",
+  "混音","混音/母带","键盘","简介","口白","录音","录音室","母带",
+  "母带处理","配唱","配唱制作","企划","曲","曲词","曲詞",
+  "詞","詞/曲","词","词/曲","词曲","编曲","編曲","制作","制作人",
+  "製作","製作人","翻唱","钢琴","萨克斯","色士风","弦乐","小号",
+  "小提琴","演唱","长号","中文词","中文翻译","翻譯","翻词",
+  "翻詞","歌词","歌詞","罗马音","翻唱","说唱","文案",
+  "作","作詞","作詞/作曲","作詞曲","作曲","作曲/编曲","作曲者","作词",
+  "作词/作曲","作词曲","작곡","작사","작사/작곡","편곡",
+]);
+const LYRIC_METADATA_RE = new RegExp(
+  "^(?:" +
+    [...LYRIC_METADATA_KW]
+      .sort((a, b) => b.length - a.length)
+      .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|") +
+    ")[\\s._\\-—:：]*:",
+  "i",
+);
+
+function isLyricMetadata(line: string): boolean {
+  return LYRIC_METADATA_RE.test(line.trim());
+}
+
 // 判断是否为纯音乐/无歌词
 const hasLyrics = computed(() => {
   if (lyrics.value.length === 0) return false;
@@ -302,6 +340,9 @@ const fetchMusicData = async () => {
       if (track) {
         song.value = track as SongData;
         maindate = await YrcToJson(currentId.value, song.value);
+        maindate.lyrics = maindate.lyrics.filter(
+          (l: LyricLine) => !isLyricMetadata(l.text),
+        );
         lyrics.value = maindate.lyrics;
         mediaSession();
         return;
@@ -315,6 +356,9 @@ const fetchMusicData = async () => {
     if (Array.isArray(data) && data.length > 0) {
       song.value = data[0];
       maindate = await YrcToJson(currentId.value, song.value);
+      maindate.lyrics = maindate.lyrics.filter(
+        (l: LyricLine) => !isLyricMetadata(l.text),
+      );
       lyrics.value = maindate.lyrics;
       mediaSession();
     }
