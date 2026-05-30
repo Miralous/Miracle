@@ -103,7 +103,10 @@ function toggleMobileLyrics() {
       ) as HTMLElement;
       if (activeEl) {
         container.scrollTo({
-          top: activeEl.offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2,
+          top:
+            activeEl.offsetTop -
+            container.clientHeight / 2 +
+            activeEl.clientHeight / 2,
           behavior: "instant",
         });
       } else {
@@ -113,7 +116,10 @@ function toggleMobileLyrics() {
           const target = lines[currentLyricIndex.value] as HTMLElement;
           if (target) {
             container.scrollTo({
-              top: target.offsetTop - container.clientHeight / 2 + target.clientHeight / 2,
+              top:
+                target.offsetTop -
+                container.clientHeight / 2 +
+                target.clientHeight / 2,
               behavior: "instant",
             });
           }
@@ -281,6 +287,41 @@ async function YrcToJson(musicid: string, meta: any) {
   console.log(json);
   return json;
 }
+import { LYRIC_METADATA_KW } from "./words";
+
+// 核心关键词（长词优先，请确保已加入 "单位" 或 "举办单位"）
+const sortedKeywords = [...LYRIC_METADATA_KW]
+  .sort((a, b) => b.length - a.length)
+  .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+  .join("|");
+
+// 完美匹配全半角符号及连写的正则
+const LYRIC_METADATA_RE = new RegExp(
+  "(?:" +
+    sortedKeywords +
+    ")" +
+    // 后缀约束：关键词后面必须跟着以下三种情况之一才删除
+    "(?:" +
+    // 1. 任意全半角标点符号（包含冒号、斜杠、横杠、等号、括号等）
+    "[._\\-—~/:：／＼＝=＝\\[\\]【】()（）《》<>\"规律'`“”+＋,，|｜#&§@×…\\s]+" +
+    "|" +
+    // 2. 纯空格，且空格后有名字（如：作词 周杰伦）
+    "\\s+(?=[^\\s])" +
+    "|" +
+    // 3. 关键词正好是括号的最后一部分（如：【独白】）
+    "(?=[\\s\\]】）)])" +
+    ")",
+  "i",
+);
+
+// 过滤函数
+function filterLyricLines(lines) {
+  return lines.filter((line) => !LYRIC_METADATA_RE.test(line));
+}
+
+function isLyricMetadata(line: string): boolean {
+  return LYRIC_METADATA_RE.test(line.trim());
+}
 
 // 判断是否为纯音乐/无歌词
 const hasLyrics = computed(() => {
@@ -302,6 +343,9 @@ const fetchMusicData = async () => {
       if (track) {
         song.value = track as SongData;
         maindate = await YrcToJson(currentId.value, song.value);
+        maindate.lyrics = maindate.lyrics.filter(
+          (l: LyricLine) => !isLyricMetadata(l.text),
+        );
         lyrics.value = maindate.lyrics;
         mediaSession();
         return;
@@ -315,6 +359,9 @@ const fetchMusicData = async () => {
     if (Array.isArray(data) && data.length > 0) {
       song.value = data[0];
       maindate = await YrcToJson(currentId.value, song.value);
+      maindate.lyrics = maindate.lyrics.filter(
+        (l: LyricLine) => !isLyricMetadata(l.text),
+      );
       lyrics.value = maindate.lyrics;
       mediaSession();
     }

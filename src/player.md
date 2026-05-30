@@ -53,6 +53,7 @@ onUnmounted(() => {
     
     .VPNavBar {
         backdrop-filter: blur(0px) !important;
+        transition: background-color calc(var(--vp-transition-time) * 2) !important;
     }
 
     /* ヘッダーを絶対配置にしてコンテンツの上に重ね、透明にする */
@@ -64,6 +65,11 @@ onUnmounted(() => {
         background: transparent !important;
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
+    }
+
+    /* モバイルメニュー展開時にnavbarを不透明にする（vp-transition-timeの遅延後に切り替え） */
+    .VPNavBar.screen-open {
+        background: var(--vp-nav-bg-color) !important;
     }
 }
 </style>
