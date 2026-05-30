@@ -327,6 +327,10 @@ async function QQJsonGET(name: string, artist: string, album: string, yrcjson: a
     return 1 - distance / Math.max(lenA, lenB);
   }
   let nmed = await fetch(`https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name)} ${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}`)
+  if(!nmed.ok){
+    console.log("QQ音乐API查询失败，使用原生歌词");
+    return;
+  }
   let nme = await nmed.json();
   if(!nme.data||!Array.isArray(nme.data)||nme.data.length === 0) {
     console.log("未找到匹配的歌曲，使用原生歌词");
@@ -340,6 +344,10 @@ async function QQJsonGET(name: string, artist: string, album: string, yrcjson: a
     return {metadata:{zq:false}};
   }
   let datae = await fetch(`https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`)
+  if(!datae.ok){
+    console.log("QQ音乐API查询歌词失败，使用原生歌词");
+    return;
+  }
   let dataejson = await datae.json();
   if(!dataejson.data) return;
   let qrc={orig: null, ts: null, roma: null};
@@ -453,6 +461,7 @@ function QrcToJson(qrcd: any,id: number, apinu: number){
   return json;
 }
 import { LYRIC_METADATA_KW } from "./words";
+//import { on } from "events";
 
 // 核心关键词（长词优先，请确保已加入 "单位" 或 "举办单位"）
 const sortedKeywords = [...LYRIC_METADATA_KW]
@@ -513,9 +522,13 @@ const fetchMusicData = async () => {
         if(!maindate.metadata.zq&&globalConfig.netease.QQMusicLyricsSource){
           const qqdata = await QQJsonGET(song.value.name, song.value.artist, '', maindate);
           if(qqdata&&qqdata.metadata&&qqdata.metadata.zq){
-            maindate = qqdata;
+            maindate.lyrics = qqdata.lyrics.filter(
+              (l: LyricLine) => !isLyricMetadata(l.text),
+            );
+            maindate.metadata = qqdata.metadata
           }
         }
+        console.log("歌词元数据过滤完成，最终:", maindate);
         lyrics.value = maindate.lyrics;
         mediaSession();
         return;
@@ -535,9 +548,13 @@ const fetchMusicData = async () => {
       if(!maindate.metadata.zq&&globalConfig.netease.QQMusicLyricsSource){
         const qqdata = await QQJsonGET(song.value.name, song.value.artist, '', maindate);
         if(qqdata&&qqdata.metadata&&qqdata.metadata.zq){
-          maindate = qqdata;
+          maindate.lyrics = qqdata.lyrics.filter(
+            (l: LyricLine) => !isLyricMetadata(l.text),
+          );
+          maindate.metadata = qqdata.metadata
         }
       }
+      console.log("歌词元数据过滤完成，最终:", maindate);
       lyrics.value = maindate.lyrics;
       mediaSession();
     }
@@ -589,7 +606,6 @@ function onTimeUpdate() {
   if (audioRef.value) {
     currentTime.value = audioRef.value.currentTime;
   }
-  requestAnimationFrame(() => onTimeUpdate());
 }
 
 const onLoadedMetadata = async () => {
@@ -866,8 +882,7 @@ onMounted(() => {
     if (e.key === "Escape") showMobileLyrics.value = false;
   });
 });
-
-onTimeUpdate();
+setInterval(onTimeUpdate, 15);
 </script>
 
 <template>
