@@ -10,6 +10,7 @@ import "./styles/color.css";
 import "./utils/rainbow";
 
 import beforeDocs from "./components/layout/beforeDocs.vue";
+import PostNav from "./components/layout/postNav.vue";
 import Comments from "./components/layout/afterDocs.vue";
 
 import { registerComponents } from "./configs/registerComponents";
@@ -25,7 +26,7 @@ export default {
   Layout: () =>
     h(DefaultTheme.Layout, null, {
       "doc-before": () => h(beforeDocs),
-      "doc-after": () => h(Comments),
+      "doc-after": () => h('div', null, [h(PostNav), h(Comments)]),
     }),
 
   enhanceApp({ app, router }) {
