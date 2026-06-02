@@ -19,6 +19,7 @@ import Moments from "../components/moments/moments.vue";
 import File from "../components/utils/file.vue";
 import Musics from "../components/dashboard/Musics.vue";
 import Pictures from "../components/dashboard/Pictures.vue";
+import Statistics from "../components/dashboard/Statistics.vue";
 import Timeline from "../components/timeline/timeline.vue";
 import About from "../components/about/about.vue";
 import MusicPlayer from "../components/player/player.vue";
@@ -37,6 +38,8 @@ const components = {
   Pictures,
   FriendCard,
   TagChip,
+  // Dashboard
+  Statistics,
   // Pages
   Articles,
   Tags,

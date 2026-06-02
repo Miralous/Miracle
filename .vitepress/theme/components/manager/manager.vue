@@ -5,7 +5,7 @@ import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
 import { useCardHover } from "../../utils/useCardHover";
 
-const activeTab = ref("posts"); // 默认 POSTS
+const activeTab = ref("statistics"); // 默认 Statistics
 const selectedCategory = ref("");
 
 // 分类
@@ -183,6 +183,19 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
     <!-- Tab 切换 -->
     <div class="tags">
       <TagChip
+        :active="activeTab === 'statistics'"
+        @click="activeTab = 'statistics'"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
+        :label="globalConfig.lang.statistics"
+      >
+        <template #icon>
+          <Icon :icon="globalConfig.icon.statistics" />
+        </template>
+      </TagChip>
+
+      <TagChip
         :active="activeTab === 'posts'"
         @click="activeTab = 'posts'"
         @mouseenter="handleMouseEnter"
@@ -239,6 +252,11 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
     <h1 class="year">{{ globalConfig.lang.contents }}</h1>
 
     <div class="posts-grid">
+      <!-- STATISTICS -->
+      <div v-if="activeTab === 'statistics'" class="statistics-wrapper">
+        <Statistics />
+      </div>
+
       <!-- POSTS -->
       <div
         v-if="activeTab === 'posts'"
@@ -603,5 +621,9 @@ span.anchor {
 
 .delete {
   color: var(--vp-c-danger-1);
+}
+
+.statistics-wrapper {
+  width: 100%;
 }
 </style>
