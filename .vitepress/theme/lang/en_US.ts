@@ -69,6 +69,7 @@ export const languageFile = {
   statistics: "Statistics",
   unknownTitle: "Unknown Title",
   unknownArtist: "Unknown Artist",
+  unknownAlbum: "Unknown Album",
   musicPlayerSuffix: "'s Music Player",
   games: "Games",
   played: "Played",

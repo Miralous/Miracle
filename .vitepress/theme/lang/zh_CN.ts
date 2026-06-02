@@ -69,6 +69,7 @@ export const languageFile = {
   statistics: "统计",
   unknownTitle: "未知歌曲",
   unknownArtist: "未知歌手",
+  unknownAlbum: "未知专辑",
   musicPlayerSuffix: "的音乐播放器",
   games: "游戏",
   played: "玩过",

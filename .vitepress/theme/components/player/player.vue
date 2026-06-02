@@ -76,6 +76,7 @@ let maindate: any;
 const song = ref<SongData | null>(null);
 const lyrics = ref<LyricLine[]>([]);
 const isLoading = ref(true);
+let albumName = ref("");
 
 // Audio & Playback State
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -277,8 +278,12 @@ async function YrcToJson(musicid: string, meta: any) {
   const response = await fetch(
     `https://cors.emnasop.cn/api/lyric?id=${musicid}`,
   );
-  //暂时的cors代理,原为“https://music.163.com/api/song/lyric?os=pc&id=${musicid}&yv=-1&tv=-1&rv=-1&lv=-1”
+  /*
+    暂时的cors代理,原为“https://music.163.com/api/song/lyric?os=pc&id=${musicid}&yv=-1&tv=-1&rv=-1&lv=-1”
+    注意！上api没有albumName，它来自http://music.163.com/api/song/detail/?id=${musicid}&ids=%5B${musicid}%5D的songs[0].album.name
+  */
   const datae = await response.json();
+  albumName.value = datae.albumName || meta.name;
   const yrc = datae;
   let json: any = {
     metadata: { zq: false, m: 2, CLXIIIid: "", nolyric: true },
@@ -358,6 +363,7 @@ async function YrcToJson(musicid: string, meta: any) {
   json.metadata.CLXIIIid = musicid;
   json.metadata.ti = meta.name;
   json.metadata.ar = meta.artist;
+  json.metadata.al = albumName;
   json.metadata.roma = pdjg.romaif;
   json.metadata.pair = pdjg.pairif;
   console.log(json);
@@ -414,12 +420,13 @@ async function QQJsonGET(
     console.log("未找到匹配的歌曲，使用原生歌词");
     return;
   }
-  let aru = stringSimilarity(nme.data[0].singer, artist);
-  let tiu = stringSimilarity(nme.data[0].name, name);
-  let alu = stringSimilarity(nme.data[0].album, album);
-  if (aru < 0.3 && tiu < 0.8 && alu < 0.3) {
-    console.log("QQ音乐API查询结果相似度不足，使用原生歌词");
-    return { metadata: { zq: false } };
+  if(!nme.data[0].song||!nme.data[0].singer||!nme.data[0].album) {console.error("NSA不存在");return};
+  let aru = stringSimilarity(nme.data[0].singer.replace(/\([^)]*\)/g, '').replace(/ /g, ""),artist.replace(/\([^)]*\)/g, '').replace(/ /g, ""))
+  let tiu = stringSimilarity(nme.data[0].song.replace(/\([^)]*\)/g, '').replace(/-.*$/, '').replace(/ /g, ""),name.replace(/\([^)]*\)/g, '').replace(/ /g, ""))
+  let alu = album==name?1:stringSimilarity(nme.data[0].album.replace(/\([^)]*\)/g, '').replace(/ /g, ""),album.replace(/\([^)]*\)/g, '').replace(/ /g, ""))
+  
+  if(aru<0.3||tiu<0.8||alu<0.3){
+      return {metadata:{zq:false,message:`匹配度过低，放弃匹配。相似度：歌手${aru.toFixed(2)}，歌曲${tiu.toFixed(2)}，专辑${alu.toFixed(2)}。${nme.data.data[0].song} - ${nme.data.data[0].singer} · ${nme.data.data[0].album}`}};
   }
   let datae = await fetch(
     `https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`,
@@ -633,7 +640,7 @@ const fetchMusicData = async () => {
           const qqdata = await QQJsonGET(
             song.value.name,
             song.value.artist,
-            "",
+            albumName.value || "",
             maindate,
           );
           if (qqdata && qqdata.metadata && qqdata.metadata.zq) {
@@ -664,7 +671,7 @@ const fetchMusicData = async () => {
         const qqdata = await QQJsonGET(
           song.value.name,
           song.value.artist,
-          "",
+          albumName.value || "",
           maindate,
         );
         if (qqdata && qqdata.metadata && qqdata.metadata.zq) {
@@ -689,7 +696,7 @@ function mediaSession() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.value?.name || globalConfig.lang.unknownTitle,
       artist: song.value?.artist || globalConfig.lang.unknownArtist,
-      //album: song.value?.album || "Unknown Album", 部分meting接口没有返回专辑信息，暂不使用
+      album: albumName.value || globalConfig.lang.unknownAlbum, 
       artwork: [
         {
           src: song.value?.pic || "",
@@ -781,7 +788,7 @@ const currentLyricIndex = computed(() => {
   return 0;
 });
 function document_title_change() {
-  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist} | ${globalConfig.author}${globalConfig.lang.musicPlayerSuffix}`;
+  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist}${albumName.value ? `《${albumName.value}》` : ``} | ${globalConfig.author}${globalConfig.lang.musicPlayerSuffix}`;
   if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
     if (
       currentLyricIndex.value !== -1 &&
@@ -1067,7 +1074,7 @@ setInterval(onTimeUpdate, 15);
         <div class="am-cover-wrapper" :class="{ 'is-playing': isPlaying }">
           <img
             :src="song.pic"
-            alt="Album Cover"
+            :alt="albumName || globalConfig.lang.unknownAlbum"
             class="am-cover"
             @click="togglePlay"
           />
