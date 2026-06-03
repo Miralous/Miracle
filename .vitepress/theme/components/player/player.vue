@@ -373,7 +373,6 @@ async function QQJsonGET(
   name: string,
   artist: string,
   album: string,
-  yrcjson: any,
 ) {
   console.log("正在使用QQ音乐API进行补充查询...");
   function stringSimilarity(a: string, b: string) {
@@ -408,10 +407,16 @@ async function QQJsonGET(
     const distance = prev[lenB]; // 最终编辑距离
     return 1 - distance / Math.max(lenA, lenB);
   }
-  let nmed = await fetch(
-    `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name)} ${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}`,
-  );
-  if (!nmed.ok) {
+  let nmed;
+  try {
+    nmed = await fetch(
+      `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name.replace(/-.*$/, ''))}%20${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}%20${album==name?'':encodeURIComponent(album)}`
+    );
+  } catch (error) {
+    console.error('请求失败:', error);
+    nmed = null;
+  }
+  if (!nmed || !nmed.ok) {
     console.log("QQ音乐API查询失败，使用原生歌词");
     return;
   }
@@ -428,15 +433,23 @@ async function QQJsonGET(
   if(aru<0.3||tiu<0.8||alu<0.3){
       return {metadata:{zq:false,message:`匹配度过低，放弃匹配。相似度：歌手${aru.toFixed(2)}，歌曲${tiu.toFixed(2)}，专辑${alu.toFixed(2)}。${nme.data.data[0].song} - ${nme.data.data[0].singer} · ${nme.data.data[0].album}`}};
   }
-  let datae = await fetch(
-    `https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`,
-  );
-  if (!datae.ok) {
+  let dataejson;
+  try {
+    const response = await fetch(
+      `https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[0].id}`
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    dataejson = await response.json();
+  } catch (error) {
+    console.error('请求失败:', error);
+    datae = null;
+  }
+  if (!dataejson || !dataejson.data) {
     console.log("QQ音乐API查询歌词失败，使用原生歌词");
     return;
   }
-  let dataejson = await datae.json();
-  if (!dataejson.data) return;
   let qrc = { orig: null, ts: null, roma: null };
   qrc.orig = dataejson.data.yrc;
   qrc.ts = dataejson.data.trans;
@@ -641,7 +654,6 @@ const fetchMusicData = async () => {
             song.value.name,
             song.value.artist,
             albumName.value || "",
-            maindate,
           );
           if (qqdata && qqdata.metadata && qqdata.metadata.zq) {
             maindate.lyrics = qqdata.lyrics.filter(
@@ -672,7 +684,6 @@ const fetchMusicData = async () => {
           song.value.name,
           song.value.artist,
           albumName.value || "",
-          maindate,
         );
         if (qqdata && qqdata.metadata && qqdata.metadata.zq) {
           maindate.lyrics = qqdata.lyrics.filter(
@@ -788,7 +799,7 @@ const currentLyricIndex = computed(() => {
   return 0;
 });
 function document_title_change() {
-  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist}${albumName.value ? `《${albumName.value}》` : ``} | ${globalConfig.author}${globalConfig.lang.musicPlayerSuffix}`;
+  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist}${albumName.value && albumName.value !== song.value?.name ? `《${albumName.value}》` : ``} | ${globalConfig.author}${globalConfig.lang.musicPlayerSuffix}`;
   if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
     if (
       currentLyricIndex.value !== -1 &&
