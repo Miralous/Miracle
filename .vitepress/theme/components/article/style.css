@@ -24,10 +24,10 @@
 }
 
 .diary:hover {
-  opacity: 0.7;
+  opacity: 0.72;
 }
 .diary:hover .title {
-  color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-2);
 }
 
 .textPlace {

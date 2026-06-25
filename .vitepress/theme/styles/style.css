@@ -12,7 +12,8 @@
 @import url("./twikoo.css");
 @import url("katex/dist/katex.min.css");
 @import url("https://rsms.me/inter/inter.css");
-@import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300..700;1,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap");
 @import url("https://fonts.googleapis.cn/css2?family=Noto+Serif+SC:wght@200..900&display=swap");
 
 /**
@@ -20,26 +21,25 @@
  * -------------------------------------------------------------------------- */
 
 :root {
-  /* font family */
+  /* font family — Claude uses humanist sans + slab-serif display + JetBrains Mono */
   --vp-font-family-base: "InterVariable", system-ui, sans-serif;
-  --vp-font-family-mono: "IBM Plex Mono", var(--vp-font-family-base);
+  --vp-font-family-mono: "JetBrains Mono", ui-monospace, monospace;
   /* only for title !!!!!! */
-  --vp-font-family-title: "Noto Serif SC", var(--vp-font-family-base);
+  --vp-font-family-title: "Crimson Pro", "Noto Serif SC", Georgia, serif;
 
   /* Border Radius */
   --vp-border-radius-2: calc(var(--vp-border-radius-1) - 6px);
   --vp-border-radius-3: calc(var(--vp-border-radius-2) - 6px);
   --vp-border-radius-4: calc(var(--vp-border-radius-3) - 6px);
 
-  /* Shadow */
+  /* Shadow — soft warm, lower opacity, Claude-inspired */
   --vp-shadow:
-    var(--vp-c-bg-alt) 0px 12px 25px -5px, var(--vp-c-bg-alt) 0px 7px 15px -7px;
+    rgba(0, 0, 0, 0.04) 0px 4px 12px,
+    rgba(0, 0, 0, 0.03) 0px 2px 6px;
   --vp-shadow-brand:
-    var(--vp-c-brand-soft) 0px 12px 25px -5px,
-    var(--vp-c-brand-soft) 0px 7px 15px -7px;
+    oklch(0.68 0.12 calc(var(--hue) + 28) / 0.18) 0px 8px 20px -4px;
   --vp-shadow-negative:
-    var(--vp-c-yellow-soft) 0px 12px 25px -5px,
-    var(--vp-c-yellow-soft) 0px 7px 15px -7px;
+    rgba(212, 160, 23, 0.18) 0px 8px 20px -4px;
 
   /* Blur */
   --vp-blur: blur(10px);
@@ -47,27 +47,27 @@
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);
 
-  /* === Editorial Minimalist Tokens === */
+  /* === Warm Humanist Editorial Tokens === */
 
   /* Spacing */
   --vp-gap-lg: calc(var(--vp-gap) * 2.5);
   --vp-card-padding: calc(var(--vp-gap) * 2.5);
 
   /* Thin decorative line */
-  --vp-line-thin: 1px solid var(--vp-c-text-2);
-  --vp-line-opacity: 0.2;
+  --vp-line-thin: 1px solid var(--vp-c-text-3);
+  --vp-line-opacity: 0.18;
 
   /* Typography */
-  --vp-font-family-display: "Playfair Display", var(--vp-font-family-title);
+  --vp-font-family-display: "Crimson Pro", "Noto Serif SC", Georgia, serif;
   --vp-font-size-meta: 0.75rem;
   --vp-font-letter-spacing-meta: 0.4em;
   --vp-font-weight-card-title: 500;
   --vp-font-weight-body: 400;
   --vp-font-line-height-body: 1.8;
 
-  /* Animations */
-  --vp-easing-editorial: cubic-bezier(0.77, 0, 0.175, 1);
-  --vp-anim-duration-fade: 0.8s;
+  /* Animations — slower, breathing (Claude: meditative, not aggressive) */
+  --vp-easing-editorial: cubic-bezier(0.4, 0, 0.2, 1);
+  --vp-anim-duration-fade: 1s;
 
   /* Section heading decorative line */
   --vp-decorative-line-width: 3rem;

@@ -35,7 +35,7 @@ export const globalConfig = {
   // theme setting
   styles: {
     color: {
-      hue: 280,
+      hue: 16, // warm coral (Claude-inspired)
       globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
         enabled: false, // hue will be cycled
