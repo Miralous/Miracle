@@ -109,7 +109,6 @@ const groupedMoments = computed(() => {
 </template>
 
 <style scoped>
-/* 保持您原有的样式不变 */
 .posts-grid {
   display: flex;
   gap: var(--vp-gap);
@@ -122,45 +121,42 @@ const groupedMoments = computed(() => {
   gap: var(--vp-gap);
 }
 .momentImage {
-  border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
-  border-bottom: 1px solid var(--vp-c-divider);
-  height: 200px;
   width: 100%;
+  max-height: 180px;
   object-fit: cover;
+  margin-bottom: 1rem;
+  border-radius: var(--vp-border-radius-3);
 }
 .post-card {
   display: flex;
   flex: 1;
-  border-radius: var(--vp-border-radius-1);
-  border: 1px solid var(--vp-c-divider);
   flex-direction: column;
-  background-color: var(--vp-c-bg);
-  will-change: transform;
-  box-shadow: var(--vp-shadow);
-  transition: all var(--vp-transition-time);
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+  transition: opacity var(--vp-transition-time);
 }
 .post-card:hover {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
+  opacity: 0.7;
 }
 .textPlace {
-  padding: 25px;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 .meta {
   margin-top: auto;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--vp-font-size-meta);
+  font-weight: 400;
   color: var(--vp-c-text-3);
   opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: var(--vp-font-letter-spacing-meta);
 }
 .content {
   color: var(--vp-c-text-1);
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 22px;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.7;
   margin-bottom: 6px;
   transition: all var(--vp-transition-time);
 }
@@ -169,11 +165,12 @@ const groupedMoments = computed(() => {
 }
 .year {
   margin-top: 30px;
-  line-height: 110px;
+  line-height: 1.1;
   font-size: 100px;
   position: relative;
   top: 30px;
-  font-weight: bold;
+  font-weight: 400;
+  font-family: var(--vp-font-family-display);
   color: var(--vp-c-gutter);
   opacity: 0.7;
   z-index: -1;

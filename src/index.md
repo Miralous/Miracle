@@ -12,7 +12,7 @@ footer: false
 </ClientOnly>
 <div class="VPContent is-home" id="VPContent" style="padding-top: 0 !important;">
     <div class="VPHome">
-        <div class="vp-doc container" style="margin: 0 auto; padding: 0 6vw 128px 6vw; max-width: 1280px;">
+        <div class="vp-doc container" style="margin: 0 auto; padding: 0 14vw 128px 14vw;">
 <div v-if="globalConfig.homePage.modules.pictures" class="hide-phone">
     <h2><Icon :icon="globalConfig.icon.photos"/> {{ globalConfig.lang.photos }}</h2>
     <ClientOnly>
@@ -117,9 +117,6 @@ footer: false
     .indexPage img.VPImage.logo {
         display: none
     }
-    .indexPage h2 {
-        text-transform: var(--vp-title-uppercase);
-    }
 /* ========================================================
    核心修复：所有模块默认不显示顶边框
    ======================================================== */
@@ -128,12 +125,12 @@ footer: false
 }
 
 /* ========================================================
-   只有当它“不是第一个可见模块”时，才把边框补回来。
+   只有当它"不是第一个可见模块"时，才把边框补回来。
    通过 `~` 选择器，如果一个 div 前面还有别的 div，说明它不是第一，就加边框。
    ======================================================== */
 .indexPage .container > div ~ div h2 {
     border-top: 1px solid var(--vp-c-divider) !important;
-    margin-top: 48px !important; /* 恢复后续模块的间距 */
+    margin-top: 64px !important; /* 恢复后续模块的间距 */
 }
 
 /* ========================================================
@@ -156,6 +153,7 @@ footer: false
 
 /* 统一让真正意义上的第一个元素的顶间距缩减 */
 .indexPage .container > div:first-child h2 {
-    margin-top: 10px !important;
+    margin-top: 24px !important;
 }
+
 </style>
