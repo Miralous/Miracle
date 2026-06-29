@@ -145,9 +145,6 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 </template>
 
 <style scoped>
-* {
-  font-weight: 500 !important;
-}
 .timeline-wrapper {
   display: flex;
   flex-direction: column;
@@ -174,6 +171,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   color: inherit;
   transition: all var(--vp-transition-time);
   cursor: default;
+  font-weight: 400;
 
   --line-color-post: var(--vp-c-brand-1);
   --line-color-post-negative: var(--vp-c-red-1);
@@ -220,7 +218,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   left: 65px;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 1px;
   opacity: 0.5;
   z-index: 1;
 
@@ -258,8 +256,8 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   left: 66px;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: var(--line-color);
   transition: all var(--vp-transition-time);
@@ -288,6 +286,7 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   text-overflow: ellipsis;
   word-break: break-all;
   transition: all var(--vp-transition-time);
+  font-weight: 400;
 }
 
 .timeline-item.post:hover .timeline-text-content {
@@ -309,11 +308,13 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   transform: translateY(-50%);
   width: 45px;
   text-align: right;
-  font-size: 0.875rem;
+  font-size: var(--vp-font-size-meta);
   color: var(--vp-c-text-3);
   opacity: 0.8;
-  font-family: var(--vp-use-mono);
+  font-family: var(--vp-font-family-base);
   font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  letter-spacing: var(--vp-font-letter-spacing-meta);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -328,11 +329,12 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
 
 .year {
   margin-top: 30px;
-  line-height: 110px;
+  line-height: 1.1;
   font-size: 100px;
   position: relative;
   top: 30px;
-  font-weight: bold !important;
+  font-weight: 400 !important;
+  font-family: var(--vp-font-family-display);
   color: var(--vp-c-gutter);
   opacity: 0.7;
   z-index: -1;

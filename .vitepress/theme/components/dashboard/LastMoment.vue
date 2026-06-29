@@ -3,9 +3,6 @@
     v-if="lastMoment"
     class="last-moment"
     href="/moments"
-    @mouseenter="handleMouseEnter"
-    @mousemove="handleMouseMove"
-    @mouseleave="handleMouseLeave"
   >
     <div class="content">
       <span class="text">
@@ -24,7 +21,6 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useCardHover } from "../../utils/useCardHover";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
 import { globalConfig } from "#config";
 import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
@@ -36,7 +32,6 @@ interface Moment {
   negative?: boolean;
 }
 
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 const { moments } = globalConfig;
 const { showNegative } = useDeepHideNegative();
 
@@ -55,51 +50,50 @@ const lastMoment = computed<Moment | null>(() => {
 <style scoped>
 .last-moment {
   display: flex;
-  justify-content: center; /* 水平居中 */
+  justify-content: flex-start;
   align-items: center;
-  padding: 15px 25px;
+  padding: 1.25rem 0;
   margin-bottom: var(--vp-gap);
-  border-radius: var(--vp-border-radius-1);
-  border: 1px solid var(--vp-c-divider);
-  background-color: var(--vp-c-bg);
+  border-bottom: 1px solid var(--vp-c-divider);
   text-decoration: none;
   overflow: hidden;
-  white-space: nowrap; /* 一行显示 */
-  box-shadow: var(--vp-shadow);
-  transition: all var(--vp-transition-time);
-  will-change: transform;
+  white-space: nowrap;
+  transition: opacity var(--vp-transition-time);
 }
 
 .last-moment:hover {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: var(--vp-shadow-brand);
+  opacity: 0.7;
+}
+.last-moment:hover .text {
+  color: var(--vp-c-brand-2);
 }
 
 .content {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 100%; /* 避免超出容器 */
-  overflow: hidden; /* 超出隐藏 */
-  justify-content: center; /* 内部内容居中 */
+  max-width: 100%;
+  overflow: hidden;
+  justify-content: flex-start;
 }
 
 .text {
-  font-weight: 600;
+  font-weight: 400;
+  font-family: var(--vp-font-family-display);
   color: var(--vp-c-text-1);
-  text-overflow: ellipsis; /* 超出显示省略号 */
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   transition: color var(--vp-transition-time);
 }
 
-.last-moment:hover .text {
-  color: var(--vp-c-brand-2);
-}
-
 .datetime {
-  flex-shrink: 0; /* 日期不收缩 */
+  flex-shrink: 0;
+  font-size: var(--vp-font-size-meta);
   color: var(--vp-c-text-3);
   opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: var(--vp-font-letter-spacing-meta);
 }
 </style>

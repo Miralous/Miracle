@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useCardHover } from "../../utils/useCardHover";
 import { data as posts } from "../../data/posts.data";
 import { data as moments } from "../../data/moments.data";
 import { data as photos } from "../../data/photos.data";
 import { data as friends } from "../../data/friends.data";
 import { globalConfig } from "#config";
 import { getRunningTime } from "../../utils/getRunningTime";
-
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 // ─── 基础统计 ──────────────────────────────────────────────
 
@@ -75,9 +72,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
     <div class="stats-grid">
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.category" />
@@ -90,9 +84,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.wordCount" />
@@ -105,9 +96,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.moment" />
@@ -120,9 +108,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.average" />
@@ -140,9 +125,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
     <div class="stats-grid two">
       <div
         class="stat-card extended"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         v-if="longestPost"
       >
         <div class="stat-icon">
@@ -164,9 +146,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card extended"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         v-if="shortestPost"
       >
         <div class="stat-icon">
@@ -199,9 +178,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
         :label="cat"
         :count="count"
         :href="`/archives?category=${encodeURIComponent(cat)}`"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <template #icon>
           <Icon :icon="globalConfig.icon.category" />
@@ -221,9 +197,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
         :label="tag"
         :count="count"
         :href="`/tags?tag=${encodeURIComponent(tag)}`"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <template #icon>
           <Icon :icon="globalConfig.icon.tag" />
@@ -239,9 +212,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
     <div class="stats-grid">
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.moment" />
@@ -254,9 +224,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.photos" />
@@ -269,9 +236,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.friends" />
@@ -284,9 +248,6 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
       <div
         class="stat-card"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="stat-icon">
           <Icon :icon="globalConfig.icon.siteAge" />
@@ -309,9 +270,11 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
   display: flex;
   align-items: center;
   margin: 32px 0 20px;
-  font-family: var(--vp-font-family-title);
-  font-weight: 700;
-  font-size: 1.4rem;
+  font-family: var(--vp-font-family-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
   border-top: none !important;
 }
 
@@ -320,12 +283,15 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 }
 
 .statistics h2:before {
-  content: "‎";
+  content: "";
   display: block;
-  height: 20px;
-  border-radius: var(--vp-border-radius-4);
-  border: 2px solid var(--vp-c-brand-3);
-  margin-right: 14px;
+  width: var(--vp-decorative-line-width);
+  height: 1px;
+  background-color: var(--vp-c-text-2);
+  margin-right: 1.25rem;
+  opacity: 0.5;
+  border: none;
+  border-radius: 0;
 }
 
 /* ── 网格 ── */
@@ -347,25 +313,19 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
   }
 }
 
-/* ── 统计卡片 ── */
+/* ── 统计文本行 ── */
 
 .stat-card {
-  border-radius: var(--vp-border-radius-2);
-  border: 1px solid var(--vp-c-divider);
-  background-color: var(--vp-c-bg);
-  box-shadow: var(--vp-shadow);
-  padding: 20px 24px;
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: all var(--vp-transition-time);
-  will-change: transform;
-  z-index: 1;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+  transition: opacity var(--vp-transition-time);
 }
 
 .stat-card:hover {
-  border-color: var(--vp-c-brand-2);
-  box-shadow: var(--vp-shadow-brand);
+  opacity: 0.7;
 }
 
 .stat-card.extended {
@@ -375,15 +335,11 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
 .stat-icon {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--vp-border-radius-3);
-  background-color: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .stat-body {
@@ -394,15 +350,15 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 
 .stat-value {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.2;
   color: var(--vp-c-text-1);
-  font-family: var(--vp-use-mono);
+  font-family: var(--vp-font-family-display);
 }
 
 .stat-value.small {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -419,20 +375,20 @@ const runningDays = computed(() => getRunningTime(globalConfig.dateCreated));
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: var(--vp-font-size-meta);
   color: var(--vp-c-text-3);
   opacity: 0.8;
-  font-weight: 500;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: var(--vp-font-letter-spacing-meta);
 }
 
 .stat-meta {
-  font-size: 12px;
+  font-size: var(--vp-font-size-meta);
   color: var(--vp-c-text-3);
   opacity: 0.6;
   margin-top: 2px;
-  font-family: var(--vp-use-mono);
+  font-family: var(--vp-font-family-base);
 }
 
 /* ── 胶囊网格 ── */

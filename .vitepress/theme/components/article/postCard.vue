@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useCardHover } from "../../utils/useCardHover";
 import { globalConfig } from "#config";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
 
@@ -27,8 +26,6 @@ const props = withDefaults(defineProps<CardProps>(), {
   negative: false,
   meta: "true",
 });
-
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 // 计算最终跳转链接
 const clink = computed(() => {
@@ -60,9 +57,6 @@ const isClickable = computed(() => !!clink.value);
     :type="props.type"
     class="diary"
     :class="{ 'is-negative': props.negative }"
-    @mouseenter="handleMouseEnter"
-    @mousemove="handleMouseMove"
-    @mouseleave="handleMouseLeave"
   >
     <!-- ✅ 优化：删除了原本代码中重复嵌套了一层的 v-if="props.image" -->
     <div v-if="props.image" class="img-container">
@@ -135,11 +129,11 @@ const isClickable = computed(() => !!clink.value);
 
 <style scoped>
 .img-container img {
-  border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
-  border-bottom: 1px solid var(--vp-c-divider);
-  height: 200px;
   width: 100%;
+  max-height: 180px;
   object-fit: cover;
+  margin-bottom: 1rem;
+  border-radius: var(--vp-border-radius-3);
 }
 
 .iconify {
@@ -149,46 +143,38 @@ const isClickable = computed(() => !!clink.value);
 
 .diary {
   flex: 1;
-  border-radius: var(--vp-border-radius-1);
-  border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
-  background-color: var(--vp-c-bg);
-  will-change: transform;
-  box-shadow: var(--vp-shadow);
-  transition: all var(--vp-transition-time);
-  z-index: 1;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+  transition: opacity var(--vp-transition-time);
 }
 
 .diary[type="project"] .title {
   text-transform: var(--vp-title-uppercase);
-  font-family: var(--vp-use-mono);
+  font-family: var(--vp-font-family-display);
 }
 
 .diary:hover {
-  border-color: var(--vp-c-brand-2);
-  box-shadow: var(--vp-shadow-brand);
+  opacity: 0.7;
+}
+.diary:hover .title {
+  color: var(--vp-c-brand-1);
 }
 
-/* ========================================== */
-/* ✅ 新增：Negative 状态下的 Hover 样式覆盖 */
-/* ========================================== */
+/* Negative posts: dashed bottom border */
 .diary.is-negative {
-  border-style: dashed;
-  border-color: var(--vp-c-yellow-1);
+  border-bottom-style: dashed;
+  border-bottom-color: var(--vp-c-yellow-1);
 }
 .diary.is-negative:hover {
-  border-color: var(--vp-c-yellow-1);
-  box-shadow: var(--vp-shadow-negative) !important;
+  opacity: 0.8;
 }
-
 .diary.is-negative:hover .title {
   color: var(--vp-c-yellow-1);
 }
-/* ========================================== */
 
 .textPlace {
-  padding: 25px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -196,55 +182,54 @@ const isClickable = computed(() => !!clink.value);
 
 .meta {
   margin-top: auto;
-  font-size: 13px;
+  font-size: var(--vp-font-size-meta);
   color: var(--vp-c-text-3);
   opacity: 0.8;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 500;
+  font-weight: var(--vp-font-weight-body);
+  text-transform: uppercase;
+  letter-spacing: var(--vp-font-letter-spacing-meta);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .title {
   margin-bottom: 8px !important;
   color: var(--vp-c-text-1);
-  font-size: 20px;
-  line-height: 26px;
-  font-weight: 600;
+  font-size: 1.15rem;
+  line-height: 1.35;
+  font-weight: var(--vp-font-weight-card-title);
+  font-family: var(--vp-font-family-display);
   margin: 0;
-  text-transform: capitalize;
-  transition: all var(--vp-transition-time);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  transition: color var(--vp-transition-time);
 }
 
-.diary:hover .title {
-  color: var(--vp-c-brand-2);
-}
-
-/* ✅ 关键：换行 + 自动换行 */
 .details {
   color: var(--vp-c-text-2);
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 0.9rem;
+  line-height: 1.7;
   white-space: pre-line;
   overflow-wrap: break-word;
-  font-weight: 500;
+  font-weight: var(--vp-font-weight-body);
 }
 
 .notitle {
-  font-size: 15px;
+  font-size: 0.95rem;
 }
 
 .category {
   margin-right: 5px;
   color: var(--vp-c-text-2);
-  opacity: 0.8;
-  background-color: var(--vp-c-border);
-  padding: 2px 9px;
-  border-radius: var(--vp-border-radius-1);
-  font-size: 13px;
+  font-size: var(--vp-font-size-meta);
+  text-transform: uppercase;
+  letter-spacing: var(--vp-font-letter-spacing-meta);
 }
 .category:hover {
   color: var(--vp-c-text-1);
-  opacity: 1;
 }
 </style>

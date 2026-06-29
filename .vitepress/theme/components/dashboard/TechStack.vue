@@ -2,9 +2,6 @@
   <div class="tech-grid">
     <TagChip
       v-for="stack in stacks"
-      @mouseenter="handleMouseEnter"
-      @mousemove="handleMouseMove"
-      @mouseleave="handleMouseLeave"
       :key="stack.name"
       :label="stack.name"
     >
@@ -17,8 +14,6 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useCardHover } from "#theme/utils/useCardHover";
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 import { globalConfig } from "#config";
 
 const stacks = ref(globalConfig.homePage.stacks);

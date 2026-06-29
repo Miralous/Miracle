@@ -5,9 +5,6 @@
       <TagChip
         v-for="friend in friends"
         :key="friend.title"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         :label="friend.title"
         :href="friend.link"
       >
@@ -21,8 +18,6 @@
 
 <script setup lang="ts">
 import { globalConfig } from "#config";
-import { useCardHover } from "#theme/utils/useCardHover";
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 function shuffle(array: any[]) {
   return array

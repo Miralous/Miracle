@@ -3,7 +3,6 @@ import { ref, computed } from "vue";
 import { Icon } from "@iconify/vue";
 import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
-import { useCardHover } from "../../utils/useCardHover";
 
 const activeTab = ref("statistics"); // 默认 Statistics
 const selectedCategory = ref("");
@@ -45,9 +44,6 @@ const handleCategoryClick = (cat: string) => {
   url.searchParams.set("category", cat);
   window.history.pushState({}, "", url);
 };
-
-// 卡片鼠标交互
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 // 生成当前时间字符串
 const getCurrentTimeString = () => {
@@ -185,9 +181,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <TagChip
         :active="activeTab === 'statistics'"
         @click="activeTab = 'statistics'"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.statistics"
       >
         <template #icon>
@@ -198,9 +191,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <TagChip
         :active="activeTab === 'posts'"
         @click="activeTab = 'posts'"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.posts"
       >
         <template #icon>
@@ -211,9 +201,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <TagChip
         :active="activeTab === 'moments'"
         @click="activeTab = 'moments'"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.moments"
       >
         <template #icon>
@@ -225,9 +212,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
         v-if="showPhotosTab"
         :active="activeTab === 'photos'"
         @click="activeTab = 'photos'"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.photos"
       >
         <template #icon>
@@ -238,9 +222,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <TagChip
         :active="activeTab === 'friends'"
         @click="activeTab = 'friends'"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.friends"
       >
         <template #icon>
@@ -261,9 +242,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <div
         v-if="activeTab === 'posts'"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <div class="title">{{ globalConfig.lang.createANewPost }}</div>
@@ -293,9 +271,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
         v-for="post in groupedPosts"
         :key="post.url"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <div class="title">{{ post.title }}</div>
@@ -323,9 +298,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <div
         v-if="activeTab === 'moments'"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <div class="title">{{ globalConfig.lang.createANewMoment }}</div>
@@ -355,9 +327,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
         v-for="m in globalConfig.moments"
         :key="m.date + m.time"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <div class="title">{{ m.content }}</div>
@@ -382,9 +351,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <div
         v-if="activeTab === 'photos' && showPhotosTab"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <div class="title">{{ globalConfig.lang.previewTree }}</div>
@@ -403,9 +369,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
         v-for="p in groupedPhotos"
         :key="p.path"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <img :src="p.path" class="avatar" />
@@ -432,9 +395,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
       <div
         v-if="activeTab === 'friends'"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <div class="title">{{ globalConfig.lang.addANewLink }}</div>
@@ -464,9 +424,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
         v-for="f in globalConfig.friends"
         :key="f.link"
         class="post-card diary"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
       >
         <div class="textPlace">
           <img
@@ -527,7 +484,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
   display: flex;
   flex-direction: column;
   background-color: var(--vp-c-bg);
-  will-change: transform;
   box-shadow: var(--vp-shadow);
   transition: all var(--vp-transition-time);
 }
@@ -597,7 +553,6 @@ const showPhotosTab = computed(() => !photos || photos.length === 0);
   font-size: 13px;
 }
 .tags {
-  perspective: 1000px;
   border-radius: var(--vp-border-radius-1);
   transition: all var(--vp-transition-time);
   display: flex;

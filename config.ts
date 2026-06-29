@@ -35,7 +35,7 @@ export const globalConfig = {
   // theme setting
   styles: {
     color: {
-      hue: 280,
+      hue: 16, // warm coral (Claude-inspired)
       globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
         enabled: false, // hue will be cycled
@@ -50,13 +50,6 @@ export const globalConfig = {
       transparent: false, // transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
       mono: false, // use monospace font for title
-      cardHover: {
-        enabled: true, // enable card hover effect
-        scale: 1.03,
-        maxMove: 8,
-        maxRotate: 5, // 3d effect |  set 0 to disable 3D
-        easing: 0.5,
-      },
     },
   },
 
