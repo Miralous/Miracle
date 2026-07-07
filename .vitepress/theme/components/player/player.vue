@@ -410,7 +410,7 @@ async function QQJsonGET(
   let nmed;
   try {
     nmed = await fetch(
-      `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name.replace(/-.*$/, ''))}%20${encodeURIComponent(artist.replace(/\/[^/]*$/, ""))}%20${album==name?'':encodeURIComponent(album)}`
+      `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name.replace(/-.*$/, ''))}%20${encodeURIComponent(artist)}%20${album==name?'':encodeURIComponent(album)}`
     );
   } catch (error) {
     console.error('请求失败:', error);
@@ -425,13 +425,23 @@ async function QQJsonGET(
     console.log("未找到匹配的歌曲，使用原生歌词");
     return;
   }
-  if(!nme.data[0].song||!nme.data[0].singer||!nme.data[0].album) {console.error("NSA不存在");return};
-  let aru = stringSimilarity(nme.data[0].singer.replace(/\([^)]*\)/g, '').replace(/ /g, ""),artist.replace(/\([^)]*\)/g, '').replace(/ /g, ""))
-  let tiu = stringSimilarity(nme.data[0].song.replace(/\([^)]*\)/g, '').replace(/-.*$/, '').replace(/ /g, ""),name.replace(/\([^)]*\)/g, '').replace(/ /g, ""))
-  let alu = album==name?1:stringSimilarity(nme.data[0].album.replace(/\([^)]*\)/g, '').replace(/ /g, ""),album.replace(/\([^)]*\)/g, '').replace(/ /g, ""))
-  
-  if(aru<0.3||tiu<0.8||alu<0.3){
-      return {metadata:{zq:false,message:`匹配度过低，放弃匹配。相似度：歌手${aru.toFixed(2)}，歌曲${tiu.toFixed(2)}，专辑${alu.toFixed(2)}。${nme.data.data[0].song} - ${nme.data.data[0].singer} · ${nme.data.data[0].album}`}};
+  const qqName = nme.data[0].song?nme.data[0].song:"";const qqArtist = nme.data[0].singer?nme.data[0].singer:"";const qqAlbum = nme.data[0].album?nme.data[0].album:"";
+  const qqList = qqArtist.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase().split("/");
+  const wyList = artist.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase().split("/");
+  let aru = 0;
+  for (const qq of qqList) { 
+    for (const wy of wyList) {
+      const sim = stringSimilarity(qq, wy);
+      if (sim > aru) {
+        aru = sim;
+      }
+    }
+  }
+  let tiu = stringSimilarity(qqName.replace(/\([^)]*\)/g, '').replace(/-.*$/, '').replace(/ /g, "").toUpperCase(),name.replace(/\([^)]*\)/g, '').replace(/-.*$/, '').replace(/ /g, "").toUpperCase())
+  let alu = album==name||qqName==qqAlbum?1:stringSimilarity(qqAlbum.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase(),album.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase())
+  if(tiu<0.8||(aru<0.5&&alu<0.7)){//初音ミク的歌和我初音未来的歌有什么关系呢，就算专辑名一样罢了（x
+    console.log(`匹配度过低，放弃匹配。相似度：歌手${aru.toFixed(2)}，歌曲${tiu.toFixed(2)}，专辑${alu.toFixed(2)}。${nme.data.data[0].song} - ${nme.data.data[0].singer} · ${nme.data.data[0].album}`);
+    return {metadata:{zq:false,message:`匹配度过低，放弃匹配。相似度：歌手${aru.toFixed(2)}，歌曲${tiu.toFixed(2)}，专辑${alu.toFixed(2)}。${nme.data.data[0].song} - ${nme.data.data[0].singer} · ${nme.data.data[0].album}`}};
   }
   let dataejson;
   try {
@@ -444,7 +454,6 @@ async function QQJsonGET(
     dataejson = await response.json();
   } catch (error) {
     console.error('请求失败:', error);
-    datae = null;
   }
   if (!dataejson || !dataejson.data) {
     console.log("QQ音乐API查询歌词失败，使用原生歌词");
