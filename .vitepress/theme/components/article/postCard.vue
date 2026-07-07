@@ -13,6 +13,8 @@ interface CardProps {
   type?: string;
   negative?: boolean;
   meta?: string;
+  metadata?: Record<string, string>;
+  visibleMetaKeys?: string[];
 }
 
 const props = withDefaults(defineProps<CardProps>(), {
@@ -25,6 +27,8 @@ const props = withDefaults(defineProps<CardProps>(), {
   type: "",
   negative: false,
   meta: "true",
+  metadata: () => ({}),
+  visibleMetaKeys: () => [],
 });
 
 // 计算最终跳转链接
@@ -46,94 +50,149 @@ const descriptionText = computed(() => {
 
 // 判断是否可点击
 const isClickable = computed(() => !!clink.value);
+console.log(props.metadata)
 </script>
 
 <template>
-  <!-- 用 a 或 div 动态渲染 -->
-  <!-- ✅ 关键改动：动态绑定 class，当 props.negative 为真时添加 'is-negative' 类 -->
-  <component
-    :is="isClickable ? 'a' : 'div'"
-    :href="isClickable ? url : undefined"
-    :type="props.type"
-    class="diary"
-    :class="{ 'is-negative': props.negative }"
-  >
-    <!-- ✅ 优化：删除了原本代码中重复嵌套了一层的 v-if="props.image" -->
-    <div v-if="props.image" class="img-container">
-      <img :src="props.image" />
-    </div>
+  <div class="card-wrapper">
+    <component
+      :is="isClickable ? 'a' : 'div'"
+      :href="isClickable ? url : undefined"
+      :type="props.type"
+      class="diary"
+      :class="{ 'is-negative': props.negative }"
+    >
+      <div v-if="props.image" class="img-container">
+        <img :src="props.image" />
+      </div>
 
-    <div class="textPlace">
-      <p class="title" v-if="props.title">{{ props.title }}</p>
+      <div class="textPlace">
+        <p class="title" v-if="props.title">{{ props.title }}</p>
 
-      <!-- 支持换行 -->
-      <p
-        class="details"
-        v-if="props.description && props.title"
-        :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
-      >
-        {{ descriptionText }}
-      </p>
-      <p
-        class="details notitle"
-        v-else-if="props.description"
-        :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
-      >
-        {{ descriptionText }}
-      </p>
+        <p
+          class="details"
+          v-if="props.description && props.title"
+          :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
+        >
+          {{ descriptionText }}
+        </p>
+        <p
+          class="details notitle"
+          v-else-if="props.description"
+          :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
+        >
+          {{ descriptionText }}
+        </p>
 
-      <div class="meta" v-if="props.meta === 'true'">
-        <!-- 分类显示 -->
-        <template v-if="props.category">
-          <a v-if="props.type === 'project'" class="category" :href="clink">
-            <Icon :icon="globalConfig.icon.friends" />
-            {{ props.category }}
-          </a>
-
-          <a
-            v-else
-            class="category"
-            :href="`/archives?category=${props.category}`"
-            :style="
-              props.negative
-                ? 'background-color: var(--vp-c-warning-soft);'
-                : ''
-            "
-          >
-            <span v-if="props.negative" style="color: var(--vp-c-warning-1)">
-              <Icon
-                :icon="globalConfig.icon.negative"
-                style="color: var(--vp-c-warning-1)"
-              />
+        <div class="meta" v-if="props.meta === 'true'">
+          <template v-if="props.category">
+            <a v-if="props.type === 'project'" class="category" :href="clink">
+              <Icon :icon="globalConfig.icon.friends" />
               {{ props.category }}
-            </span>
-            <span v-else>
-              <Icon :icon="globalConfig.icon.new" />
-              {{ props.category }}
-            </span>
-          </a>
-        </template>
+            </a>
 
-        <span class="date">
-          <Icon
-            v-if="!props.category"
-            :icon="globalConfig.icon.calendar"
-            style="margin-right: 3px; bottom: 0px"
-          />
-          {{ props.originDate ? formatRelativeDate(props.originDate) : "" }}
+            <a
+              v-else
+              class="category"
+              :href="`/archives?category=${props.category}`"
+              :style="
+                props.negative
+                  ? 'background-color: var(--vp-c-warning-soft);'
+                  : ''
+              "
+            >
+              <span v-if="props.negative" style="color: var(--vp-c-warning-1)">
+                <Icon
+                  :icon="globalConfig.icon.negative"
+                  style="color: var(--vp-c-warning-1)"
+                />
+                {{ props.category }}
+              </span>
+              <span v-else>
+                <Icon :icon="globalConfig.icon.new" />
+                {{ props.category }}
+              </span>
+            </a>
+          </template>
+
+          <span class="date">
+            <Icon
+              v-if="!props.category"
+              :icon="globalConfig.icon.calendar"
+              style="margin-right: 3px; bottom: 0px"
+            />
+            {{ props.originDate ? formatRelativeDate(props.originDate) : "" }}
+          </span>
+        </div>
+      </div>
+    </component>
+
+    <div
+      v-if="props.image && props.visibleMetaKeys?.length"
+      class="exif-overlay"
+    >
+      <div class="exif-items">
+        <span
+          v-for="key in props.visibleMetaKeys"
+          :key="key"
+          class="exif-item"
+        >
+          {{ props.metadata?.[key] }}
         </span>
       </div>
     </div>
-  </component>
+  </div>
 </template>
 
 <style scoped>
+.card-wrapper {
+  position: relative;
+}
+
 .img-container img {
   width: 100%;
   max-height: 180px;
   object-fit: cover;
   margin-bottom: 1rem;
   border-radius: var(--vp-border-radius-3);
+}
+
+.exif-overlay {
+  position: absolute;
+  top: 1.25rem;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent 55%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  opacity: 0;
+  transition: opacity var(--vp-transition-time);
+  pointer-events: none;
+  border-radius: var(--vp-border-radius-3);
+}
+
+.card-wrapper:hover .exif-overlay {
+  opacity: 1;
+}
+
+.exif-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.exif-item {
+  font-size: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--vp-border-radius-1);
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
 .iconify {

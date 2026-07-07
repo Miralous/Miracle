@@ -126,6 +126,8 @@ export const globalConfig = {
       ],
     },
   ],
+  
+  abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
 
   // abouts
   about: {

@@ -41,6 +41,8 @@ onUnmounted(() => {
             :image="photo.path"
             :url="photo.path"
             :description="photo.fileName"
+            :metadata="photo.metadata"
+            :visibleMetaKeys="photo.visibleMetaKeys"
             meta="false"
           />
         </div>
