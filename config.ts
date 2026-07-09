@@ -126,8 +126,10 @@ export const globalConfig = {
       ],
     },
   ],
-  
+  EXIF_GPS: true, // enable GPS in EXIF (if false, it will hide GPS in EXIF)
+  // To show the 'GPS' field in the configuration below
   abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
+  detail_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue", "FocalLengthIn35mmFormat", "GPSLatitude", "GPSLongitude"],
 
   // abouts
   about: {

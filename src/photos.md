@@ -114,7 +114,7 @@ const handleCategoryClick = (category: string) => {
           >
             <PostCard
               :image="photo.path"
-              :url="photo.path"
+              :url="'/photo-detail?category=' + encodeURIComponent(photo.category) + '&file=' + encodeURIComponent(photo.fileName)"
               :description="photo.fileName"
               :metadata="photo.metadata"
               :visibleMetaKeys="photo.visibleMetaKeys"

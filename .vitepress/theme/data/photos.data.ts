@@ -96,7 +96,9 @@ export default defineLoader({
 
 async load(files) {
     const { globalConfig } = await import("#config");
-    const metaKeys: string[] = globalConfig?.abbreviated_metadata ?? [];
+    const abbrKeys: string[] = globalConfig?.abbreviated_metadata ?? [];
+    const detailKeys: string[] = (globalConfig as any)?.detail_metadata ?? [];
+    const metaKeys: string[] = [...new Set([...abbrKeys, ...detailKeys])];
 
     const result: Photo[] = [];
     const seenPaths = new Set<string>();

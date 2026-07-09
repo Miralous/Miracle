@@ -50,7 +50,12 @@ const descriptionText = computed(() => {
 
 // 判断是否可点击
 const isClickable = computed(() => !!clink.value);
-console.log(props.metadata)
+
+const displayMetaKeys = computed(() => {
+  const configKeys = (globalConfig as any).abbreviated_metadata || [];
+  if (!props.metadata) return [];
+  return configKeys.filter((key: string) => props.metadata![key]);
+});
 </script>
 
 <template>
@@ -64,6 +69,20 @@ console.log(props.metadata)
     >
       <div v-if="props.image" class="img-container">
         <img :src="props.image" />
+        <div
+          v-if="displayMetaKeys.length"
+          class="exif-overlay"
+        >
+          <div class="exif-items">
+            <span
+              v-for="key in displayMetaKeys"
+              :key="key"
+              class="exif-item"
+            >
+              {{ props.metadata?.[key] }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div class="textPlace">
@@ -126,21 +145,6 @@ console.log(props.metadata)
         </div>
       </div>
     </component>
-
-    <div
-      v-if="props.image && props.visibleMetaKeys?.length"
-      class="exif-overlay"
-    >
-      <div class="exif-items">
-        <span
-          v-for="key in props.visibleMetaKeys"
-          :key="key"
-          class="exif-item"
-        >
-          {{ props.metadata?.[key] }}
-        </span>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -149,20 +153,21 @@ console.log(props.metadata)
   position: relative;
 }
 
+.img-container {
+  position: relative;
+}
+
 .img-container img {
   width: 100%;
   max-height: 180px;
   object-fit: cover;
-  margin-bottom: 1rem;
+  display: block;
   border-radius: var(--vp-border-radius-3);
 }
 
 .exif-overlay {
   position: absolute;
-  top: 1.25rem;
-  left: 0;
-  right: 0;
-  height: 180px;
+  inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent 55%);
   display: flex;
   align-items: flex-end;
@@ -174,7 +179,7 @@ console.log(props.metadata)
   border-radius: var(--vp-border-radius-3);
 }
 
-.card-wrapper:hover .exif-overlay {
+.img-container:hover .exif-overlay {
   opacity: 1;
 }
 

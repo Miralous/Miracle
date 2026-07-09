@@ -23,6 +23,7 @@ import Statistics from "../components/dashboard/Statistics.vue";
 import Timeline from "../components/timeline/timeline.vue";
 import About from "../components/about/about.vue";
 import MusicPlayer from "../components/player/player.vue";
+import PhotoDetail from "../components/photo/PhotoDetail.vue";
 
 const components = {
   // Dashboard
@@ -53,6 +54,7 @@ const components = {
   Twikoo,
   File,
   MusicPlayer,
+  PhotoDetail,
 };
 
 type GlobalComponentTypes = typeof components;
