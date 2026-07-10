@@ -2,6 +2,8 @@ import { existsSync, readFileSync, statSync } from "fs";
 import path from "path";
 import { defineLoader } from "vitepress";
 import exifr from "exifr";
+import { globalConfig } from "#config";
+
 
 export interface Photo {
   fileName: string;
@@ -18,6 +20,30 @@ function formatExposureTime(value: number | undefined): string {
   if (value >= 1) return `${value}s`;
   const denom = Math.round(1 / value);
   return `1/${denom}s`;
+}
+
+async function formatAddress(lat: number | undefined, lon: number | undefined): Promise<string> {
+  if (!lat || !lon || !globalConfig.EXIF_GPS) return "";
+  try {
+    console.log(`Fetching address for lat=${lat}, lon=${lon}`);
+    const response = await fetch(`https://latlonconvaddr.emnasop.cn/?lat=${lat}&lon=${lon}`);
+    //源api为https://cn.apihz.cn/api/other/jwjuhe2.php?id={id}&key={key}&lon={纬度}&lat={经度}
+    //也可替换为nominatim
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    if(data.code !== 200) {
+      throw new Error(`API error: ${data.code}`);
+    }
+    if(!data.nation || !data.province || !data.county) {//不包括data.city，可能是直辖市
+      throw new Error(`Incomplete address data: ${JSON.stringify(data)}`);
+    }
+    const address = `${data.nation}${data.province}${data.city}${data.county}`;
+    return address;
+  } catch {
+    return "";
+  }
 }
 
 function formatAperture(value: number | undefined): string {
@@ -53,8 +79,9 @@ async function extractMetadata(
       tiff: true,
       exif: true,
       ifd0: true,
-      gps: false,
+      gps: true,
     });
+    const gpsDate = await exifr.gps(buffer);
     if (!raw) return { metadata, visibleMetaKeys };
 
     for (const key of keys) {
@@ -73,6 +100,13 @@ async function extractMetadata(
         case "ApertureValue":
           if (raw.FNumber) value = formatAperture(raw.FNumber);
           else if (raw.ApertureValue) value = formatAperture(raw.ApertureValue);
+          break;
+        case "GPS":
+          if (gpsDate.latitude && gpsDate.longitude) {
+            const lat = gpsDate.latitude;
+            const lon = gpsDate.longitude;
+            value = await formatAddress(lat, lon);
+          }
           break;
         default:
           if (raw[key] !== undefined && raw[key] !== null) {
