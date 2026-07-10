@@ -199,16 +199,17 @@ onMounted(() => {
 
   .image-section {
     position: fixed;
-    top: 50%;
+    top: calc((100% + 64px) / 2);
     transform: translateY(-50%);
     width: calc((100% - 420px) * 0.88);
     margin: 0 calc((100% - 420px) * 0.06 + 420px) 0 calc((100% - 420px) * 0.06);
   }
 
   .image-section img {
-    width: 100%;
-    height: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 64px - 4rem);
     display: block;
+    margin: 0 auto;
     box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
   }
 
