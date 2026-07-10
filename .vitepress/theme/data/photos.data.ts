@@ -13,6 +13,9 @@ export interface Photo {
   visibleMetaKeys?: string[];
 }
 
+const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif']);
+
+
 export let data: Photo[];
 
 function formatExposureTime(value: number | undefined): string {
@@ -133,12 +136,19 @@ async load(files) {
     const abbrKeys: string[] = globalConfig?.abbreviated_metadata ?? [];
     const detailKeys: string[] = (globalConfig as any)?.detail_metadata ?? [];
     const metaKeys: string[] = [...new Set([...abbrKeys, ...detailKeys])];
+    const convertConfig = (globalConfig as any)?.imageConvert;
 
     const result: Photo[] = [];
     const seenPaths = new Set<string>();
+    const convertCache = new Map<string, string>();
 
     for (const file of files) {
       if (file.endsWith(".json")) continue;
+
+      if (convertConfig?.enabled) {
+        const targetExt = `.${convertConfig.format}`;
+        if (file.endsWith(targetExt)) continue;
+      }
 
       const stats = statSync(file);
       if (!stats.isFile()) continue;
@@ -150,7 +160,45 @@ async load(files) {
       const category = parts[0];
       const fileName = parts[parts.length - 1];
 
-      const photoPath = `/data/photos/${category}/${fileName}`;
+      let photoPath = `/data/photos/${category}/${fileName}`;
+
+      if (convertConfig?.enabled) {
+        const sourceExt = path.extname(file).toLowerCase();
+        if (IMAGE_EXTENSIONS.has(sourceExt)) {
+          const targetExt = `.${convertConfig.format}`;
+          const parsedPath = path.parse(file);
+          const convertedFile = path.join(parsedPath.dir, `${parsedPath.name}${targetExt}`);
+
+          if (!convertCache.has(file)) {
+            const needsConvert = !existsSync(convertedFile)
+              || statSync(file).mtimeMs > statSync(convertedFile).mtimeMs;
+
+            if (needsConvert) {
+              try {
+                const sharp = (await import("sharp")).default;
+                console.log(`Converting ${fileName} to ${convertConfig.format}...`);
+                await sharp(file)
+                  .toFormat(convertConfig.format as 'avif' | 'webp', {
+                    quality: convertConfig.quality ?? 80,
+                    effort: convertConfig.effort ?? 4,
+                  })
+                  .toFile(convertedFile);
+                console.log(`  -> ${path.basename(convertedFile)}`);
+              } catch (err) {
+                console.error(`Failed to convert ${fileName}:`, err);
+              }
+            }
+            convertCache.set(file, convertedFile);
+          }
+
+          const cached = convertCache.get(file)!;
+          if (existsSync(cached)) {
+            const rel = path.relative("public/data/photos", cached).split(path.sep).join('/');
+            photoPath = `/data/photos/${rel}`;
+          }
+        }
+      }
+
       if (seenPaths.has(photoPath)) continue;
       seenPaths.add(photoPath);
 
