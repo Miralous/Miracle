@@ -35,6 +35,9 @@ export default {
     if (!inBrowser) return;
 
     const init = async () => {
+      if (globalConfig.styles.color.preset === "catppuccin") {
+        await import("./styles/theme/ctp.css");
+      }
       applyCssVars();
     };
 
