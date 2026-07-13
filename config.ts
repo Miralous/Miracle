@@ -138,13 +138,7 @@ export const globalConfig = {
   abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
   detail_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue", "FocalLengthIn35mmFormat", "GPS"],
 
-  // image conversion (avif/webp)
-  imageConvert: {
-    enabled: false,   // set true to convert images
-    format: 'webp',   // 'avif' | 'webp'
-    quality: 80,      // 1-100
-    effort: 4,        // 0-6 (webp) or 0-9 (avif), higher = slower but better compression
-  },
+
 
   // abouts
   about: {
