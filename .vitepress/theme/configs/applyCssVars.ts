@@ -7,7 +7,7 @@ export function applyCssVars() {
 
   const vars = {
     "--hue": styles.color.hue,
-    "--chue": styles.color.globalHue ? styles.color.hue : 30, // warm beige default
+    "--chue": styles.color.globalHue ? styles.color.hue : 280,
     "--vp-border-radius-1": `${styles.visual.radius}px`,
     "--vp-gap": `${styles.visual.gap}px`,
     "--vp-transition-time": `${0.1 * (styles.visual.transition / 10)}s`,
