@@ -141,14 +141,12 @@ async load(files) {
     const result: Photo[] = [];
     const seenPaths = new Set<string>();
     const convertCache = new Map<string, string>();
+    const targetExt = convertConfig?.format ? `.${convertConfig.format}` : null;
 
     for (const file of files) {
       if (file.endsWith(".json")) continue;
 
-      if (convertConfig?.enabled) {
-        const targetExt = `.${convertConfig.format}`;
-        if (file.endsWith(targetExt)) continue;
-      }
+      if (targetExt && file.endsWith(targetExt)) continue;
 
       const stats = statSync(file);
       if (!stats.isFile()) continue;
@@ -158,7 +156,7 @@ async load(files) {
       if (parts.length < 2) continue;
 
       const category = parts[0];
-      const fileName = parts[parts.length - 1];
+      let fileName = parts[parts.length - 1];
 
       let photoPath = `/data/photos/${category}/${fileName}`;
 
@@ -178,6 +176,7 @@ async load(files) {
                 const sharp = (await import("sharp")).default;
                 console.log(`Converting ${fileName} to ${convertConfig.format}...`);
                 await sharp(file)
+                  .withMetadata()
                   .toFormat(convertConfig.format as 'avif' | 'webp', {
                     quality: convertConfig.quality ?? 80,
                     effort: convertConfig.effort ?? 4,
@@ -195,6 +194,7 @@ async load(files) {
           if (existsSync(cached)) {
             const rel = path.relative("public/data/photos", cached).split(path.sep).join('/');
             photoPath = `/data/photos/${rel}`;
+            fileName = path.basename(rel);
           }
         }
       }

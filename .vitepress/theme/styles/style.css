@@ -47,6 +47,13 @@
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);
 
+  /* Editoral tokens for photo detail */
+  --vp-card-padding: 28px;
+  --vp-font-family-display: "Crimson Pro", "Noto Serif SC", Georgia, serif;
+  --vp-font-size-meta: 0.75rem;
+  --vp-font-letter-spacing-meta: 0.4em;
+  --vp-font-weight-body: 400;
+
   font-variant-alternates: styleset(
     open-digits,
     disambiguation,

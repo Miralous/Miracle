@@ -50,6 +50,12 @@ const descriptionText = computed(() => {
 });
 
 const isClickable = computed(() => !!clink.value);
+
+const displayMetaKeys = computed(() => {
+  const configKeys = (globalConfig as any).abbreviated_metadata || [];
+  if (!props.metadata) return [];
+  return configKeys.filter((key: string) => props.metadata![key]);
+});
 </script>
 
 <template>
@@ -65,6 +71,13 @@ const isClickable = computed(() => !!clink.value);
   >
     <div v-if="props.image" class="img-container">
       <img :src="props.image" />
+      <div v-if="displayMetaKeys.length" class="exif-overlay">
+        <div class="exif-items">
+          <span v-for="key in displayMetaKeys" :key="key" class="exif-item">
+            {{ props.metadata?.[key] }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="textPlace">
@@ -140,6 +153,42 @@ const isClickable = computed(() => !!clink.value);
   height: 200px;
   width: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.exif-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent 55%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  opacity: 0;
+  transition: opacity var(--vp-transition-time);
+  pointer-events: none;
+  border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
+}
+
+.img-container:hover .exif-overlay {
+  opacity: 1;
+}
+
+.exif-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.exif-item {
+  font-size: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--vp-border-radius-1);
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
 .iconify {
