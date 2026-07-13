@@ -35,9 +35,8 @@ export const globalConfig = {
   // theme setting
   styles: {
     color: {
-      preset: "claude" as "claude" | "catppuccin", // color scheme: "claude" (warm humanist) | "catppuccin" (pastel purple)
       hue: 16, // warm coral (Claude-inspired)
-      globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others use the preset's default palette.
+      globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
         enabled: false, // hue will be cycled
         speed: 10, // hue is (getCurrentHue() + x) % 360......(updateHue, 100);

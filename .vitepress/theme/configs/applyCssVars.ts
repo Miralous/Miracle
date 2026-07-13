@@ -5,12 +5,9 @@ export function applyCssVars() {
   const root = document.documentElement;
   const { styles } = globalConfig;
 
-  const preset = styles.color.preset || "claude";
-  const defaultChue = preset === "catppuccin" ? 280 : 30;
-
   const vars = {
     "--hue": styles.color.hue,
-    "--chue": styles.color.globalHue ? styles.color.hue : defaultChue,
+    "--chue": styles.color.globalHue ? styles.color.hue : 30, // warm beige default
     "--vp-border-radius-1": `${styles.visual.radius}px`,
     "--vp-gap": `${styles.visual.gap}px`,
     "--vp-transition-time": `${0.1 * (styles.visual.transition / 10)}s`,
