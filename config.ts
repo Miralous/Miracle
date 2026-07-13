@@ -137,7 +137,10 @@ export const globalConfig = {
   // To show the 'GPS' field in the configuration below
   abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
   detail_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue", "FocalLengthIn35mmFormat", "GPS"],
-
+  
+  convert_photos: true,// enable convert photos to webp or avif (if false, it will not convert photos)
+  convert_photos_format: "webp", // convert photos to webp or avif (webp / avif)
+  convert_photos_quality: 80, // convert photos quality (0-100)
 
 
   // abouts
