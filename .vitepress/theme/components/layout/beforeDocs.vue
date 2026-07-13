@@ -2,6 +2,7 @@
   <div
     class="vp-doc layout beforeDocs"
     v-if="frontmatter.title"
+    "
   >
 
     <div class="textArea card-style" >
@@ -74,6 +75,7 @@ import { useData } from "vitepress";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
 import { globalConfig } from "#config";
 import { formatUrl } from "../../utils/formatUrl";
+import { useCardHover } from "../../utils/useCardHover";
 import { data as posts } from "../../data/posts.data";
 
 const { page } = useData();
@@ -85,6 +87,8 @@ const image = frontmatter.image
 const tags = Array.isArray(frontmatter.tags)
   ? frontmatter.tags
   : [frontmatter.tags];
+
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 </script>
 
 <style scoped>
@@ -102,11 +106,21 @@ div.vp-doc.layout.beforeDocs {
   background-repeat: no-repeat;
   border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
   transition: all var(--vp-transition-time);
+  box-shadow: var(--vp-shadow);
 }
 
-/* 🌟 卡片整体样式 — pure text block */
+/* 🌟 卡片整体样式 */
 .card-style {
-  /* no background, no border-radius — clean editorial text */
+  background-color: var(
+    --vp-c-bg-soft
+  ); /* 匹配 Vitepress 的柔和背景色，浅色灰，深色暗 */
+  border-radius: var(--vp-border-radius-1); /* 圆角 */
+}
+
+/* 调整移动端间距 */
+@media screen and (max-width: 600px) {
+  .card-style {
+  }
 }
 
 /* 顶部元数据栏 */
@@ -116,11 +130,9 @@ div.vp-doc.layout.beforeDocs {
   gap: 4px calc(var(--vp-gap) * 1.25);
   margin-bottom: 28px;
   span, a {
-  color: var(--vp-c-text-2);
+  color: var(--vp-c-text-2); /* 柔和的次级文字颜色 */
   opacity: .8;}
-  font-size: var(--vp-font-size-meta);
-  text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
+  font-size: 14.5px;
    * {font-weight: 400 !important;}
 }
 
@@ -151,12 +163,13 @@ div.vp-doc.layout.beforeDocs {
 
 /* 📰 标题样式 */
 .title {
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  font-weight: 400;
-  line-height: 1.2;
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.4;
   color: var(--vp-c-text-1);
-  font-family: var(--vp-font-family-display);
-  letter-spacing: 0.02em;
+  /* 使用衬线体来模拟图片里的优雅质感 */
+  font-family: var(--vp-font-family-title);
+  letter-spacing: 0.5px;
 }
 
 /* ✨ 描述区域样式 */
@@ -164,11 +177,9 @@ div.vp-doc.layout.beforeDocs {
   display: flex;
   align-items: flex-start;
   gap: var(--vp-gap);
-  padding: calc(var(--vp-gap) * 1.5) calc(var(--vp-gap) / 2) 0;
+  padding: 0 calc(var(--vp-gap) / 2);
   color: var(--vp-c-text-3);
   opacity: .8;
-  border-top: 1px solid var(--vp-c-divider);
-  margin-top: 0;
 }
 
 .iconify {
@@ -176,13 +187,14 @@ div.vp-doc.layout.beforeDocs {
 }
 
 p.desc {
-  font-size: 0.95rem;
-  line-height: 1.8;
+  font-size: 15px;
+  line-height: 1.7;
   font-weight: 400;
 }
 
 .textPlace {
-  padding: var(--vp-card-padding);
+    
+  padding: calc(var(--vp-gap) * 1.5); /* 增加留白 */
 }
 
 @media screen and (max-width: 700px) {

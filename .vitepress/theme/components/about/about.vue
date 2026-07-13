@@ -5,6 +5,9 @@
         :src="globalConfig.homePage.avatar"
         alt="avatar"
         class="avatar"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
       />
       <div class="textPlace">
         <span class="name">{{ globalConfig.author }}</span>
@@ -21,6 +24,9 @@
         :key="index"
         :label="item.title"
         :count="item.content"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
       >
         <template #icon>
           <Icon :icon="item.icon" />
@@ -88,8 +94,10 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { globalConfig } from "#config";
+import { useCardHover } from "../../utils/useCardHover";
 
 const l = globalConfig.about.tags;
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 // 映射星期数据以符合 UI 显示 (中英对照)
 const scheduleMap = [
@@ -168,7 +176,9 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
 </script>
 
 <style lang="css" scoped>
+/* 前面原有的 CSS 保持不变 ... */
 .tags {
+  perspective: 1000px;
   border-radius: var(--vp-border-radius-1);
   transition: all var(--vp-transition-time);
   display: flex;
@@ -182,6 +192,7 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
   margin: 30px 0;
   .avatar {
     width: 80px;
+    perspective: 1000px;
     transition: all var(--vp-transition-time);
     height: 80px;
     border-radius: 50%;
@@ -192,19 +203,21 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
     flex-direction: column;
     gap: 4px;
     .name {
-      font-size: clamp(1.5rem, 3vw, 2rem);
-      font-weight: 400;
-      font-family: var(--vp-font-family-display);
+      font-size: 1.5em;
+      font-weight: bold;
     }
     .introduce {
       color: var(--vp-c-text-2);
-      line-height: var(--vp-font-line-height-body);
     }
   }
 }
 .tasks {
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: var(--vp-shadow);
+  border-radius: var(--vp-border-radius-1);
+  padding: 25px;
   gap: var(--vp-gap);
   .task {
     display: flex;
@@ -230,10 +243,12 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
 }
 
 .day-card {
-  border-bottom: 1px solid var(--vp-c-divider);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--vp-border-radius-1);
+  background-color: var(--vp-c-bg);
+  box-shadow: var(--vp-shadow);
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
 }
 
 .day-header {
@@ -247,8 +262,7 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
 }
 
 .day-header .en {
-  font-weight: 400;
-  font-family: var(--vp-font-family-display);
+  font-weight: bold;
   font-size: 1.1em;
   color: var(--vp-c-text-1);
 }
@@ -270,8 +284,8 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
   flex-direction: column;
   gap: 6px;
   padding-left: 12px;
-  border-left: 1px solid var(--vp-c-divider);
-  transition: all var(--vp-transition-time);
+  border-left: 2px solid var(--vp-c-divider);
+  transition: all var(--vp-transition-time); /* 将过渡动画移到自身上使状态切换更平滑 */
 
   &:hover {
     border-color: var(--vp-c-brand-1);
@@ -281,7 +295,7 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
 /* === 新增的高亮类 === */
 .course-item.active-course {
   border-color: var(--vp-c-brand-1);
-  border-width: 4px;
+  border-width: 6px;
   background-color: var(--vp-c-brand-soft);
   padding-top: 10px;
   padding-bottom: 10px;
@@ -299,7 +313,7 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
 }
 
 .course-item .name {
-  font-weight: 400;
+  font-weight: 600;
   font-size: 0.95em;
   color: var(--vp-c-text-1);
   line-height: 1.3;

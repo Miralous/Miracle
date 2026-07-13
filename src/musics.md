@@ -7,7 +7,9 @@ footer: false
 import { ref, onMounted, computed, onBeforeUnmount, nextTick } from 'vue';
 import { generateGrid } from "#theme/utils/generateGrid";
 import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
+import { useCardHover } from "#theme/utils/useCardHover";
 import { globalConfig } from "#config";
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 const playlist = ref<any[]>([]);
 const selectedSinger = ref<string | null>(null);
@@ -125,6 +127,9 @@ import {getSongId} from "#theme/utils/getSongId"
   <TagChip
     @click="handleSingerClick('')"
     :active="!selectedSinger"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
     :label="globalConfig.lang.allArtists"
   />
   <TagChip
@@ -132,6 +137,9 @@ import {getSongId} from "#theme/utils/getSongId"
     :key="singer"
     @click="handleSingerClick(singer)"
     :active="selectedSinger === singer"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
     :label="singer"
   />
 </div>

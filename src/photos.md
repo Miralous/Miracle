@@ -8,7 +8,10 @@ import { ref, onMounted, computed, onBeforeUnmount } from "vue";
 import { generateGrid } from "#theme/utils/generateGrid";
 import {globalConfig} from "#config"
 import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
+import { useCardHover } from "#theme/utils/useCardHover";
 import { data as photos } from "#theme/data/photos.data";
+
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 const selectedCategory = ref<string | null>(null);
 
@@ -81,6 +84,9 @@ const handleCategoryClick = (category: string) => {
   <TagChip
     @click="handleCategoryClick('')"
     :active="!selectedCategory"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
     :label="globalConfig.lang.allPhotos"
   />
 
@@ -89,6 +95,9 @@ const handleCategoryClick = (category: string) => {
     :key="category"
     @click="handleCategoryClick(category)"
     :active="selectedCategory === category"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
     :label="category"
   />
 </div>

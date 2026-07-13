@@ -78,17 +78,19 @@ const showNav = computed(() => prevPost.value || nextPost.value);
   gap: 8px;
   flex: 1;
   min-width: 0;
-  padding: 1rem 0;
+  padding: 16px 20px;
+  border-radius: var(--vp-border-radius-1);
+  background-color: var(--vp-c-bg-soft);
   text-decoration: none;
-  border-bottom: 1px solid var(--vp-c-divider);
-  transition: opacity var(--vp-transition-time);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+  border: 1px solid transparent;
 }
 
 .nav-link:hover {
-  opacity: 0.7;
-}
-.nav-link:hover .nav-arrow {
-  color: var(--vp-c-brand-2);
+  background-color: var(--vp-c-bg-mute);
+  border-color: var(--vp-c-divider);
 }
 
 .nav-prev {
@@ -113,22 +115,21 @@ const showNav = computed(() => prevPost.value || nextPost.value);
 }
 
 .nav-link:hover .nav-arrow {
-  color: var(--vp-c-brand-2);
+  color: var(--vp-c-brand-1);
 }
 
 .nav-label {
-  font-size: var(--vp-font-size-meta);
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--vp-c-text-3);
   text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
+  letter-spacing: 0.5px;
   flex-shrink: 0;
 }
 
 .nav-title {
-  font-size: 0.9rem;
-  font-weight: 400;
-  font-family: var(--vp-font-family-display);
+  font-size: 14px;
+  font-weight: 500;
   color: var(--vp-c-text-1);
   overflow: hidden;
   text-overflow: ellipsis;

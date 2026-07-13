@@ -1,6 +1,7 @@
 .posts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  /* ✅ 保证最小300px */
   gap: var(--vp-gap);
   margin-bottom: 24px;
 }
@@ -8,6 +9,7 @@
 .column {
   display: flex;
   flex-direction: column;
+  gap: var(--vp-gap);
 }
 
 .post-card {
@@ -16,21 +18,23 @@
 
 .diary {
   flex: 1;
+  border-radius: var(--vp-border-radius-1);
+  border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--vp-c-divider);
-  transition: opacity var(--vp-transition-time);
+  background-color: var(--vp-c-bg);
+  will-change: transform;
+  box-shadow: var(--vp-shadow);
+  transition: all var(--vp-transition-time);
 }
 
 .diary:hover {
-  opacity: 0.72;
-}
-.diary:hover .title {
-  color: var(--vp-c-brand-2);
+  border-color: var(--vp-c-brand-1);
+  box-shadow: var(--vp-shadow-brand);
 }
 
 .textPlace {
+  padding: 25px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -38,43 +42,42 @@
 
 .meta {
   margin-top: auto;
-  font-size: var(--vp-font-size-meta);
+  font-size: 13px;
   color: var(--vp-c-text-3);
   opacity: 0.8;
-  text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
 }
 
 .title {
   color: var(--vp-c-text-1);
-  font-size: 1.15rem;
-  line-height: 1.35;
-  font-weight: var(--vp-font-weight-card-title);
-  font-family: var(--vp-font-family-display);
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
   margin: 0;
-  transition: color var(--vp-transition-time);
+  transition: all var(--vp-transition-time);
+}
+
+.diary:hover .title {
+  color: var(--vp-c-brand-2);
 }
 
 .details {
   color: var(--vp-c-text-2);
-  font-size: 0.9rem;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 20px;
   margin: 8px 0 10px 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-weight: var(--vp-font-weight-body);
 }
 
 .year {
   margin-top: 30px;
-  line-height: 1.1;
+  line-height: 110px;
   font-size: 100px;
   position: relative;
   top: 30px;
-  font-weight: 400;
-  font-family: var(--vp-font-family-display);
+  font-weight: bold;
   color: var(--vp-c-gutter);
   opacity: 0.7;
   z-index: -1;
@@ -87,21 +90,25 @@
 
 .category {
   margin-right: 8px;
-  color: var(--vp-c-text-2);
-  font-size: var(--vp-font-size-meta);
-  text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-border);
+  padding: 2px 8px;
+  border-radius: var(--vp-border-radius-1);
+  font-size: 13px;
 }
 
 .tags {
+  perspective: 1000px;
+  border-radius: var(--vp-border-radius-1);
   transition: all var(--vp-transition-time);
+
   display: flex;
   flex-wrap: wrap;
   gap: var(--vp-gap);
 }
 
 span.name {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 span.name,

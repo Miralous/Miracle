@@ -10,6 +10,7 @@ import {
 import { Icon } from "@iconify/vue";
 import PostCard from "./postCard.vue";
 import { generateGrid } from "../../utils/generateGrid";
+import { useCardHover } from "../../utils/useCardHover";
 import { columnCount, updateColumns } from "../../utils/dynamicColumns";
 import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
@@ -195,6 +196,9 @@ watch(showNegative, (val) => {
 });
 
 // =========================
+// hover
+// =========================
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 </script>
 
 <template>
@@ -205,6 +209,9 @@ watch(showNegative, (val) => {
     <div class="tags">
       <TagChip
         href="/archives"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.categories"
       >
         <template #icon>
@@ -217,6 +224,9 @@ watch(showNegative, (val) => {
         v-if="showNegativeButton"
         negative
         @click="toggleNegative"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
         :active="showNegative"
         :label="globalConfig.lang.negative"
       >
@@ -230,6 +240,9 @@ watch(showNegative, (val) => {
         v-for="tag in tags"
         :key="tag"
         @click="handleTagClick(tag)"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
         :active="selectedTag === tag"
         :label="tag"
         :count="tagCounts[tag]"

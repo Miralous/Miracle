@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useCardHover } from "../../utils/useCardHover";
 import { globalConfig } from "#config";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
 
@@ -31,7 +32,8 @@ const props = withDefaults(defineProps<CardProps>(), {
   visibleMetaKeys: () => [],
 });
 
-// 计算最终跳转链接
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
+
 const clink = computed(() => {
   if (props.type === "project" && props.category) {
     return `https://github.com/${props.category}`;
@@ -39,7 +41,6 @@ const clink = computed(() => {
   return props.url || "";
 });
 
-// 处理换行符
 const descriptionText = computed(() => {
   if (!props.description) return "";
   return props.description
@@ -48,156 +49,97 @@ const descriptionText = computed(() => {
     .replace(/\r\n/g, "\n");
 });
 
-// 判断是否可点击
 const isClickable = computed(() => !!clink.value);
-
-const displayMetaKeys = computed(() => {
-  const configKeys = (globalConfig as any).abbreviated_metadata || [];
-  if (!props.metadata) return [];
-  return configKeys.filter((key: string) => props.metadata![key]);
-});
 </script>
 
 <template>
-  <div class="card-wrapper">
-    <component
-      :is="isClickable ? 'a' : 'div'"
-      :href="isClickable ? url : undefined"
-      :type="props.type"
-      class="diary"
-      :class="{ 'is-negative': props.negative }"
-    >
-      <div v-if="props.image" class="img-container">
-        <img :src="props.image" />
-        <div
-          v-if="displayMetaKeys.length"
-          class="exif-overlay"
-        >
-          <div class="exif-items">
-            <span
-              v-for="key in displayMetaKeys"
-              :key="key"
-              class="exif-item"
-            >
-              {{ props.metadata?.[key] }}
-            </span>
-          </div>
-        </div>
-      </div>
+  <component
+    :is="isClickable ? 'a' : 'div'"
+    :href="isClickable ? url : undefined"
+    :type="props.type"
+    class="diary"
+    :class="{ 'is-negative': props.negative }"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
+  >
+    <div v-if="props.image" class="img-container">
+      <img :src="props.image" />
+    </div>
 
-      <div class="textPlace">
-        <p class="title" v-if="props.title">{{ props.title }}</p>
+    <div class="textPlace">
+      <p class="title" v-if="props.title">{{ props.title }}</p>
 
-        <p
-          class="details"
-          v-if="props.description && props.title"
-          :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
-        >
-          {{ descriptionText }}
-        </p>
-        <p
-          class="details notitle"
-          v-else-if="props.description"
-          :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
-        >
-          {{ descriptionText }}
-        </p>
+      <p
+        class="details"
+        v-if="props.description && props.title"
+        :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
+      >
+        {{ descriptionText }}
+      </p>
+      <p
+        class="details notitle"
+        v-else-if="props.description"
+        :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
+      >
+        {{ descriptionText }}
+      </p>
 
-        <div class="meta" v-if="props.meta === 'true'">
-          <template v-if="props.category">
-            <a v-if="props.type === 'project'" class="category" :href="clink">
-              <Icon :icon="globalConfig.icon.friends" />
+      <div class="meta" v-if="props.meta === 'true'">
+        <template v-if="props.category">
+          <a v-if="props.type === 'project'" class="category" :href="clink">
+            <Icon :icon="globalConfig.icon.friends" />
+            {{ props.category }}
+          </a>
+
+          <a
+            v-else
+            class="category"
+            :href="`/archives?category=${props.category}`"
+            :style="
+              props.negative
+                ? 'background-color: var(--vp-c-warning-soft);'
+                : ''
+            "
+          >
+            <span v-if="props.negative" style="color: var(--vp-c-warning-1)">
+              <Icon
+                :icon="globalConfig.icon.negative"
+                style="color: var(--vp-c-warning-1)"
+              />
               {{ props.category }}
-            </a>
+            </span>
+            <span v-else>
+              <Icon :icon="globalConfig.icon.new" />
+              {{ props.category }}
+            </span>
+          </a>
+        </template>
 
-            <a
-              v-else
-              class="category"
-              :href="`/archives?category=${props.category}`"
-              :style="
-                props.negative
-                  ? 'background-color: var(--vp-c-warning-soft);'
-                  : ''
-              "
-            >
-              <span v-if="props.negative" style="color: var(--vp-c-warning-1)">
-                <Icon
-                  :icon="globalConfig.icon.negative"
-                  style="color: var(--vp-c-warning-1)"
-                />
-                {{ props.category }}
-              </span>
-              <span v-else>
-                <Icon :icon="globalConfig.icon.new" />
-                {{ props.category }}
-              </span>
-            </a>
-          </template>
-
-          <span class="date">
-            <Icon
-              v-if="!props.category"
-              :icon="globalConfig.icon.calendar"
-              style="margin-right: 3px; bottom: 0px"
-            />
-            {{ props.originDate ? formatRelativeDate(props.originDate) : "" }}
-          </span>
-        </div>
+        <span class="date">
+          <Icon
+            v-if="!props.category"
+            :icon="globalConfig.icon.calendar"
+            style="margin-right: 3px; bottom: 0px"
+          />
+          {{ props.originDate ? formatRelativeDate(props.originDate) : "" }}
+        </span>
       </div>
-    </component>
-  </div>
+    </div>
+  </component>
 </template>
 
 <style scoped>
-.card-wrapper {
-  position: relative;
-}
-
 .img-container {
   position: relative;
 }
 
 .img-container img {
+  border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+  height: 200px;
   width: 100%;
-  max-height: 180px;
   object-fit: cover;
-  display: block;
-  border-radius: var(--vp-border-radius-3);
-}
-
-.exif-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent 55%);
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 12px 16px;
-  opacity: 0;
-  transition: opacity var(--vp-transition-time);
-  pointer-events: none;
-  border-radius: var(--vp-border-radius-3);
-}
-
-.img-container:hover .exif-overlay {
-  opacity: 1;
-}
-
-.exif-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-}
-
-.exif-item {
-  font-size: 12px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 2px 8px;
-  border-radius: var(--vp-border-radius-1);
-  font-weight: 500;
-  line-height: 1.5;
-  white-space: nowrap;
 }
 
 .iconify {
@@ -207,38 +149,42 @@ const displayMetaKeys = computed(() => {
 
 .diary {
   flex: 1;
+  border-radius: var(--vp-border-radius-1);
+  border: 1px solid var(--vp-c-divider);
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--vp-c-divider);
-  transition: opacity var(--vp-transition-time);
+  background-color: var(--vp-c-bg);
+  will-change: transform;
+  box-shadow: var(--vp-shadow);
+  transition: all var(--vp-transition-time);
+  z-index: 1;
 }
 
 .diary[type="project"] .title {
   text-transform: var(--vp-title-uppercase);
-  font-family: var(--vp-font-family-display);
+  font-family: var(--vp-use-mono);
 }
 
 .diary:hover {
-  opacity: 0.7;
-}
-.diary:hover .title {
-  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-2);
+  box-shadow: var(--vp-shadow-brand);
 }
 
-/* Negative posts: dashed bottom border */
 .diary.is-negative {
-  border-bottom-style: dashed;
-  border-bottom-color: var(--vp-c-yellow-1);
+  border-style: dashed;
+  border-color: var(--vp-c-yellow-1);
 }
 .diary.is-negative:hover {
-  opacity: 0.8;
+  border-color: var(--vp-c-yellow-1);
+  box-shadow: var(--vp-shadow-negative) !important;
 }
+
 .diary.is-negative:hover .title {
   color: var(--vp-c-yellow-1);
 }
 
 .textPlace {
+  padding: 25px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -246,54 +192,54 @@ const displayMetaKeys = computed(() => {
 
 .meta {
   margin-top: auto;
-  font-size: var(--vp-font-size-meta);
+  font-size: 13px;
   color: var(--vp-c-text-3);
   opacity: 0.8;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: var(--vp-font-weight-body);
-  text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-weight: 500;
 }
 
 .title {
   margin-bottom: 8px !important;
   color: var(--vp-c-text-1);
-  font-size: 1.15rem;
-  line-height: 1.35;
-  font-weight: var(--vp-font-weight-card-title);
-  font-family: var(--vp-font-family-display);
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
   margin: 0;
-  text-transform: none;
-  letter-spacing: 0.02em;
-  transition: color var(--vp-transition-time);
+  text-transform: capitalize;
+  transition: all var(--vp-transition-time);
+}
+
+.diary:hover .title {
+  color: var(--vp-c-brand-2);
 }
 
 .details {
   color: var(--vp-c-text-2);
-  font-size: 0.9rem;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 20px;
   white-space: pre-line;
   overflow-wrap: break-word;
-  font-weight: var(--vp-font-weight-body);
+  font-weight: 500;
 }
 
 .notitle {
-  font-size: 0.95rem;
+  font-size: 15px;
 }
 
 .category {
   margin-right: 5px;
   color: var(--vp-c-text-2);
-  font-size: var(--vp-font-size-meta);
-  text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
+  opacity: 0.8;
+  background-color: var(--vp-c-border);
+  padding: 2px 9px;
+  border-radius: var(--vp-border-radius-1);
+  font-size: 13px;
 }
 .category:hover {
   color: var(--vp-c-text-1);
+  opacity: 1;
 }
 </style>

@@ -52,39 +52,28 @@ div.VPLink.no-icon.VPFeature {
   h4,
   h5,
   h6 {
-    font-family: var(--vp-font-family-display);
-    font-weight: 400;
+    font-family: var(--vp-font-family-title);
+    font-weight: 700;
   }
 }
 
 .VPHome h2 {
-  margin-bottom: 32px;
-  font-size: 1.35rem;
-  letter-spacing: 0.04em;
-  line-height: 1.4;
+  margin-bottom: 30px;
 }
 
 main .vp-doc h2,
 .styledH2 {
   display: flex;
   align-items: center;
-  margin-bottom: 32px;
-  font-family: var(--vp-font-family-display);
-  font-weight: 400;
-  font-size: 1.35rem;
-  letter-spacing: 0.04em;
-  line-height: 1.4;
+  margin-bottom: 24px;
 
   &:before {
-    content: "";
+    content: "‎";
     display: block;
-    width: var(--vp-decorative-line-width);
-    height: 1px;
-    background-color: var(--vp-c-text-3);
-    margin-right: 1.25rem;
-    opacity: 0.42;
-    border: none;
-    border-radius: 0;
+    height: 20px;
+    border-radius: 100px;
+    border: 2px solid var(--vp-c-brand-3);
+    margin-right: 14px;
   }
 }
 
@@ -97,7 +86,6 @@ ol,
 ul,
 blockquote {
   color: var(--vp-c-text-2) !important;
-  line-height: var(--vp-font-line-height-body);
 }
 
 /**
@@ -177,8 +165,7 @@ div.VPHero.has-image.VPHomeHero div.container {
 
 footer.VPFooter {
   margin-top: 50px;
-  font-family: var(--vp-font-family-base);
-  letter-spacing: 0.04em;
+  font-family: var(--vp-use-mono);
   border-top: 0 !important;
 
   a {
@@ -374,9 +361,9 @@ a.header-anchor {
  * -------------------------------------------------------------------------- */
 
 .VPNav * {
-  font-family: var(--vp-font-family-base);
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-family: var(--vp-use-mono);
+  font-weight: 600;
+  text-transform: var(--vp-title-uppercase);
 }
 
 @media screen and (min-width: 960px) {
@@ -763,46 +750,4 @@ h1.artist {
 mark {
   background-color: var(--vp-c-yellow-soft) !important;
   color: var(--vp-c-text-1) !important;
-}
-
-/**
- * Page Width: align all pages with hero — 14vw padding, no max-width
- * -------------------------------------------------------------------------- */
-
-/* Doc pages (blog posts) — 14vw side padding like hero */
-.VPDoc {
-  padding-left: 14vw !important;
-  padding-right: 14vw !important;
-}
-.VPDoc .container {
-  max-width: none !important;
-}
-.VPDoc .content {
-  max-width: none !important;
-}
-.VPDoc .content-container {
-  max-width: none !important;
-}
-
-/* Home pages (about, archives, tags, etc.) — 14vw side padding like hero */
-.VPHome .vp-doc.container {
-  padding-left: 14vw !important;
-  padding-right: 14vw !important;
-  max-width: none !important;
-}
-.VPHomeContent {
-  max-width: none !important;
-}
-
-/* Page layout (index, player) — no override needed, handled inline */
-
-@media (max-width: 768px) {
-  .VPDoc {
-    padding-left: 8vw !important;
-    padding-right: 8vw !important;
-  }
-  .VPHome .vp-doc.container {
-    padding-left: 8vw !important;
-    padding-right: 8vw !important;
-  }
 }

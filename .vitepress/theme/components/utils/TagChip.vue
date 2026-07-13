@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useCardHover } from "../../utils/useCardHover";
+
 defineProps<{
   label?: string;
   count?: string | number | null;
@@ -41,57 +43,75 @@ defineEmits<{
 
 <style scoped>
 .tag {
-  font-family: var(--vp-font-family-base);
-  letter-spacing: 0.04em;
-  transition: color var(--vp-transition-time);
-  padding: 0.35rem 0;
-  color: var(--vp-c-text-2);
+  font-family: var(--vp-use-mono);
+  text-transform: var(--vp-title-uppercase);
+  transition: all var(--vp-transition-time);
+  padding: 12px 24px;
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--vp-border-radius-1);
+  box-shadow: var(--vp-shadow);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 16px;
+  margin: 0;
+  will-change: transform;
   display: inline-flex;
   align-items: center;
   cursor: pointer;
 }
 
-.tag:hover:not(.active),
+.tag:hover:not(.active) {
+  border-color: var(--vp-c-brand-1);
+}
+
 .tag:hover:not(.active) .name,
 .tag:hover:not(.active) .count,
 .tag:hover:not(.active) .anchor,
 .tag:hover:not(.active) :deep(svg) {
-  color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-2);
 }
 
-.active,
+.active {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: var(--vp-shadow-brand);
+}
+
 .active .name,
 .active .count,
 .active .anchor,
 .active :deep(svg) {
-  color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-2);
 }
 
 .name {
-  font-weight: 500;
-  transition: color var(--vp-transition-time);
+  font-weight: 600;
+  transition: all var(--vp-transition-time);
 }
 
 .count {
   margin-left: 12px;
+  border-radius: 100%;
   opacity: 0.7;
-  transition: color var(--vp-transition-time);
+  transition: all var(--vp-transition-time);
 }
 .anchor {
   opacity: 0.4;
   margin-right: 4px;
-  transition: color var(--vp-transition-time);
+  transition: all var(--vp-transition-time);
 }
 
 /* negative 样式 */
 .tag.negative.active,
+.tag.negative:hover {
+  border-color: var(--vp-c-yellow-1);
+  box-shadow: var(--vp-shadow-negative) !important;
+}
+
 .tag.negative.active .name,
 .tag.negative.active .count,
 .tag.negative.active .anchor,
 .tag.negative.active :deep(svg),
-.tag.negative:hover,
 .tag.negative:hover .name,
 .tag.negative:hover .count,
 .tag.negative:hover .anchor,
@@ -105,7 +125,7 @@ defineEmits<{
   margin-right: 10px;
   color: var(--vp-c-text-3);
   opacity: 0.6;
-  transition: color var(--vp-transition-time);
+  transition: all var(--vp-transition-time);
 }
 
 :deep(a svg) {

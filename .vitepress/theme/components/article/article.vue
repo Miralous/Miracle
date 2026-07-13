@@ -11,6 +11,7 @@ import { Icon } from "@iconify/vue";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
 import PostCard from "./postCard.vue";
 import { generateGrid } from "../../utils/generateGrid";
+import { useCardHover } from "../../utils/useCardHover";
 import { columnCount, updateColumns } from "../../utils/dynamicColumns";
 import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
@@ -176,6 +177,8 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 // hover
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
+
 /**
  * ✅ NEW: 控制 Negative 按钮是否显示
  */
@@ -202,6 +205,9 @@ watch(showNegative, (val) => {
     <div class="tags">
       <TagChip
         href="/tags"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
         :label="globalConfig.lang.tags"
       >
         <template #icon>
@@ -214,6 +220,9 @@ watch(showNegative, (val) => {
         v-if="showNegativeButton"
         negative
         @click="toggleNegative"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
         :active="showNegative"
         :label="globalConfig.lang.negative"
       >
@@ -227,6 +236,9 @@ watch(showNegative, (val) => {
         v-for="category in categories"
         :key="category"
         @click="handleCategoryClick(category)"
+        @mouseenter="handleMouseEnter"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
         anchorIcon="~/"
         :active="selectedCategory === category"
         :label="category"

@@ -73,13 +73,11 @@ const props = withDefaults(defineProps<CardProps>(), {
 
 <style scoped>
 .styledH2 {
-  margin: 48px 0 32px 0;
-  font-size: 1.25rem;
-  font-weight: 400;
-  line-height: 1.4;
-  font-family: var(--vp-font-family-display);
-  letter-spacing: 0.04em;
-  padding-top: 32px;
+  margin: 48px 0px 36px 0px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  padding-top: 24px;
   border-top: 1px solid var(--vp-c-divider);
 }
 </style>

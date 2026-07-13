@@ -110,4 +110,8 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--vp-gap);
 }
+
+.diary {
+  height: 100% !important;
+}
 </style>

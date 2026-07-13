@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { useCardHover } from "../../utils/useCardHover";
 import { globalConfig } from "#config";
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 interface CardProps {
   title: string;
@@ -23,6 +25,9 @@ const props = withDefaults(defineProps<CardProps>(), {
 <template>
   <div
     class="card"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
   >
     <a
       :href="props.link"
@@ -56,45 +61,53 @@ const props = withDefaults(defineProps<CardProps>(), {
 
 <style scoped>
 .card {
-  border-bottom: 1px solid var(--vp-c-divider);
-  transition: opacity var(--vp-transition-time);
+  border-radius: var(--vp-border-radius-1);
+  border: 1px solid var(--vp-c-divider);
+  height: 100%;
+  background-color: var(--vp-c-bg);
+  will-change: transform;
+  box-shadow: var(--vp-shadow);
+  transition: all var(--vp-transition-time);
 }
 
 .card:hover {
-  opacity: 0.7;
-}
-.card:hover .title {
-  color: var(--vp-c-brand-2);
+  border-color: var(--vp-c-brand-1);
+  box-shadow: var(--vp-shadow-brand);
 }
 
 .cardInfo {
-  padding: 1rem 0;
+  height: 100%;
+  padding: 25px;
   display: flex;
-  flex-direction: row;
+  flex-direction: row; /* point 1 */
   gap: var(--vp-gap);
 }
 
 .title {
   color: var(--vp-c-text-1);
-  font-size: 1.15rem;
-  line-height: 1.35;
-  font-weight: var(--vp-font-weight-card-title);
-  font-family: var(--vp-font-family-display);
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 600;
   margin: 0;
-  transition: color var(--vp-transition-time);
+  transition: all var(--vp-transition-time);
+  font-family: var(--title), var(--vp-font-family-base);
+}
+
+.card:hover .title {
+  color: var(--vp-c-brand-2);
 }
 
 .details {
   color: var(--vp-c-text-2);
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 20px;
 }
 .img-container {
   aspect-ratio: 1;
   margin-right: 5px;
   width: 48px;
   height: 48px;
-  align-self: center !important;
+  align-self: center !important; /* point 2 */
 }
 
 .img {

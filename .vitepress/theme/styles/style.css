@@ -47,31 +47,6 @@
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);
 
-  /* === Warm Humanist Editorial Tokens === */
-
-  /* Spacing */
-  --vp-gap-lg: calc(var(--vp-gap) * 2.5);
-  --vp-card-padding: calc(var(--vp-gap) * 2.5);
-
-  /* Thin decorative line */
-  --vp-line-thin: 1px solid var(--vp-c-text-3);
-  --vp-line-opacity: 0.18;
-
-  /* Typography */
-  --vp-font-family-display: "Crimson Pro", "Noto Serif SC", Georgia, serif;
-  --vp-font-size-meta: 0.75rem;
-  --vp-font-letter-spacing-meta: 0.4em;
-  --vp-font-weight-card-title: 500;
-  --vp-font-weight-body: 400;
-  --vp-font-line-height-body: 1.8;
-
-  /* Animations — slower, breathing (Claude: meditative, not aggressive) */
-  --vp-easing-editorial: cubic-bezier(0.4, 0, 0.2, 1);
-  --vp-anim-duration-fade: 1s;
-
-  /* Section heading decorative line */
-  --vp-decorative-line-width: 3rem;
-
   font-variant-alternates: styleset(
     open-digits,
     disambiguation,
@@ -96,44 +71,6 @@
 
 .dark {
   --vp-mini-bg: var(--vp-c-border);
-}
-
-/* === Global Editorial Keyframes === */
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleY {
-  from {
-    opacity: 0;
-    transform: scaleY(0);
-  }
-  to {
-    opacity: var(--vp-line-opacity, 0.2);
-    transform: scaleY(1);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
 }
 
 @font-face {
