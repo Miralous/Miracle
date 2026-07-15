@@ -141,11 +141,12 @@ onMounted(() => {
 
 .photo-title {
   font-family: var(--vp-font-family-display);
-  font-size: 1.25rem;
   font-weight: 400;
   color: var(--vp-c-text-1);
   margin: 0 0 1.5rem 0;
   word-break: break-all;
+  border-top: 0;
+  padding:0;
 }
 
 .meta-list {
