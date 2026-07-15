@@ -57,10 +57,12 @@ onMounted(() => {
     </div>
 
     <template v-else-if="photo">
+      <!--
       <a class="back-link" href="/photos">
         <Icon icon="ph:arrow-left-duotone" />
         <span>{{ lg.backToPhotos || "Back to Photos" }}</span>
       </a>
+      -->
 
       <div class="image-section">
         <img :src="photo.path" :alt="photo.fileName" />
