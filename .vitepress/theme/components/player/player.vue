@@ -1404,7 +1404,7 @@ setInterval(onTimeUpdate, 15);
                 >
                   <icon icon="ph:dots-six-vertical" />
                 </span>
-                <img :src="track.pic" class="am-playlist-item-cover" />
+                <img :src="track.pic" loading="lazy" class="am-playlist-item-cover" />
                 <div class="am-playlist-item-info">
                   <span class="am-playlist-item-name">{{ track.name }}</span>
                   <span class="am-playlist-item-artist">{{
