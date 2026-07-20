@@ -7,7 +7,8 @@ footer: false
 
 <ClientOnly>
   <div ref="firstPageRef">
-    <FirstPage />
+    <FirstPage v-if="globalConfig.firstPageMode===1"/>
+    <FirstPage_2 v-if="globalConfig.firstPageMode===2"/>
   </div>
 </ClientOnly>
 <div class="VPContent is-home" id="VPContent" style="padding-top: 0 !important;">

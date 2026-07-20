@@ -6,6 +6,7 @@ import PostCard from "../components/article/postCard.vue";
 import Tags from "../components/article/tags.vue";
 import TagChip from "../components/utils/TagChip.vue";
 import FirstPage from "../components/dashboard/FirstPage.vue";
+import FirstPage_2 from "../components/dashboard/FirstPage_2.vue";
 import Friends from "../components/dashboard/Friends.vue";
 import LastMoment from "../components/dashboard/LastMoment.vue";
 import Projects from "../components/dashboard/Projects.vue";
@@ -28,6 +29,7 @@ import PhotoDetail from "../components/photo/PhotoDetail.vue";
 const components = {
   // Dashboard
   FirstPage,
+  FirstPage_2,
   RecentPosts,
   Projects,
   TechStack,

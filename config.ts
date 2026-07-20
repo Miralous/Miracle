@@ -31,7 +31,7 @@ export const globalConfig = {
   },
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
-
+  firstPageMode: 2,// Set up the homepage so it's the first thing users see,1 displays text,2 to show the large image
   // theme setting
   styles: {
     color: {
@@ -141,7 +141,6 @@ export const globalConfig = {
   convert_photos: true,// enable convert photos to webp or avif (if false, it will not convert photos)
   convert_photos_format: "webp", // convert photos to webp or avif (webp / avif)
   convert_photos_quality: 80, // convert photos quality (0-100)
-
 
   // abouts
   about: {
