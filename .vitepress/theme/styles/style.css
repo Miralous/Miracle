@@ -14,6 +14,7 @@
 @import url("https://rsms.me/inter/inter.css");
 @import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
 @import url("https://fonts.googleapis.cn/css2?family=Noto+Serif+SC:wght@200..900&display=swap");
+@import url("https://fonts.googleapis.cn/css2?family=Playwrite+SK:wght@100..400&display=swap");
 
 /**
  * Variables
@@ -24,7 +25,7 @@
   --vp-font-family-base: "InterVariable", system-ui, sans-serif;
   --vp-font-family-mono: "IBM Plex Mono", var(--vp-font-family-base);
   /* only for title !!!!!! */
-  --vp-font-family-title: "Noto Serif SC", var(--vp-font-family-base);
+  --vp-font-family-title: "Playwrite SK", var(--vp-font-family-mono), var(--vp-font-family-base);
 
   /* Border Radius */
   --vp-border-radius-2: calc(var(--vp-border-radius-1) - 6px);
