@@ -71,5 +71,9 @@ onUnmounted(() => {
     .VPNavBar.screen-open {
         background: var(--vp-nav-bg-color) !important;
     }
+
+    img.VPImage.logo {
+        display: none
+    }
 }
 </style>

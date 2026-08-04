@@ -128,7 +128,7 @@ div.vp-doc.layout.beforeDocs {
   display: flex;
   flex-wrap: wrap;
   gap: 4px calc(var(--vp-gap) * 1.25);
-  margin-bottom: 28px;
+  margin-bottom: calc(var(--vp-gap) * 1.5);
   span, a {
   color: var(--vp-c-text-2); /* 柔和的次级文字颜色 */
   opacity: .8;}

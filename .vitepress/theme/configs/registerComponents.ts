@@ -15,7 +15,6 @@ import TechStack from "../components/dashboard/TechStack.vue";
 import FriendCard from "../components/friends/card.vue";
 import Comments from "../components/layout/afterDocs.vue";
 import Twikoo from "../components/layout/twikoo.vue";
-import Manager from "../components/manager/manager.vue";
 import Moments from "../components/moments/moments.vue";
 import File from "../components/utils/file.vue";
 import Musics from "../components/dashboard/Musics.vue";
@@ -49,7 +48,6 @@ const components = {
   Timeline,
   About,
   Moments,
-  Manager,
   // Layout
   Icon,
   Comments,

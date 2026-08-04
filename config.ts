@@ -31,11 +31,12 @@ export const globalConfig = {
   },
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
-  firstPageMode: 2,// Set up the homepage so it's the first thing users see,1 displays text,2 to show the large image
+  firstPageMode: 1, // Set up the homepage so it's the first thing users see, 1 to displays text, 2 to show the large image
   // theme setting
   styles: {
     color: {
       hue: 280,
+      monochrome: true,
       globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
         enabled: false, // hue will be cycled
@@ -127,7 +128,6 @@ export const globalConfig = {
         // enable / disable music list
         { text: languageFile.musics, link: "/musics" },
         { text: languageFile.photos, link: "/photos" },
-        { text: languageFile.manager, link: "/manager" },
         // enable / disable comments
         { text: languageFile.whiteboard, link: "/whiteboard" },
       ],
@@ -136,9 +136,16 @@ export const globalConfig = {
   EXIF_GPS: true, // enable GPS in EXIF (if false, it will hide GPS in EXIF)
   // To show the 'GPS' field in the configuration below
   abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
-  detail_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue", "FocalLengthIn35mmFormat", "GPS"],
-  
-  convert_photos: true,// enable convert photos to webp or avif (if false, it will not convert photos)
+  detail_metadata: [
+    "Model",
+    "ISO",
+    "ExposureTime",
+    "ApertureValue",
+    "FocalLengthIn35mmFormat",
+    "GPS",
+  ],
+
+  convert_photos: true, // enable convert photos to webp or avif (if false, it will not convert photos)
   convert_photos_format: "webp", // convert photos to webp or avif (webp / avif)
   convert_photos_quality: 80, // convert photos quality (0-100)
 
@@ -152,19 +159,9 @@ export const globalConfig = {
         content: "Tianjin",
       },
       {
-        icon: "ph:cake-duotone",
-        title: "Birthday",
-        content: "May 30, 2013",
-      },
-      {
         icon: "ph:ruler-duotone",
         title: "Height",
-        content: "144 CM",
-      },
-      {
-        icon: "ph:feather-duotone",
-        title: "Weight",
-        content: "43 KG",
+        content: "152 CM",
       },
     ],
     todo: [

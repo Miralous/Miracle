@@ -472,7 +472,7 @@ div.VPNavBar {
   }
 
   a.title span {
-    font-family: var(--vp-font-family-title) !important;
+    font-family: var(--vp-font-family-name) !important;
     text-transform: none !important;
     border-radius: var(--vp-border-radius-1) 0 0 var(--vp-border-radius-1);
   }
