@@ -13,8 +13,8 @@ import "./utils/rainbow";
 import beforeDocs from "./components/layout/beforeDocs.vue";
 import Comments from "./components/layout/afterDocs.vue";
 
-import { registerComponents } from "./configs/registerComponents";
-import { applyCssVars } from "./configs/applyCssVars";
+import { registerComponents } from "./registerComponents";
+import { applyCssVars } from "./applyCssVars";
 import { globalConfig } from "#config";
 /* =========================
  * Theme Export

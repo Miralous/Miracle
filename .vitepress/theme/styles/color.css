@@ -24,7 +24,7 @@
 
   /* Border Colors */
   --vp-c-border: oklch(0.8575 0.0145 calc(var(--chue) - 12));
-  --vp-c-divider: oklch(0.8575 0.0145 calc(var(--chue) - 12));
+  --vp-c-divider: oklch(0.8775 0.0145 calc(var(--chue) - 12));
   --vp-c-gutter: oklch(0.8083 0.0174 calc(var(--chue) - 9));
 
   /* Text Colors */
@@ -140,7 +140,7 @@
 
   /* Border Colors */
   --vp-c-border: oklch(0.324 0.0319 calc(var(--chue) + 1));
-  --vp-c-divider: oklch(0.324 0.0319 calc(var(--chue) + 1));
+  --vp-c-divider: oklch(0.304 0.0319 calc(var(--chue) + 1));
   --vp-c-gutter: oklch(0.4037 0.032 var(--chue));
 
   /* Text Colors */

@@ -5,7 +5,7 @@ export const data = {
   friends: "ph:users-duotone",
   words: "ph:text-aa-bold",
   link: "ph:link-bold",
-  calendar: "ph:pencil-bold",
+  calendar: "ph:clock-bold",
   categoryMeta: "ph:book-bookmark-bold",
   sparcle: "ph:sparkle-duotone",
   category: "ph:book-bookmark-duotone",

@@ -24,18 +24,13 @@ export const globalConfig = {
   favicon:
     "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=4&mask=circle", // favicon (suggest: circle mask)
   url: "https://qwq.blue", // main url (https://xxxx.xxx)
-  blogBase: {
-    type: "github", // github / gitea
-    giteaUrl: "https://gitea.com", // if the type is gitea, fill in the gitea url like: https://gitea.com
-    repo: "Miralous/Miracle", // the repo of ur blog
-  },
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
   firstPageMode: 1, // Set up the homepage so it's the first thing users see, 1 to displays text, 2 to show the large image
   // theme setting
   styles: {
     color: {
-      hue: 280,
+      hue: 300,
       monochrome: false,
       globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
@@ -46,17 +41,17 @@ export const globalConfig = {
     visual: {
       transition: 10, // x[s(second(s))] / 100 | e.g. 10 -> 0.1s (default)
       gap: 12, // x[px]
-      radius: 26, // x[px]
+      radius: 16, // x[px]
       enableCardTitle: true, // show title in custom card (warning, danger...)
       transparent: false, // transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
       mono: false, // use monospace font for title
       cardHover: {
         enabled: true, // enable card hover effect
-        scale: 1.03,
-        maxMove: 8,
-        maxRotate: 5, // 3d effect |  set 0 to disable 3D
-        easing: 0.5,
+        scale: 1.02,
+        maxMove: 4,
+        maxRotate: 1, // 3d effect |  set 0 to disable 3D
+        easing: 0.2,
       },
     },
   },
@@ -72,7 +67,7 @@ export const globalConfig = {
           "https://i.mji.rip/2026/05/26/b15f373cb4e715b252bb9aa3f5687904.jpeg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
         image: "70vh", // only work when type is "image", e.g. "65vh"
       },
-      pictures: true, // show pictures
+      pictures: false, // show pictures
       lastMoment: true, // last moment
       recentPosts: true, // recent posts
       projects: true, // projects (may be very sloooooow)
