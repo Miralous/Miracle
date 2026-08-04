@@ -7,6 +7,7 @@ import { enhanceAppWithTabs } from "vitepress-plugin-tabs/client";
 
 import "./styles/style.css";
 import "./styles/color.css";
+import "./styles/monochrome.css";
 import "./utils/rainbow";
 
 import beforeDocs from "./components/layout/beforeDocs.vue";

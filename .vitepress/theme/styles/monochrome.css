@@ -1,0 +1,121 @@
+/* Full monochrome theme (pure black & white), active via html.monochrome */
+
+html.monochrome {
+  /* Accent Color */
+  --vp-c-brand-1: #000000;
+  --vp-c-brand-2: #2b2b2b;
+  --vp-c-brand-3: #000000;
+  --vp-c-brand-soft: rgba(0, 0, 0, 0.08);
+
+  /* Solid Colors and Sponsor Color */
+  --vp-c-white: #ffffff;
+  --vp-c-black: #181818;
+  --vp-c-sponsor: #333333;
+
+  /* Background Colors */
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f6f6f6;
+  --vp-c-bg-elv: #efefef;
+  --vp-c-bg-soft: #f3f3f3;
+
+  /* Border Colors */
+  --vp-c-border: #e0e0e0;
+  --vp-c-divider: #e0e0e0;
+  --vp-c-gutter: #d4d4d4;
+
+  /* Text Colors */
+  --vp-c-text-1: #181818;
+  --vp-c-text-2: #4d4d4d;
+  --vp-c-text-3: #6b6b6b;
+
+  /* Callout Colors */
+  --vp-c-tip-soft: rgba(0, 0, 0, 0.06);
+  --vp-c-warning-soft: rgba(0, 0, 0, 0.06);
+  --vp-c-danger-soft: rgba(0, 0, 0, 0.06);
+  --vp-c-caution-soft: rgba(0, 0, 0, 0.06);
+  --vp-c-important-soft: rgba(0, 0, 0, 0.06);
+
+  --vp-custom-block-info-bg: rgba(0, 0, 0, 0.05);
+  --vp-custom-block-note-bg: rgba(0, 0, 0, 0.05);
+  --vp-custom-block-details-bg: #f0f0f0;
+
+  /* Color Palette */
+  --vp-c-gray-1: #d4d4d4;
+  --vp-c-gray-2: #e0e0e0;
+  --vp-c-gray-3: #f6f6f6;
+  --vp-c-gray-soft: rgba(0, 0, 0, 0.1);
+
+  --vp-c-default-soft: #f0f0f0;
+
+  /* Badge & Code Highlight */
+  --vp-badge-tip-bg: rgba(0, 0, 0, 0.1);
+  --vp-code-line-highlight-color: rgba(0, 0, 0, 0.1);
+
+  /* Button */
+  --vp-button-brand-bg: #000000;
+  --vp-button-brand-hover-bg: #2b2b2b;
+  --vp-button-brand-active-bg: #000000;
+  --vp-button-brand-text: #ffffff !important;
+  --vp-button-brand-hover-text: #ffffff !important;
+  --vp-button-brand-active-text: #ffffff !important;
+}
+
+html.monochrome.dark {
+  /* Accent Color */
+  --vp-c-brand-1: #ffffff;
+  --vp-c-brand-2: #d9d9d9;
+  --vp-c-brand-3: #ffffff;
+  --vp-c-brand-soft: rgba(255, 255, 255, 0.12);
+
+  /* Solid Colors and Sponsor Color */
+  --vp-c-white: #ffffff;
+  --vp-c-black: #0f0f0f;
+  --vp-c-sponsor: #dddddd;
+
+  /* Background Colors */
+  --vp-c-bg: #000000;
+  --vp-c-bg-alt: #101010;
+  --vp-c-bg-elv: #1a1a1a;
+  --vp-c-bg-soft: #161616;
+
+  /* Border Colors */
+  --vp-c-border: #2a2a2a;
+  --vp-c-divider: #2a2a2a;
+  --vp-c-gutter: #383838;
+
+  /* Text Colors */
+  --vp-c-text-1: #ffffff;
+  --vp-c-text-2: #c0c0c0;
+  --vp-c-text-3: #8a8a8a;
+
+  /* Callout Colors */
+  --vp-c-tip-soft: rgba(255, 255, 255, 0.07);
+  --vp-c-warning-soft: rgba(255, 255, 255, 0.07);
+  --vp-c-danger-soft: rgba(255, 255, 255, 0.07);
+  --vp-c-caution-soft: rgba(255, 255, 255, 0.07);
+  --vp-c-important-soft: rgba(255, 255, 255, 0.07);
+
+  --vp-custom-block-info-bg: rgba(255, 255, 255, 0.06);
+  --vp-custom-block-note-bg: rgba(255, 255, 255, 0.06);
+  --vp-custom-block-details-bg: #1a1a1a;
+
+  /* Color Palette */
+  --vp-c-gray-1: #383838;
+  --vp-c-gray-2: #2a2a2a;
+  --vp-c-gray-3: #101010;
+  --vp-c-gray-soft: rgba(255, 255, 255, 0.12);
+
+  --vp-c-default-soft: #1a1a1a;
+
+  /* Badge & Code Highlight */
+  --vp-badge-tip-bg: rgba(255, 255, 255, 0.15);
+  --vp-code-line-highlight-color: rgba(255, 255, 255, 0.1);
+
+  /* Button */
+  --vp-button-brand-bg: #ffffff;
+  --vp-button-brand-hover-bg: #d9d9d9;
+  --vp-button-brand-active-bg: #ffffff;
+  --vp-button-brand-text: #000000 !important;
+  --vp-button-brand-hover-text: #000000 !important;
+  --vp-button-brand-active-text: #000000 !important;
+}

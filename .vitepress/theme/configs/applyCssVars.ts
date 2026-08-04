@@ -26,6 +26,8 @@ export function applyCssVars() {
       : "none",
   };
 
+  root.classList.toggle("monochrome", styles.color.monochrome);
+
   Object.entries(vars).forEach(([k, v]) =>
     root.style.setProperty(k, v.toString()),
   );

@@ -36,7 +36,7 @@ export const globalConfig = {
   styles: {
     color: {
       hue: 280,
-      monochrome: true,
+      monochrome: false,
       globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {
         enabled: false, // hue will be cycled
