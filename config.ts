@@ -26,7 +26,7 @@ export const globalConfig = {
   url: "https://qwq.blue", // main url (https://xxxx.xxx)
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
-  firstPageMode: 1, // Set up the homepage so it's the first thing users see, 1 to displays text, 2 to show the large image
+  textBannerMode: true,
   // theme setting
   styles: {
     color: {
