@@ -1,72 +1,58 @@
 <template>
-  <div
-    class="vp-doc layout beforeDocs"
-    v-if="frontmatter.title"
-    "
-  >
-
-    <div class="textArea card-style" >
-        
-    <div v-if="frontmatter.image" class="image-container">
-      <img
-        :src="image"
-      />
-    </div>
-    <div class="textPlace">
-      <div class="meta-bar">
-        <ClientOnly v-if="frontmatter.published">
-          <div class="meta-item">
-            <Icon
-              class="icon"
-              :icon="globalConfig.icon.calendar || 'lucide:pencil'"
-            />
-            <span>{{ formatRelativeDate(frontmatter.published) }}</span>
-          </div>
-        </ClientOnly>
-
-        <ClientOnly v-if="frontmatter.updated">
-          <div class="meta-item">
-            <Icon
-              class="icon"
-              :icon="globalConfig.icon.time || 'lucide:clock'"
-            />
-            <span>{{ formatRelativeDate(frontmatter.updated) }}</span>
-          </div>
-        </ClientOnly>
-
-        <div class="meta-item" v-if="frontmatter.category">
-          <Icon class="icon" :icon="globalConfig.icon.categoryMeta" />
-          <a
-            class="hover-link"
-            :href="`/archives?category=${frontmatter.category}`"
-            >{{ frontmatter.category }}</a
-          >
-        </div>
-        <div v-if="postInfo?.wordCount" class="meta-item hideOnPhone">
-          <Icon class="icon" :icon="globalConfig.icon.words" />
-          <span
-            >{{ postInfo.wordCount }}
-            {{ globalConfig.lang.words || "字" }}</span
-          >
-        </div>
-
-        <div v-if="frontmatter.origin" class="meta-item">
-          <Icon class="icon" :icon="globalConfig.icon.link" />
-          <a class="hover-link" :href="frontmatter.origin" target="_blank">{{
-            formatUrl(frontmatter.origin)
-          }}</a>
-        </div>
+  <div class="vp-doc beforeDocs" v-if="frontmatter.title">
+    <article class="article-header">
+      <div v-if="frontmatter.image" class="img-container">
+        <img :src="image" alt="" />
       </div>
 
-      <h1 class="title">
-        {{ frontmatter.title }}
-      </h1>
-    </div>
-    </div>
+      <div class="body">
+        <div class="meta">
+          <ClientOnly v-if="frontmatter.published">
+            <span class="meta-item">
+              <Icon :icon="globalConfig.icon.calendar" />
+              {{ formatRelativeDate(frontmatter.published) }}
+            </span>
+          </ClientOnly>
 
-    <div class="desc-box" v-if="frontmatter.description">
-      <p class="desc"><Icon :icon="globalConfig.icon.sparcle" style="margin-right: calc(var(--vp-gap) / 1.5); position: relative; top: -1px;"/>{{ frontmatter.description }}</p>
-    </div>
+          <ClientOnly v-if="frontmatter.updated">
+            <span class="meta-item hideOnPhone">
+              <Icon :icon="globalConfig.icon.time || 'lucide:clock'" />
+              {{ formatRelativeDate(frontmatter.updated) }}
+            </span>
+          </ClientOnly>
+
+          <a
+            v-if="frontmatter.category"
+            class="category"
+            :href="`/archives?category=${frontmatter.category}`"
+          >
+            <Icon :icon="globalConfig.icon.categoryMeta" />
+            {{ frontmatter.category }}
+          </a>
+
+          <span v-if="postInfo?.wordCount" class="meta-item hideOnPhone">
+            <Icon :icon="globalConfig.icon.words" />
+            {{ postInfo.wordCount }} {{ globalConfig.lang.words || "字" }}
+          </span>
+
+          <a
+            v-if="frontmatter.origin"
+            class="meta-item origin"
+            :href="frontmatter.origin"
+            target="_blank"
+          >
+            <Icon :icon="globalConfig.icon.link" />
+            {{ formatUrl(frontmatter.origin) }}
+          </a>
+        </div>
+
+        <h1 class="title">{{ frontmatter.title }}</h1>
+
+        <p v-if="frontmatter.description" class="desc">
+          {{ frontmatter.description }}
+        </p>
+      </div>
+    </article>
   </div>
 </template>
 
@@ -75,131 +61,135 @@ import { useData } from "vitepress";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
 import { globalConfig } from "#config";
 import { formatUrl } from "../../utils/formatUrl";
-import { useCardHover } from "../../utils/useCardHover";
 import { data as posts } from "../../data/posts.data";
 
 const { page } = useData();
 const frontmatter = page.value?.frontmatter || {};
 const postInfo = posts.find((p) => p.filePath === page.value?.filePath);
 
-const image = frontmatter.image
-
-const tags = Array.isArray(frontmatter.tags)
-  ? frontmatter.tags
-  : [frontmatter.tags];
-
-const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
+const image = frontmatter.image;
 </script>
 
 <style scoped>
-div.vp-doc.layout.beforeDocs {
+div.vp-doc.beforeDocs {
   display: block;
-  z-index: 9999;
-  margin-bottom: 30px;
+  margin-bottom: calc(var(--vp-gap) * 2.5);
 }
 
-/* 头图样式保持 */
-.image-container img {
-  width: 100% !important;
-  height: 40vh !important;
-  object-fit: cover;
-  background-repeat: no-repeat;
-  border-radius: var(--vp-border-radius-1) var(--vp-border-radius-1) 0 0;
-  transition: all var(--vp-transition-time);
+/* 卡片：与其他 Miracle 卡片一致 */
+.article-header {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--vp-border-radius-1);
+  background-color: var(--vp-c-bg);
   box-shadow: var(--vp-shadow);
+  overflow: hidden;
+  transition: all var(--vp-transition-time);
 }
 
-/* 🌟 卡片整体样式 */
-.card-style {
-  background-color: var(
-    --vp-c-bg-soft
-  ); /* 匹配 Vitepress 的柔和背景色，浅色灰，深色暗 */
-  border-radius: var(--vp-border-radius-1); /* 圆角 */
+.article-header:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: var(--vp-shadow-brand);
 }
 
-/* 调整移动端间距 */
-@media screen and (max-width: 600px) {
-  .card-style {
-  }
+.article-header:hover .title {
+  color: var(--vp-c-brand-2);
 }
 
-/* 顶部元数据栏 */
-.meta-bar {
+/* 头图 */
+.img-container img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.body {
+  padding: 20px 25px 25px;
+}
+
+/* 重置 vp-doc 对链接的下划线渐变 */
+.article-header a {
+  background: none;
+  padding: 0;
+  text-decoration: none;
+  border-radius: 0;
+}
+
+/* 元数据行 */
+.meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px calc(var(--vp-gap) * 1.25);
-  margin-bottom: calc(var(--vp-gap) * 1.5);
-  span, a {
-  color: var(--vp-c-text-2); /* 柔和的次级文字颜色 */
-  opacity: .8;}
-  font-size: 14.5px;
-   * {font-weight: 400 !important;}
-}
-
-.meta-item {
-  display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-/* 重置 Icon 的背景和大小，使其变得极简 */
-.meta-item .icon {
-  width: 16px;
-  height: 16px;
+  gap: 4px calc(var(--vp-gap) * 1.25);
+  margin-bottom: calc(var(--vp-gap) * 0.75);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vp-c-text-3);
   opacity: 0.8;
 }
 
-.hover-link {
-    color: var(--vp-c-text-1);
-    &:hover {
-        opacity: 1 !important;
-        color: var(--vp-c-brand-1) !important;
-    }
-}
-.separator {
-  margin: 0 4px;
-  opacity: 0.4;
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
-/* 📰 标题样式 */
-.title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  line-height: 1.4;
+/* 分类 chip，与 postCard 一致 */
+a.category {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--vp-border-radius-1);
+  color: var(--vp-c-text-2);
+  opacity: 0.8;
+}
+
+a.category:hover,
+a.origin:hover {
   color: var(--vp-c-text-1);
-  /* 使用衬线体来模拟图片里的优雅质感 */
-  font-family: var(--vp-font-family-title);
-  letter-spacing: 0.5px;
+  opacity: 1;
 }
 
-/* ✨ 描述区域样式 */
-.desc-box {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--vp-gap);
-  padding: 0 calc(var(--vp-gap) / 2);
+a.origin {
   color: var(--vp-c-text-3);
-  opacity: .8;
 }
 
-.iconify {
-    opacity: 1 !important;
+/* 标题 */
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--vp-c-text-1);
+  font-family: var(--vp-font-family-title);
+  transition: all var(--vp-transition-time);
 }
 
-p.desc {
-  font-size: 15px;
+/* 描述 */
+.desc {
+  margin: calc(var(--vp-gap) * 0.75) 0 0;
+  font-size: 14px;
   line-height: 1.7;
   font-weight: 400;
-}
-
-.textPlace {
-    
-  padding: calc(var(--vp-gap) * 1.5); /* 增加留白 */
+  color: var(--vp-c-text-3);
+  opacity: 0.8;
 }
 
 @media screen and (max-width: 700px) {
-    .hideOnPhone {
-        display: none;
-    }
+  .hideOnPhone {
+    display: none;
+  }
+
+  .img-container img {
+    height: 200px;
+  }
+
+  .body {
+    padding: 20px;
+  }
 }
 </style>
