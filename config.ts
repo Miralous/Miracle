@@ -3,6 +3,7 @@ import { data as momentList } from "#theme/data/moments.data";
 import { data as friendList } from "#theme/data/friends.data";
 import { data as iconList } from "#theme/configs/iconList";
 import { data as photoList } from "#theme/data/photos.data";
+import { data as contributorList } from "#theme/components/contributors/contributors";
 
 // experimental: i18n
 import { zh, en } from "#theme/lang/index";
@@ -41,7 +42,7 @@ export const globalConfig = {
     visual: {
       transition: 10, // x[s(second(s))] / 100 | e.g. 10 -> 0.1s (default)
       gap: 12, // x[px]
-      radius: 20, // x[px]
+      radius: 26, // x[px]
       enableCardTitle: true, // show title in custom card (warning, danger...)
       transparent: false, // transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
@@ -281,12 +282,13 @@ export const globalConfig = {
     showRoman: false, // show romanization of lyrics (default: false, set true to show)
     autoplay: true, // auto play music when page loaded
     visualizer: false, // show visualizer at the bottom of player (default: false, set true to show)
-    musicSlice: 20, // how many singer to display in music list (default: 20, set 0 to display all)
+    musicSlice: 0, // how many singer to display in music list (default: 20, set 0 to display all)
     QQMusicLyricsSource: true, // use QQ Music API to get lyrics (default: true, set true to enable), Can greatly increase the coverage of songs with word-by-word lyrics,But there is also a small probability of matching the wrong song
   },
 
   // DO NOT EDIT THESE VALUES!!!!!
   friends: friendList,
+  contributors: contributorList,
   moments: momentList,
   photos: photoList,
   lang: languageFile,

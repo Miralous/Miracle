@@ -24,6 +24,7 @@ import Timeline from "./components/timeline/timeline.vue";
 import About from "./components/about/about.vue";
 import MusicPlayer from "./components/player/player.vue";
 import PhotoDetail from "./components/photo/PhotoDetail.vue";
+import Contributors from "./components/contributors/ctb.vue";
 
 const components = {
   // Dashboard
@@ -55,6 +56,8 @@ const components = {
   File,
   MusicPlayer,
   PhotoDetail,
+  // Contributors
+  Contributors,
 };
 
 type GlobalComponentTypes = typeof components;
