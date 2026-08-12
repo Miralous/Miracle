@@ -13,7 +13,8 @@
 @import url("katex/dist/katex.min.css");
 @import url("https://rsms.me/inter/inter.css");
 @import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
-@import url("https://fonts.font.im/css2?family=Playwrite+SK:wght@100..400&display=swap");
+@import url("https://fonts.font.im/css2?family=Playwrite+SK:wght@400&display=swap");
+@import url("https://fonts.font.im/css2?family=Noto+Serif+SC:wght@200..600&display=swap");
 
 /**
  * Variables
@@ -25,7 +26,8 @@
   --vp-font-family-mono: "IBM Plex Mono", var(--vp-font-family-base);
   /* only for title !!!!!! */
   --vp-font-family-title:
-    var(--vp-use-mono), var(--vp-font-family-mono), var(--vp-font-family-base);
+    "Noto Serif SC", var(--vp-use-mono), var(--vp-font-family-mono),
+    var(--vp-font-family-base);
   --vp-font-family-name:
     "Playwrite SK", var(--vp-use-mono), var(--vp-font-family-mono),
     var(--vp-font-family-base);
@@ -50,13 +52,6 @@
 
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);
-
-  /* Editorial tokens for photo detail */
-  --vp-card-padding: calc(var(--vp-gap) * 2.5);
-  --vp-font-family-display: "Playfair Display", var(--vp-font-family-title);
-  --vp-font-size-meta: 0.75rem;
-  --vp-font-letter-spacing-meta: 0.4em;
-  --vp-font-weight-body: 400;
 
   font-variant-alternates: styleset(
     open-digits,

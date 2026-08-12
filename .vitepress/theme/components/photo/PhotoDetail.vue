@@ -27,6 +27,14 @@ const displayMetaKeys = computed(() => {
 
 const hasExif = computed(() => displayMetaKeys.value.length > 0);
 
+const metaIcons: Record<string, string> =
+  (globalConfig as any).icon?.meta || {};
+const fallbackMetaIcon = "ph:info-duotone";
+
+function metaIcon(key: string): string {
+  return metaIcons[key] || fallbackMetaIcon;
+}
+
 function loadPhoto() {
   const params = new URLSearchParams(window.location.search);
   const category = params.get("category") || "";
@@ -34,7 +42,7 @@ function loadPhoto() {
 
   const photos: PhotoData[] = (globalConfig as any).photos || [];
   const found = photos.find(
-    (p: PhotoData) => p.category === category && p.fileName === file
+    (p: PhotoData) => p.category === category && p.fileName === file,
   );
 
   if (found) {
@@ -57,12 +65,10 @@ onMounted(() => {
     </div>
 
     <template v-else-if="photo">
-      <!--
       <a class="back-link" href="/photos">
         <Icon icon="ph:arrow-left-duotone" />
         <span>{{ lg.backToPhotos || "Back to Photos" }}</span>
       </a>
-      -->
 
       <div class="image-section">
         <img :src="photo.path" :alt="photo.fileName" />
@@ -73,16 +79,18 @@ onMounted(() => {
           <h2 class="photo-title">{{ photo.fileName }}</h2>
           <div class="meta-list">
             <div class="meta-item">
-              <span class="meta-label">{{ lg.category || "Category" }}</span>
+              <span class="meta-label">
+                <Icon :icon="metaIcon('Category')" />
+                {{ lg.category || "Category" }}
+              </span>
               <span class="meta-value">{{ photo.category }}</span>
             </div>
 
-            <div
-              v-for="key in displayMetaKeys"
-              :key="key"
-              class="meta-item"
-            >
-              <span class="meta-label">{{ lg[key] || key }}</span>
+            <div v-for="key in displayMetaKeys" :key="key" class="meta-item">
+              <span class="meta-label">
+                <Icon :icon="metaIcon(key)" />
+                {{ lg[key] || key }}
+              </span>
               <span class="meta-value">{{ photo.metadata?.[key] }}</span>
             </div>
           </div>
@@ -118,35 +126,55 @@ onMounted(() => {
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--vp-c-text-2);
-  font-size: 0.9rem;
-  transition: color var(--vp-transition-time);
+  gap: 8px;
+  font-family: var(--vp-use-mono);
+  text-transform: var(--vp-title-uppercase);
+  font-size: 13px;
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--vp-border-radius-1);
+  padding: 8px 16px;
+  box-shadow: var(--vp-shadow);
   text-decoration: none;
+  transition: all var(--vp-transition-time);
   white-space: nowrap;
 }
 
+.back-link :deep(svg) {
+  color: var(--vp-c-text-3);
+  opacity: 0.6;
+  transition: all var(--vp-transition-time);
+}
+
 .back-link:hover {
-  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-2);
+}
+
+.back-link:hover :deep(svg) {
+  color: var(--vp-c-brand-2);
+  opacity: 1;
 }
 
 /* --- Info Card --- */
 .info-card {
-  background: var(--vp-c-bg-elv);
-  border: 1px solid var(--vp-c-border);
-  border-radius: var(--vp-border-radius-2);
-  padding: var(--vp-card-padding);
+  background-color: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--vp-border-radius-1);
+  padding: 25px;
   box-shadow: var(--vp-shadow);
 }
 
 .photo-title {
-  font-family: var(--vp-font-family-display);
-  font-weight: 400;
+  font-family: var(--vp-font-family-title);
+  font-weight: 700;
+  font-size: 24px;
   color: var(--vp-c-text-1);
   margin: 0 0 1.5rem 0;
   word-break: break-all;
   border-top: 0;
-  padding:0;
+  padding: 0;
 }
 
 .meta-list {
@@ -162,17 +190,22 @@ onMounted(() => {
 }
 
 .meta-label {
-  font-size: var(--vp-font-size-meta);
-  text-transform: uppercase;
-  letter-spacing: var(--vp-font-letter-spacing-meta);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: var(--vp-title-uppercase);
+  font-size: 13px;
   color: var(--vp-c-text-3);
-  font-weight: var(--vp-font-weight-body);
+  opacity: 0.8;
+}
+
+.meta-label :deep(svg) {
+  color: var(--vp-c-text-3);
+  opacity: 0.6;
 }
 
 .meta-value {
-  font-family: var(--vp-font-family-display);
   font-size: 1.1rem;
-  font-weight: 400;
   color: var(--vp-c-text-1);
   line-height: 1.5;
 }
@@ -213,11 +246,7 @@ onMounted(() => {
     max-height: calc(100vh - 64px - 4rem);
     display: block;
     margin: 0 auto;
-    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
-  }
-
-  .dark .image-section img {
-    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--vp-shadow);
   }
 
   .no-exif .image-section {
@@ -243,33 +272,30 @@ onMounted(() => {
 @media (max-width: 999px) {
   .back-link {
     display: flex;
-    padding: 1rem 0 0 5%;
+    justify-content: center;
+    margin: 1rem 5% 0;
   }
 
   .image-section {
     width: 90%;
     margin: 0.75rem 5%;
+    background-color: var(--vp-c-bg);
+    border: 1px solid var(--vp-c-divider);
+    border-radius: var(--vp-border-radius-1);
+    box-shadow: var(--vp-shadow);
+    padding: 12px;
   }
 
   .image-section img {
     width: 100%;
     height: auto;
     display: block;
-    box-shadow: var(--vp-shadow);
-  }
-
-  .dark .image-section img {
-    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.5);
-  }
-
-  .no-exif .image-section {
-    width: 95%;
-    margin: 1rem 2.5%;
+    border-radius: var(--vp-border-radius-2);
   }
 
   .info-section {
-    width: 94%;
-    margin: 1.25rem 3% 3rem;
+    width: 90%;
+    margin: 0rem 5% 3rem;
   }
 }
 </style>

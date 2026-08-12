@@ -27,7 +27,14 @@ const props = defineProps({
 
 // URL category
 const urlParams = new URLSearchParams(window.location.search);
-const selectedCategory = ref(urlParams.get("category"));
+const multiSelect = globalConfig.multiSelect;
+const selectedCategories = ref<string[]>(
+  urlParams
+    .getAll("category")
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .slice(0, multiSelect ? undefined : 1),
+);
 
 // negative 状态
 import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
@@ -44,9 +51,11 @@ const articles = ref(
 const updateArticles = () => {
   let filtered = posts.filter((post) => showNegative.value || !post.negative);
 
-  if (selectedCategory.value) {
-    filtered = filtered.filter(
-      (post) => post.category === selectedCategory.value,
+  if (selectedCategories.value.length) {
+    filtered = filtered.filter((post) =>
+      selectedCategories.value.some((c) =>
+        post.category.split(",").map((s) => s.trim()).includes(c),
+      ),
     );
   }
 
@@ -64,7 +73,7 @@ watch(
 );
 
 // watch category
-watch(selectedCategory, () => {
+watch(selectedCategories, () => {
   nextTick(() => updateArticles());
 });
 
@@ -142,16 +151,21 @@ const categoryCounts = computed(() => {
 
 // category click
 const handleCategoryClick = (category: string) => {
-  const url = new URL(window.location.href);
+  const selected = selectedCategories.value;
 
-  if (selectedCategory.value === category) {
-    selectedCategory.value = null;
-    url.searchParams.delete("category");
+  if (multiSelect) {
+    selectedCategories.value = selected.includes(category)
+      ? selected.filter((c) => c !== category)
+      : [...selected, category];
   } else {
-    selectedCategory.value = category;
-    url.searchParams.set("category", category);
+    selectedCategories.value = selected[0] === category ? [] : [category];
   }
 
+  const url = new URL(window.location.href);
+  url.searchParams.delete("category");
+  selectedCategories.value.forEach((c) =>
+    url.searchParams.append("category", c),
+  );
   window.history.pushState({}, "", url);
 };
 
@@ -240,7 +254,7 @@ watch(showNegative, (val) => {
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
         anchorIcon="~/"
-        :active="selectedCategory === category"
+        :active="selectedCategories.includes(category)"
         :label="category"
         :count="categoryCounts[category]"
         showAnchor

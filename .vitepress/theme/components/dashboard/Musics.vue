@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import { globalConfig } from "#config";
+import { getPlaylist } from "#theme/utils/getPlaylist";
 
 const playlist = ref<any[]>([]);
 
@@ -8,13 +8,10 @@ const playlist = ref<any[]>([]);
 const defaultImg =
   "https://pic2.zhimg.com/50/v2-cc1a32fcb444fc9d5e23f2ee078dc6e1_720w.jpg?source=1940ef5c";
 
-// 获取歌单数据
+// 获取歌单数据（1h 缓存）
 onMounted(async () => {
   try {
-    const response = await fetch(
-      `${globalConfig.netease.metingApi}/?type=playlist&id=${globalConfig.netease.musicList}`,
-    );
-    const data = await response.json();
+    const data = await getPlaylist();
     playlist.value = data;
     console.log(playlist.value);
   } catch (error) {

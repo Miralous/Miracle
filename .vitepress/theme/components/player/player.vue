@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, h } from "vue";
 // prepared
 import { globalConfig } from "#config";
+import { getPlaylist } from "#theme/utils/getPlaylist";
 
 interface PlayerProps {
   id: string;
@@ -19,12 +20,10 @@ const autoplay = globalConfig.netease.autoplay ?? true;
 // 支持从配置中读取歌单 id 列表（兼容字符串 id 数组 或 对象数组 { id: ... }）
 async function getListIds() {
   try {
-    const date = await fetch(`${api}/?type=playlist&id=${list}`);
-    return Array.isArray(date)
-      ? date.map((it: any) =>
-          typeof it === "string" ? it : it.url.match(/\d+$/)?.[0] || "",
-        )
-      : [];
+    const date = await getPlaylist();
+    return date.map((it: any) =>
+      typeof it === "string" ? it : it.url.match(/\d+$/)?.[0] || "",
+    );
   } catch (e) {
     console.error("getListIds失败:", e);
     return [];
@@ -41,8 +40,7 @@ const loadPlaylist = async () => {
         typeof it === "string" ? ({ id: it } as SongData) : it,
       );
     } else if (list) {
-      const res = await fetch(`${api}/?type=playlist&id=${list}`);
-      const data = await res.json();
+      const data = await getPlaylist();
       if (Array.isArray(data)) {
         playlistTracks.value = data;
         playOrder.value = [...data];
@@ -369,11 +367,7 @@ async function YrcToJson(musicid: string, meta: any) {
   console.log(json);
   return json;
 }
-async function QQJsonGET(
-  name: string,
-  artist: string,
-  album: string,
-) {
+async function QQJsonGET(name: string, artist: string, album: string) {
   console.log("正在使用QQ音乐API进行补充查询...");
   function stringSimilarity(a: string, b: string) {
     //vibe coding函数uwu
@@ -410,10 +404,10 @@ async function QQJsonGET(
   let nmed;
   try {
     nmed = await fetch(
-      `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name.replace(/-.*$/, ''))}%20${encodeURIComponent(artist)}%20${album==name?'':encodeURIComponent(album)}`
+      `https://api.vkeys.cn/v2/music/tencent/search/song?word=${encodeURIComponent(name.replace(/-.*$/, ""))}%20${encodeURIComponent(artist)}%20${album == name ? "" : encodeURIComponent(album)}`,
     );
   } catch (error) {
-    console.error('请求失败:', error);
+    console.error("请求失败:", error);
     nmed = null;
   }
   if (!nmed || !nmed.ok) {
@@ -425,14 +419,24 @@ async function QQJsonGET(
     console.log("未找到匹配的歌曲，使用原生歌词");
     return;
   }
-  let max=0;
-  let index=-1;
-  for(let i=0;i<nme.data.length;i++){
-    const qqName = nme.data[i].song?nme.data[i].song:"";const qqArtist = nme.data[i].singer?nme.data[i].singer:"";const qqAlbum = nme.data[i].album?nme.data[i].album:"";
-    const qqList = qqArtist.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase().split("/");
-    const wyList = artist.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase().split("/");
+  let max = 0;
+  let index = -1;
+  for (let i = 0; i < nme.data.length; i++) {
+    const qqName = nme.data[i].song ? nme.data[i].song : "";
+    const qqArtist = nme.data[i].singer ? nme.data[i].singer : "";
+    const qqAlbum = nme.data[i].album ? nme.data[i].album : "";
+    const qqList = qqArtist
+      .replace(/\([^)]*\)/g, "")
+      .replace(/ /g, "")
+      .toUpperCase()
+      .split("/");
+    const wyList = artist
+      .replace(/\([^)]*\)/g, "")
+      .replace(/ /g, "")
+      .toUpperCase()
+      .split("/");
     let a_aru = 0;
-    for (const qq of qqList) { 
+    for (const qq of qqList) {
       for (const wy of wyList) {
         const sim = stringSimilarity(qq, wy);
         if (sim > a_aru) {
@@ -440,35 +444,67 @@ async function QQJsonGET(
         }
       }
     }
-    const a_tiu = stringSimilarity(qqName.replace(/\([^)]*\)/g, '').replace(/-.*$/, '').replace(/ /g, "").toUpperCase(),name.replace(/\([^)]*\)/g, '').replace(/-.*$/, '').replace(/ /g, "").toUpperCase())
-    const a_alu = album==name||qqName==qqAlbum?1:stringSimilarity(qqAlbum.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase(),album.replace(/\([^)]*\)/g, '').replace(/ /g, "").toUpperCase())
-    if(a_tiu+a_aru+a_alu>max){
-      max=a_tiu+a_aru+a_alu;
-      index=i;
+    const a_tiu = stringSimilarity(
+      qqName
+        .replace(/\([^)]*\)/g, "")
+        .replace(/-.*$/, "")
+        .replace(/ /g, "")
+        .toUpperCase(),
+      name
+        .replace(/\([^)]*\)/g, "")
+        .replace(/-.*$/, "")
+        .replace(/ /g, "")
+        .toUpperCase(),
+    );
+    const a_alu =
+      album == name || qqName == qqAlbum
+        ? 1
+        : stringSimilarity(
+            qqAlbum
+              .replace(/\([^)]*\)/g, "")
+              .replace(/ /g, "")
+              .toUpperCase(),
+            album
+              .replace(/\([^)]*\)/g, "")
+              .replace(/ /g, "")
+              .toUpperCase(),
+          );
+    if (a_tiu + a_aru + a_alu > max) {
+      max = a_tiu + a_aru + a_alu;
+      index = i;
     }
   }
-  if(!nme.data[index]){
-    return {metadata:{zq:false,message:`未找到匹配的歌曲  .`}};
+  if (!nme.data[index]) {
+    return { metadata: { zq: false, message: `未找到匹配的歌曲  .` } };
   }
-  const qqName = nme.data[index].song?nme.data[index].song:"";const qqArtist = nme.data[index].singer?nme.data[index].singer:"";const qqAlbum = nme.data[index].album?nme.data[index].album:"";
-  if(max<1.7){
-    console.log(`匹配度过低，放弃匹配。相似度：${max}。${qqName} - ${qqArtist} · ${qqAlbum}`)
-    return {metadata:{zq:false,message:`匹配度过低，放弃匹配。相似度：${max}。${qqName} - ${qqArtist} · ${qqAlbum}`}};
-  }else if(index===-1){
-    console.log("未找到匹配的歌曲.")
-    return {metadata:{zq:false,message:"未找到匹配的歌曲."}};
+  const qqName = nme.data[index].song ? nme.data[index].song : "";
+  const qqArtist = nme.data[index].singer ? nme.data[index].singer : "";
+  const qqAlbum = nme.data[index].album ? nme.data[index].album : "";
+  if (max < 1.7) {
+    console.log(
+      `匹配度过低，放弃匹配。相似度：${max}。${qqName} - ${qqArtist} · ${qqAlbum}`,
+    );
+    return {
+      metadata: {
+        zq: false,
+        message: `匹配度过低，放弃匹配。相似度：${max}。${qqName} - ${qqArtist} · ${qqAlbum}`,
+      },
+    };
+  } else if (index === -1) {
+    console.log("未找到匹配的歌曲.");
+    return { metadata: { zq: false, message: "未找到匹配的歌曲." } };
   }
   let dataejson;
   try {
     const response = await fetch(
-      `https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[index].id}`
+      `https://api.vkeys.cn/v2/music/tencent/lyric?id=${nme.data[index].id}`,
     );
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     dataejson = await response.json();
   } catch (error) {
-    console.error('请求失败:', error);
+    console.error("请求失败:", error);
   }
   if (!dataejson || !dataejson.data) {
     console.log("QQ音乐API查询歌词失败，使用原生歌词");
@@ -731,7 +767,7 @@ function mediaSession() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: song.value?.name || globalConfig.lang.unknownTitle,
       artist: song.value?.artist || globalConfig.lang.unknownArtist,
-      album: albumName.value || globalConfig.lang.unknownAlbum, 
+      album: albumName.value || globalConfig.lang.unknownAlbum,
       artwork: [
         {
           src: song.value?.pic || "",
@@ -1373,7 +1409,9 @@ setInterval(onTimeUpdate, 15);
                         : globalConfig.lang.playModeShuffle
                   }}
                 </h3>
-                <span class="am-playlist-count">{{ playOrder.length }} {{ globalConfig.lang.songUnit }}</span>
+                <span class="am-playlist-count"
+                  >{{ playOrder.length }} {{ globalConfig.lang.songUnit }}</span
+                >
               </div>
               <button class="am-playlist-close" @click="showPlaylist = false">
                 <icon :icon="globalConfig.icon.close" />
@@ -1404,7 +1442,11 @@ setInterval(onTimeUpdate, 15);
                 >
                   <icon icon="ph:dots-six-vertical" />
                 </span>
-                <img :src="track.pic" loading="lazy" class="am-playlist-item-cover" />
+                <img
+                  :src="track.pic"
+                  loading="lazy"
+                  class="am-playlist-item-cover"
+                />
                 <div class="am-playlist-item-info">
                   <span class="am-playlist-item-name">{{ track.name }}</span>
                   <span class="am-playlist-item-artist">{{

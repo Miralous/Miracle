@@ -5,8 +5,7 @@ import { data as iconList } from "#theme/configs/iconList";
 import { data as photoList } from "#theme/data/photos.data";
 
 // experimental: i18n
-import { languageFile as zh } from "#theme/lang/zh_CN";
-import { languageFile as en } from "#theme/lang/en_US";
+import { zh, en } from "#theme/lang/index";
 
 const languageMap: Record<string, any> = { zh, en };
 
@@ -26,6 +25,7 @@ export const globalConfig = {
   url: "https://qwq.blue", // main url (https://xxxx.xxx)
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
+  multiSelect: false, // allow selecting multiple tags/categories/artists at once to show their content together (if false, only one can be selected)
   textBannerMode: true,
   // theme setting
   styles: {

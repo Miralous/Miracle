@@ -42,4 +42,28 @@ export const data = {
   games: "ph:game-controller-duotone",
   prev: "ph:caret-left-bold",
   next: "ph:caret-right-bold",
+
+  /* EXIF metadata icons (PhotoDetail) */
+  meta: {
+    Category: "ph:book-bookmark-duotone",
+    Model: "ph:camera-duotone",
+    Make: "ph:copyright-duotone",
+    LensModel: "ph:frame-duotone",
+    ISO: "ph:sun-duotone",
+    ExposureTime: "ph:timer-duotone",
+    ShutterSpeedValue: "ph:timer-duotone",
+    ApertureValue: "ph:circle-half-duotone",
+    FNumber: "ph:circle-half-duotone",
+    FocalLength: "ph:ruler-duotone",
+    FocalLengthIn35mmFormat: "ph:ruler-duotone",
+    GPS: "ph:map-pin-duotone",
+    DateTimeOriginal: "ph:calendar-duotone",
+    CreateDate: "ph:calendar-duotone",
+    ModifyDate: "ph:calendar-duotone",
+    WhiteBalance: "ph:palette-duotone",
+    Flash: "ph:lightning-duotone",
+    ExposureCompensation: "ph:plus-minus-duotone",
+    MeteringMode: "ph:target-duotone",
+    ColorSpace: "ph:palette-duotone",
+  },
 };

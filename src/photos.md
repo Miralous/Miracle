@@ -13,16 +13,19 @@ import { data as photos } from "#theme/data/photos.data";
 
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
-const selectedCategory = ref<string | null>(null);
+const multiSelect = globalConfig.multiSelect;
+const selectedCategories = ref<string[]>([]);
 
 onMounted(() => {
   // 初始化选中标签（刷新页面时保持状态）
   const urlParams = new URLSearchParams(window.location.search);
-  const categoryFromUrl = urlParams.get("category")?.trim();
-
-  if (categoryFromUrl) {
-    selectedCategory.value = categoryFromUrl;
-  }
+  const categoriesFromUrl = urlParams
+    .getAll("category")
+    .map((c) => c.trim())
+    .filter(Boolean);
+  selectedCategories.value = multiSelect
+    ? categoriesFromUrl
+    : categoriesFromUrl.slice(0, 1);
 
   updateColumns();
   window.addEventListener("resize", updateColumns);
@@ -45,13 +48,13 @@ const categories = computed(() => {
 
 // 按分类分组
 const groupedByCategory = computed(() => {
-  const filterCategory = selectedCategory.value?.trim().toLowerCase();
+  const filters = selectedCategories.value.map((c) => c.toLowerCase());
 
   const processedItems = photos.filter((photo) => {
     const category = (photo.category || "Uncategorized").toLowerCase();
 
-    if (!filterCategory) return true;
-    return category === filterCategory;
+    if (!filters.length) return true;
+    return filters.includes(category);
   });
 
   return generateGrid(
@@ -62,18 +65,23 @@ const groupedByCategory = computed(() => {
   );
 });
 
-// 点击标签
+// 点击标签（再次点击取消选中）
 const handleCategoryClick = (category: string) => {
-  selectedCategory.value = category || null;
+  const selected = selectedCategories.value;
 
-  const url = new URL(window.location.href);
-
-  if (category) {
-    url.searchParams.set("category", category);
+  if (multiSelect) {
+    selectedCategories.value = selected.includes(category)
+      ? selected.filter((c) => c !== category)
+      : [...selected, category];
   } else {
-    url.searchParams.delete("category");
+    selectedCategories.value = selected[0] === category ? [] : [category];
   }
 
+  const url = new URL(window.location.href);
+  url.searchParams.delete("category");
+  selectedCategories.value.forEach((c) =>
+    url.searchParams.append("category", c),
+  );
   window.history.pushState({}, "", url);
 };
 </script>
@@ -82,19 +90,10 @@ const handleCategoryClick = (category: string) => {
 
 <div class="tags">
   <TagChip
-    @click="handleCategoryClick('')"
-    :active="!selectedCategory"
-    @mouseenter="handleMouseEnter"
-    @mousemove="handleMouseMove"
-    @mouseleave="handleMouseLeave"
-    :label="globalConfig.lang.allPhotos"
-  />
-
-  <TagChip
     v-for="category in categories"
     :key="category"
     @click="handleCategoryClick(category)"
-    :active="selectedCategory === category"
+    :active="selectedCategories.includes(category)"
     @mouseenter="handleMouseEnter"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"

@@ -26,7 +26,14 @@ const props = defineProps({
 // URL tag
 // =========================
 const urlParams = new URLSearchParams(window.location.search);
-const selectedTag = ref(urlParams.get("tag"));
+const multiSelect = globalConfig.multiSelect;
+const selectedTags = ref<string[]>(
+  urlParams
+    .getAll("tag")
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, multiSelect ? undefined : 1),
+);
 
 // =========================
 // 🔥 DeepHide Negative
@@ -47,9 +54,9 @@ const updateArticles = () => {
   let filtered = posts.filter((post) => showNegative.value || !post.negative);
 
   // tag filter
-  if (selectedTag.value) {
+  if (selectedTags.value.length) {
     filtered = filtered.filter((post) =>
-      post.tags?.includes(selectedTag.value!),
+      selectedTags.value.some((t) => post.tags?.includes(t)),
     );
   }
 
@@ -65,7 +72,7 @@ const updateArticles = () => {
 // watchers
 // =========================
 watch(() => props.maxItems, updateArticles);
-watch(selectedTag, () => nextTick(updateArticles));
+watch(selectedTags, () => nextTick(updateArticles));
 watch(showNegative, () => nextTick(updateArticles));
 
 // =========================
@@ -143,16 +150,19 @@ const tagCounts = computed(() => {
 // tag click
 // =========================
 const handleTagClick = (tag: string) => {
-  const url = new URL(window.location.href);
+  const selected = selectedTags.value;
 
-  if (selectedTag.value === tag) {
-    selectedTag.value = null;
-    url.searchParams.delete("tag");
+  if (multiSelect) {
+    selectedTags.value = selected.includes(tag)
+      ? selected.filter((t) => t !== tag)
+      : [...selected, tag];
   } else {
-    selectedTag.value = tag;
-    url.searchParams.set("tag", tag);
+    selectedTags.value = selected[0] === tag ? [] : [tag];
   }
 
+  const url = new URL(window.location.href);
+  url.searchParams.delete("tag");
+  selectedTags.value.forEach((t) => url.searchParams.append("tag", t));
   window.history.pushState({}, "", url);
 };
 
@@ -243,7 +253,7 @@ const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
         @mouseenter="handleMouseEnter"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        :active="selectedTag === tag"
+        :active="selectedTags.includes(tag)"
         :label="tag"
         :count="tagCounts[tag]"
         anchorIcon="#"

@@ -8,11 +8,13 @@ import { ref, onMounted, computed, onBeforeUnmount, nextTick } from 'vue';
 import { generateGrid } from "#theme/utils/generateGrid";
 import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
 import { useCardHover } from "#theme/utils/useCardHover";
+import { getPlaylist } from "#theme/utils/getPlaylist";
 import { globalConfig } from "#config";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 const playlist = ref<any[]>([]);
-const selectedSinger = ref<string | null>(null);
+const multiSelect = globalConfig.multiSelect;
+const selectedSingers = ref<string[]>([]);
 
 // 默认图片
 const defaultImg = "https://pic2.zhimg.com/50/v2-cc1a32fcb444fc9d5e23f2ee078dc6e1_720w.jpg?source=1940ef5c";
@@ -20,13 +22,17 @@ const defaultImg = "https://pic2.zhimg.com/50/v2-cc1a32fcb444fc9d5e23f2ee078dc6e
 onMounted(async () => {
   // 初始化选中标签（刷新页面时保持状态）
   const urlParams = new URLSearchParams(window.location.search);
-  const singerFromUrl = urlParams.get("singer")?.trim();
-  if (singerFromUrl) selectedSinger.value = singerFromUrl;
+  const singersFromUrl = urlParams
+    .getAll("singer")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  selectedSingers.value = multiSelect
+    ? singersFromUrl
+    : singersFromUrl.slice(0, 1);
 
-  // 获取歌单数据
+  // 获取歌单数据（1h 缓存）
   try {
-    const response = await fetch(`${globalConfig.netease.metingApi}/?type=playlist&id=${globalConfig.netease.musicList}`);
-    const data = await response.json();
+    const data = await getPlaylist();
     playlist.value = data;
     console.log('歌单数据:', playlist.value);
   } catch (error) {
@@ -75,7 +81,7 @@ const singers = computed(() => {
 });
 
 const groupedByArtist = computed(() => {
-  const filterSinger = selectedSinger.value?.trim().toLowerCase();
+  const selected = selectedSingers.value.map(s => s.toLowerCase());
   const visibleSingers = singers.value.map(s => s.toLowerCase()); 
   const processedItems: Array<{ artist: string; song: any }> = [];
 
@@ -88,15 +94,18 @@ const groupedByArtist = computed(() => {
     }
 
     const artists = song.artist.split('/').map(a => a.trim());
-    artists.forEach(artist => {
-      const artistLower = artist.toLowerCase();
 
-      if (visibleSingers.includes(artistLower)) {
-        if (!filterSinger || artistLower === filterSinger) {
-          processedItems.push({ artist, song });
-        }
-      }
+    // 取第一个「可见且被选中」的歌手，避免多选时同一首歌重复出现；不选择时显示全部
+    const matched = artists.find(artist => {
+      const lower = artist.toLowerCase();
+      if (!visibleSingers.includes(lower)) return false;
+      if (!selected.length) return true;
+      return selected.includes(lower);
     });
+
+    if (matched) {
+      processedItems.push({ artist: matched, song });
+    }
   });
 
   return shuffle(generateGrid(
@@ -109,13 +118,21 @@ const groupedByArtist = computed(() => {
 
 
 
-// 🔹 点击标签
+// 🔹 点击标签（再次点击取消选中）
 const handleSingerClick = (singer: string) => {
-  selectedSinger.value = singer || null;
+  const selected = selectedSingers.value;
+
+  if (multiSelect) {
+    selectedSingers.value = selected.includes(singer)
+      ? selected.filter((s) => s !== singer)
+      : [...selected, singer];
+  } else {
+    selectedSingers.value = selected[0] === singer ? [] : [singer];
+  }
 
   const url = new URL(window.location.href);
-  if (singer) url.searchParams.set("singer", singer);
-  else url.searchParams.delete("singer");
+  url.searchParams.delete("singer");
+  selectedSingers.value.forEach((s) => url.searchParams.append("singer", s));
   window.history.pushState({}, "", url);
 };
 
@@ -125,18 +142,10 @@ import {getSongId} from "#theme/utils/getSongId"
 <h1 class="artist">{{ globalConfig.lang.artists }}</h1>
 <div class="tags">
   <TagChip
-    @click="handleSingerClick('')"
-    :active="!selectedSinger"
-    @mouseenter="handleMouseEnter"
-    @mousemove="handleMouseMove"
-    @mouseleave="handleMouseLeave"
-    :label="globalConfig.lang.allArtists"
-  />
-  <TagChip
     v-for="singer in singers"
     :key="singer"
     @click="handleSingerClick(singer)"
-    :active="selectedSinger === singer"
+    :active="selectedSingers.includes(singer)"
     @mouseenter="handleMouseEnter"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
