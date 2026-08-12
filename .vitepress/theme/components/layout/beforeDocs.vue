@@ -1,6 +1,11 @@
 <template>
   <div class="vp-doc beforeDocs" v-if="frontmatter.title">
-    <article class="article-header">
+    <article
+      class="article-header"
+      @mouseenter="handleMouseEnter"
+      @mousemove="handleMouseMove"
+      @mouseleave="handleMouseLeave"
+    >
       <div v-if="frontmatter.image" class="img-container">
         <img :src="image" alt="" />
       </div>
@@ -59,6 +64,7 @@
 <script setup>
 import { useData } from "vitepress";
 import { formatRelativeDate } from "../../utils/formatRelativeDate";
+import { useCardHover } from "../../utils/useCardHover";
 import { globalConfig } from "#config";
 import { formatUrl } from "../../utils/formatUrl";
 import { data as posts } from "../../data/posts.data";
@@ -68,6 +74,7 @@ const frontmatter = page.value?.frontmatter || {};
 const postInfo = posts.find((p) => p.filePath === page.value?.filePath);
 
 const image = frontmatter.image;
+const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 </script>
 
 <style scoped>

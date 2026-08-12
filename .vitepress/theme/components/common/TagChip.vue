@@ -51,7 +51,7 @@ defineEmits<{
   background-color: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
   border-radius: var(--vp-border-radius-1);
-  box-shadow: var(--vp-shadow);
+  box-shadow: var(--vp-shadow-tag);
   text-decoration: none;
   font-size: 16px;
   margin: 0;
@@ -99,6 +99,10 @@ defineEmits<{
   opacity: 0.4;
   margin-right: 4px;
   transition: all var(--vp-transition-time);
+}
+
+.tag:hover {
+  box-shadow: var(--vp-shadow-brand-tag);
 }
 
 /* negative 样式 */
