@@ -14,7 +14,14 @@ export interface Photo {
 
 export let data: Photo[];
 
-const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".tiff", ".tif", ".gif"]);
+const IMAGE_EXTENSIONS = new Set([
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".tiff",
+  ".tif",
+  ".gif",
+]);
 
 function formatExposureTime(value: number | undefined): string {
   if (!value || value <= 0) return "";
@@ -23,21 +30,27 @@ function formatExposureTime(value: number | undefined): string {
   return `1/${denom}s`;
 }
 
-async function formatAddress(lat: number | undefined, lon: number | undefined): Promise<string> {
+async function formatAddress(
+  lat: number | undefined,
+  lon: number | undefined,
+): Promise<string> {
   if (!lat || !lon || !globalConfig.EXIF_GPS) return "";
   try {
     console.log(`Fetching address for lat=${lat}, lon=${lon}`);
-    const response = await fetch(`https://latlonconvaddr.emnasop.cn/?lat=${lat}&lon=${lon}`);
+    const response = await fetch(
+      `https://latlonconvaddr.emnasop.cn/?lat=${lat}&lon=${lon}`,
+    );
     //源api为https://cn.apihz.cn/api/other/jwjuhe2.php?id={id}&key={key}&lon={纬度}&lat={经度}
     //也可替换为nominatim
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     const data = await response.json();
-    if(data.code !== 200) {
+    if (data.code !== 200) {
       throw new Error(`API error: ${data.code}`);
     }
-    if(!data.nation || !data.province || !data.county) {//不包括data.city，可能是直辖市。为直辖市时市名在province字段中，city字段为空
+    if (!data.nation || !data.province || !data.county) {
+      //不包括data.city，可能是直辖市。为直辖市时市名在province字段中，city字段为空
       throw new Error(`Incomplete address data: ${JSON.stringify(data)}`);
     }
     const address = `${data.nation}${data.province}${data.city}${data.county}`;
@@ -53,7 +66,10 @@ function formatAperture(value: number | undefined): string {
   return `f/${fixed.replace(/\.0$/, "")}`;
 }
 
-function formatModel(make: string | undefined, model: string | undefined): string {
+function formatModel(
+  make: string | undefined,
+  model: string | undefined,
+): string {
   const cleanMake = make?.trim();
   const cleanModel = model?.trim();
   if (cleanMake && cleanModel) {
@@ -126,7 +142,7 @@ async function extractMetadata(
 }
 
 export default defineLoader({
-  watch: ["public/data/photos/**/*", "public/data/photos.json"],
+  watch: ["public/data/photos/**/*", "public/data/photos/online.json"],
 
   async load(files) {
     const { globalConfig } = await import("#config");
@@ -191,7 +207,10 @@ export default defineLoader({
       if (seenPaths.has(photoPath)) continue;
       seenPaths.add(photoPath);
 
-      const { metadata, visibleMetaKeys } = await extractMetadata(file, metaKeys);
+      const { metadata, visibleMetaKeys } = await extractMetadata(
+        file,
+        metaKeys,
+      );
       result.push({
         fileName,
         category,
@@ -201,7 +220,10 @@ export default defineLoader({
       });
     }
 
-    const jsonPath = path.resolve(process.cwd(), "public/data/photos.json");
+    const jsonPath = path.resolve(
+      process.cwd(),
+      "public/data/photos/online.json",
+    );
     if (existsSync(jsonPath)) {
       const raw = readFileSync(jsonPath, "utf-8");
       const jsonData = JSON.parse(raw);

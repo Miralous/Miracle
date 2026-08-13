@@ -79,7 +79,7 @@ const props = withDefaults(defineProps<CardProps>(), {
   height: 100%;
   padding: 25px;
   display: flex;
-  flex-direction: row; /* point 1 */
+  flex-direction: var(--vp-card-point-1); /* point 1 */
   gap: var(--vp-gap);
 }
 
@@ -106,7 +106,7 @@ const props = withDefaults(defineProps<CardProps>(), {
   margin-right: 5px;
   width: 48px;
   height: 48px;
-  align-self: center !important; /* point 2 */
+  align-self: var(--vp-card-point-2) !important; /* point 2 */
 }
 
 .img {

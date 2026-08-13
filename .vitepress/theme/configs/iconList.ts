@@ -1,6 +1,6 @@
 export const data = {
   recentPosts: "ph:newspaper-duotone",
-  projects: "ph:acorn-duotone",
+  projects: "ph:github-logo-duotone",
   techStack: "ph:code-duotone",
   friends: "ph:users-duotone",
   words: "ph:text-aa-bold",

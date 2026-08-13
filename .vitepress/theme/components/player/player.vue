@@ -1113,7 +1113,7 @@ onUnmounted(() => {
   <div
     class="am-player-wrapper"
     :class="{ 'am-no-lyrics': !hasLyrics, 'mobile-hide-lyrics': true }"
-    v-if="!isLoading && song"
+    v-if="song"
   >
     <!-- 模糊背景 -->
     <div class="am-bg" :style="{ backgroundImage: `url(${song.pic})` }"></div>
@@ -1133,12 +1133,15 @@ onUnmounted(() => {
         </div>
 
         <div class="am-cover-wrapper" :class="{ 'is-playing': isPlaying }">
-          <img
-            :src="song.pic"
-            :alt="albumName || globalConfig.lang.unknownAlbum"
-            class="am-cover"
-            @click="togglePlay"
-          />
+          <Transition name="cover-fade" mode="out-in">
+            <img
+              :key="song.url"
+              :src="song.pic"
+              :alt="albumName || globalConfig.lang.unknownAlbum"
+              class="am-cover"
+              @click="togglePlay"
+            />
+          </Transition>
         </div>
 
         <div class="am-progress-container">
@@ -1218,53 +1221,57 @@ onUnmounted(() => {
       <!-- 右侧：歌词面板 -->
       <!-- 核心修改 3: 当纯音乐时隐藏面板 -->
       <div class="am-lyrics-panel" ref="lyricsContainerRef" v-if="hasLyrics">
-        <div class="am-lyrics-pad"></div>
-        <div
-          v-for="(line, index) in lyrics"
-          :key="index"
-          class="lyric-line"
-          :class="{ active: index === currentLyricIndex }"
-          @click="seekAudio({ target: { value: line.time } } as any)"
-        >
-          <span
-            v-if="
-              index === currentLyricIndex && line.etext && maindate.metadata.zq
-            "
-            class="lrc-original"
-          >
-            <span
-              v-for="(seg, segIdx) in line.etext"
-              :key="segIdx"
-              :style="{
-                '--progress':
-                  currentTime >= seg.start && currentTime <= seg.end
-                    ? ((currentTime - seg.start) / seg.Duration) * 100 + '%'
-                    : currentTime > seg.end
-                      ? '100%'
-                      : '0%',
-              }"
-              >{{ seg.text }}</span
+        <Transition name="cover-fade" mode="out-in">
+          <div :key="song.url" class="am-lyrics-inner">
+            <div class="am-lyrics-pad"></div>
+            <div
+              v-for="(line, index) in lyrics"
+              :key="index"
+              class="lyric-line"
+              :class="{ active: index === currentLyricIndex }"
+              @click="seekAudio({ target: { value: line.time } } as any)"
             >
-          </span>
-          <span
-            v-else-if="index < currentLyricIndex"
-            class="lrc-original-passed"
-          >
-            {{ line.text }}
-          </span>
-          <span v-else class="lrc-original">{{ line.text }}</span>
-          <span
-            v-if="line.romanizationslyric && globalConfig.netease.showRoman"
-            class="lrc-roman"
-            >{{ line.romanizationslyric }}</span
-          >
-          <span
-            v-if="line.pairlyric && globalConfig.netease.showTranslation"
-            class="lrc-translate"
-            >{{ line.pairlyric }}</span
-          >
-        </div>
-        <div class="am-lyrics-pad"></div>
+              <span
+                v-if="
+                  index === currentLyricIndex && line.etext && maindate.metadata.zq
+                "
+                class="lrc-original"
+              >
+                <span
+                  v-for="(seg, segIdx) in line.etext"
+                  :key="segIdx"
+                  :style="{
+                    '--progress':
+                      currentTime >= seg.start && currentTime <= seg.end
+                        ? ((currentTime - seg.start) / seg.Duration) * 100 + '%'
+                        : currentTime > seg.end
+                          ? '100%'
+                          : '0%',
+                  }"
+                  >{{ seg.text }}</span
+                >
+              </span>
+              <span
+                v-else-if="index < currentLyricIndex"
+                class="lrc-original-passed"
+              >
+                {{ line.text }}
+              </span>
+              <span v-else class="lrc-original">{{ line.text }}</span>
+              <span
+                v-if="line.romanizationslyric && globalConfig.netease.showRoman"
+                class="lrc-roman"
+                >{{ line.romanizationslyric }}</span
+              >
+              <span
+                v-if="line.pairlyric && globalConfig.netease.showTranslation"
+                class="lrc-translate"
+                >{{ line.pairlyric }}</span
+              >
+            </div>
+            <div class="am-lyrics-pad"></div>
+          </div>
+        </Transition>
       </div>
       <canvas
         ref="canvasRef"
@@ -2362,5 +2369,26 @@ onUnmounted(() => {
   .playlist-fade-leave-to .am-playlist-panel {
     transform: translateY(100%);
   }
+}
+
+/* ===== 切歌过渡：封面与歌词淡入淡出 ===== */
+.cover-fade-enter-active,
+.cover-fade-leave-active {
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.cover-fade-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.cover-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+.am-lyrics-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 </style>

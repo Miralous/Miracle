@@ -5,9 +5,11 @@ export function applyCssVars() {
   const root = document.documentElement;
   const { styles } = globalConfig;
 
+  const chue = styles.color.globalHue ? styles.color.hue : 280;
+
   const vars = {
     "--hue": styles.color.hue,
-    "--chue": styles.color.globalHue ? styles.color.hue : 280,
+    "--chue": chue,
     "--vp-border-radius-1": `${styles.visual.radius}px`,
     "--vp-gap": `${styles.visual.gap}px`,
     "--vp-transition-time": `${0.1 * (styles.visual.transition / 10)}s`,
@@ -24,6 +26,15 @@ export function applyCssVars() {
     "--vp-show-title": globalConfig.styles.visual.enableCardTitle
       ? "block"
       : "none",
+    "--vp-card-point-1": globalConfig.styles.visual.card,
+    "--vp-card-point-2":
+      globalConfig.styles.visual.card == "column" ? "unset" : "center",
+    "--vp-page-animation": globalConfig.styles.visual.pageAnimation.enabled
+      ? "pageFadeUp cubic-bezier(0.41, 0.42, 0.25, 1.12) backwards"
+      : "unset",
+    "--vp-page-animation-time": globalConfig.styles.visual.pageAnimation.enabled
+      ? globalConfig.styles.visual.pageAnimation.time + "s"
+      : "unset",
   };
 
   root.classList.toggle("monochrome", styles.color.monochrome);

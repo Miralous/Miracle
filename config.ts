@@ -47,6 +47,11 @@ export const globalConfig = {
       transparent: false, // transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
       mono: false, // use monospace font for title
+      pageAnimation: {
+        enabled: false,
+        time: 0.7, // (s)
+      },
+      card: "column", // column / row for music & friend cards
       cardHover: {
         enabled: true, // enable card hover effect
         scale: 1.02,
@@ -129,6 +134,7 @@ export const globalConfig = {
       ],
     },
   ],
+
   EXIF_GPS: true, // enable GPS in EXIF (if false, it will hide GPS in EXIF)
   // To show the 'GPS' field in the configuration below
   abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
@@ -141,7 +147,7 @@ export const globalConfig = {
     "GPS",
   ],
 
-  convert_photos: true, // enable convert photos to webp or avif (if false, it will not convert photos)
+  convert_photos: false, // enable convert photos to webp or avif (if false, it will not convert photos)
   convert_photos_format: "webp", // convert photos to webp or avif (webp / avif)
   convert_photos_quality: 80, // convert photos quality (0-100)
 

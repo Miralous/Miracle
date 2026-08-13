@@ -742,10 +742,10 @@ h1.artist {
   color: var(--vp-transparent) !important;
   -webkit-text-stroke: 1px var(--vp-c-gutter);
   margin-top: 30px;
-  line-height: 110px;
-  font-size: 100px;
+  line-height: 100px;
+  font-size: 90px;
   position: relative;
-  top: 30px;
+  top: 20px;
   font-weight: 600 !important;
   opacity: 0.7;
   z-index: -1;
@@ -763,4 +763,8 @@ h1.artist {
 mark {
   background-color: var(--vp-c-yellow-soft) !important;
   color: var(--vp-c-text-1) !important;
+}
+
+div.menu a.VPLink:hover {
+  background-color: var(--vp-c-bg-alt) !important;
 }

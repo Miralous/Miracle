@@ -29,3 +29,26 @@ div.tags,
 .posts-grid {
   margin-bottom: 30px;
 }
+
+/* 标签筛选时卡片增删动画：与主页文字 banner 的 fadeUp 风格一致 */
+.card-enter-active {
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+.card-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.card-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.card-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.card-move {
+  transition: transform 0.5s ease;
+}
