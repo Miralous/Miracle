@@ -1,0 +1,57 @@
+name: Friend Link Request
+description: Submit your website to be listed on the /friends page.
+title: Friend Link Request
+labels: ["friend-link"]
+body:
+  - type: checkboxes
+    id: agree
+    attributes:
+      label: Confirmation
+      description: Please confirm that all of the following statements are true.
+      options:
+        - label: The website is accessible from mainland China.
+          required: true
+        - label: The website does not contain content that violates the laws and regulations of mainland China.
+          required: true
+        - label: The website has published at least one post within the last year.
+          required: true
+        - label: The avatar URL is stable and loads reliably over time.
+          required: true
+        - label: I have added this website to my friend links.
+          required: true
+        - label: This request is not for modifying existing information.
+          required: true
+        - label: I will not unilaterally remove the friend link except under exceptional circumstances.
+          required: true
+  - type: input
+    id: site-name
+    attributes:
+      label: Website title
+      description: The title of your website.
+      placeholder: "Silvaire's Blog"
+    validations:
+      required: true
+  - type: input
+    id: site-desc
+    attributes:
+      label: Website description
+      description: A short description of your website.
+      placeholder: "Let life be beautiful like summer flowers and death like autumn leaves."
+    validations:
+      required: true
+  - type: input
+    id: site-link
+    attributes:
+      label: Website URL
+      description: The full URL of your website.
+      placeholder: "https://silvaire.top"
+    validations:
+      required: true
+  - type: input
+    id: site-img
+    attributes:
+      label: Avatar URL
+      description: The URL of your avatar image.
+      placeholder: "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508"
+    validations:
+      required: true

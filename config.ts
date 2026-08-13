@@ -273,8 +273,7 @@ export const globalConfig = {
   // the higher the weight, the lower the friend will be displayed
   friendWeights: {
     // example: -99, // "example" will be displayed at the top
-    "=ᗜωᗜ=": -99,
-    UwU: -98,
+    Miracle: -99,
     friends: -1,
     unable: 0, // "unable" will be displayed at the bottom
   },

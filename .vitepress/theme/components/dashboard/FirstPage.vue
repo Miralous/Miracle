@@ -73,12 +73,6 @@ import { globalConfig } from "#config";
   margin: 0 0 0 -0.05em;
   animation: fadeUp 1s ease-out 0.2s both;
   transition: all var(--vp-transition-time);
-  background: linear-gradient(var(--vp-c-brand-soft), var(--vp-c-brand-soft))
-    no-repeat center bottom / 100% 0.3em;
-  &:hover {
-    background: linear-gradient(var(--vp-c-brand-soft), var(--vp-c-brand-soft))
-      no-repeat center bottom / 100% 0.4em;
-  }
 }
 
 .hero-divider {
