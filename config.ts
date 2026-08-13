@@ -27,7 +27,8 @@ export const globalConfig = {
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
   multiSelect: false, // allow selecting multiple tags/categories/artists at once to show their content together (if false, only one can be selected)
-  allowWorkflowAddFriendLink: true, // allow add friend link from issues automagically
+  // ! please create an environment in github settings called 'friend-link-review' and set yourself as a reviewer before use it.
+  allowWorkflowAddFriendLink: true, // allow add friend link from issues automagically.
   textBannerMode: true,
   // theme setting
   styles: {
@@ -293,7 +294,7 @@ export const globalConfig = {
     QQMusicLyricsSource: true, // use QQ Music API to get lyrics (default: true, set true to enable), Can greatly increase the coverage of songs with word-by-word lyrics,But there is also a small probability of matching the wrong song
   },
 
-  // DO NOT EDIT THESE VALUES!!!!!
+  // ! DO NOT EDIT THESE VALUES
   friends: friendList,
   contributors: contributorList,
   moments: momentList,
