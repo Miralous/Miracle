@@ -26,7 +26,11 @@ import { globalConfig } from "#config";
   min-height: 90vh;
   padding: 14vh 14vw;
   overflow: hidden;
-  background: radial-gradient(circle at 100% 0%, var(--vp-c-bg-soft, transparent) 0%, transparent 50%);
+  background: radial-gradient(
+    circle at 100% 0%,
+    var(--vp-c-bg-soft, transparent) 0%,
+    transparent 50%
+  );
 }
 
 .hero-content {
@@ -68,6 +72,13 @@ import { globalConfig } from "#config";
   color: var(--vp-c-text-1);
   margin: 0 0 0 -0.05em;
   animation: fadeUp 1s ease-out 0.2s both;
+  transition: all var(--vp-transition-time);
+  background: linear-gradient(var(--vp-c-brand-soft), var(--vp-c-brand-soft))
+    no-repeat center bottom / 100% 0.3em;
+  &:hover {
+    background: linear-gradient(var(--vp-c-brand-soft), var(--vp-c-brand-soft))
+      no-repeat center bottom / 100% 0.4em;
+  }
 }
 
 .hero-divider {
@@ -185,17 +196,17 @@ import { globalConfig } from "#config";
   .first-page {
     padding: 8rem 8vw;
   }
-  
+
   .hero-author::before {
     width: 1.5rem;
     margin-right: 1rem;
   }
-  
+
   .hero-divider {
     height: 3.5rem;
     margin: 2.5rem 0 2.5rem 0.5rem;
   }
-  
+
   .hero-desc {
     margin: 0 0 0 0.5rem;
   }

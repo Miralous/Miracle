@@ -16,7 +16,6 @@ import FriendCard from "./components/friends/card.vue";
 import Comments from "./components/layout/afterDocs.vue";
 import Twikoo from "./components/layout/twikoo.vue";
 import Moments from "./components/moments/moments.vue";
-import File from "./components/common/file.vue";
 import Musics from "./components/dashboard/Musics.vue";
 import Pictures from "./components/dashboard/Pictures.vue";
 import Timeline from "./components/timeline/timeline.vue";
@@ -50,7 +49,6 @@ const components = {
   Icon,
   Comments,
   Twikoo,
-  File,
   MusicPlayer,
   PhotoDetail,
   // Contributors

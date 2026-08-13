@@ -116,3 +116,19 @@
 .VPHome * {
   user-select: none;
 }
+
+/* 页面切换过渡：与主页文字 banner 的 fadeUp 入场保持一致 */
+#VPContent.page-enter {
+  animation: pageFadeUp 0.5s cubic-bezier(0.41, 0.42, 0.25, 1.12) backwards;
+}
+
+@keyframes pageFadeUp {
+  from {
+    opacity: 0.1;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
