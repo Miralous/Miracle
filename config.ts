@@ -27,6 +27,7 @@ export const globalConfig = {
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
   multiSelect: false, // allow selecting multiple tags/categories/artists at once to show their content together (if false, only one can be selected)
+  allowWorkflowAddFriendLink: false, // allow add friend link from issues automagically
   textBannerMode: true,
   // theme setting
   styles: {
@@ -109,6 +110,7 @@ export const globalConfig = {
   },
 
   github: "Miralous", // your github username
+  miracleRepoName: "Miracle", // miracle repo name
 
   // navigation items
   nav: [

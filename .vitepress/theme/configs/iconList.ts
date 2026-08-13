@@ -1,4 +1,5 @@
 export const data = {
+  add: "ph:plus-bold",
   recentPosts: "ph:newspaper-duotone",
   projects: "ph:github-logo-duotone",
   techStack: "ph:code-duotone",

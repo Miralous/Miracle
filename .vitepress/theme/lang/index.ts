@@ -50,6 +50,7 @@ const languageFile = {
   friday: { zh: "星期五", en: "Friday" },
   saturday: { zh: "星期六", en: "Saturday" },
   photos: { zh: "图库", en: "Photos" },
+  addLink: { zh: "加入", en: "Add" },
   onlyWithExif: { zh: "包括 EXIF", en: "With EXIF" },
   previewTree: { zh: "预览文件库", en: "Preview tree" },
   miracle: { zh: "Miracle", en: "Miracle" },

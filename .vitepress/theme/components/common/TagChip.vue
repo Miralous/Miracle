@@ -6,6 +6,7 @@ defineProps<{
   count?: string | number | null;
   active?: boolean;
   negative?: boolean;
+  green?: boolean;
   href?: string;
   showAnchor?: boolean;
   anchorIcon?: string;
@@ -24,7 +25,7 @@ defineEmits<{
     :is="href ? 'a' : 'span'"
     :href="href || undefined"
     class="tag"
-    :class="{ active, negative }"
+    :class="{ active, negative, green }"
     @click="$emit('click', $event)"
     @mouseenter="$emit('mouseenter', $event)"
     @mousemove="$emit('mousemove', $event)"
@@ -109,7 +110,7 @@ defineEmits<{
 .tag.negative.active,
 .tag.negative:hover {
   border-color: var(--vp-c-yellow-1);
-  box-shadow: var(--vp-shadow-negative) !important;
+  box-shadow: var(--vp-shadow-negative-tag) !important;
 }
 
 .tag.negative.active .name,
@@ -121,6 +122,24 @@ defineEmits<{
 .tag.negative:hover .anchor,
 .tag.negative:hover :deep(svg) {
   color: var(--vp-c-yellow-1);
+}
+
+/* Green 样式 */
+.tag.green.active,
+.tag.green:hover {
+  border-color: var(--vp-c-green-1);
+  box-shadow: var(--vp-shadow-green-tag) !important;
+}
+
+.tag.green.active .name,
+.tag.green.active .count,
+.tag.green.active .anchor,
+.tag.green.active :deep(svg),
+.tag.green:hover .name,
+.tag.green:hover .count,
+.tag.green:hover .anchor,
+.tag.green:hover :deep(svg) {
+  color: var(--vp-c-green-1);
 }
 
 /* Icon 样式 */

@@ -104,6 +104,18 @@ const handleFolderClick = (folder: string) => {
   selectedFolders.value.forEach((f) => url.searchParams.append("folder", f));
   window.history.pushState({}, "", url);
 };
+
+
+  const handleClick = () => {
+
+    const url = `https://github.com/${globalConfig.github}/${globalConfig.miracleRepoName}/issues/new?template=add-link.yaml`;
+    
+    // 当前窗口跳转
+    window.location.href = url;
+    
+    // 或者在新标签页打开
+    // window.open(url, '_blank');
+  }
 </script>
 
 <div class="allFriend">
@@ -111,6 +123,20 @@ const handleFolderClick = (folder: string) => {
   <ClientOnly>
     <div class="friend-content">
       <div class="tags">
+        <TagChip
+          class="hide-phone add-link"
+          :label="globalConfig.lang.addLink"
+          green=true
+          v-if="globalConfig.allowWorkflowAddFriendLink"
+          @click="handleClick"
+          @mouseenter="handleMouseEnter"
+          @mousemove="handleMouseMove"
+          @mouseleave="handleMouseLeave"
+        >
+        <template #icon>
+          <Icon :icon="globalConfig.icon.add" />
+        </template>
+        </TagChip>
         <TagChip
           class="hide-phone"
           :label="globalConfig.lang.siteInfo"
