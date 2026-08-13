@@ -12,6 +12,7 @@ jobs:
   add-friend:
     if: contains(github.event.issue.labels.*.name, 'friend-link')
     runs-on: ubuntu-latest
+    environment: friend-link-review
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
