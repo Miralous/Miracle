@@ -68,8 +68,6 @@ footer: false
     import { ref, onMounted, onUnmounted } from 'vue'
     import { globalConfig } from "#config";
     
-    console.log(globalConfig.photos)
-
     const firstPageRef = ref<HTMLElement | null>(null)
 
     // 检查滚动位置的函数

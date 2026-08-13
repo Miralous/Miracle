@@ -60,7 +60,7 @@ import { globalConfig } from "#config";
 }
 
 .hero-title {
-  font-family: "Playfair Display", "Noto Serif SC", "Songti SC", "STSong", serif;
+  font-family: var(--vp-font-family-title);
   font-size: clamp(3.5rem, 8vw, 7.5rem);
   font-weight: 300;
   line-height: 1.1;

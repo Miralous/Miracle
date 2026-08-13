@@ -15,6 +15,7 @@ const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 const multiSelect = globalConfig.multiSelect;
 const selectedCategories = ref<string[]>([]);
+const onlyWithExif = ref(false);
 
 onMounted(() => {
   // 初始化选中标签（刷新页面时保持状态）
@@ -35,11 +36,12 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", updateColumns);
 });
 
-// 分类标签列表（不限制数量）
+// 分类标签列表（EXIF 筛选激活时，隐藏没有任何 EXIF 图片的分类）
 const categories = computed(() => {
   const set = new Set<string>();
 
   photos.forEach((photo) => {
+    if (onlyWithExif.value && !(photo.visibleMetaKeys?.length)) return;
     set.add(photo.category || "Uncategorized");
   });
 
@@ -51,6 +53,8 @@ const groupedByCategory = computed(() => {
   const filters = selectedCategories.value.map((c) => c.toLowerCase());
 
   const processedItems = photos.filter((photo) => {
+    if (onlyWithExif.value && !(photo.visibleMetaKeys?.length)) return false;
+
     const category = (photo.category || "Uncategorized").toLowerCase();
 
     if (!filters.length) return true;
@@ -64,6 +68,10 @@ const groupedByCategory = computed(() => {
     columnCount.value
   );
 });
+
+const toggleExifFilter = () => {
+  onlyWithExif.value = !onlyWithExif.value;
+};
 
 // 点击标签（再次点击取消选中）
 const handleCategoryClick = (category: string) => {
@@ -89,6 +97,18 @@ const handleCategoryClick = (category: string) => {
 <h1 class="artist">{{globalConfig.lang.photos}}</h1>
 
 <div class="tags">
+  <TagChip
+    :label="globalConfig.lang.onlyWithExif"
+    :active="onlyWithExif"
+    @click="toggleExifFilter"
+    @mouseenter="handleMouseEnter"
+    @mousemove="handleMouseMove"
+    @mouseleave="handleMouseLeave"
+  >
+    <template #icon>
+      <Icon :icon="globalConfig.icon.exif" />
+    </template>
+  </TagChip>
   <TagChip
     v-for="category in categories"
     :key="category"
@@ -153,22 +173,5 @@ const handleCategoryClick = (category: string) => {
   display: flex;
   flex-direction: column;
   gap: var(--vp-gap);
-}
-
-.artist {
-  margin-top: 30px;
-  line-height: 110px;
-  font-size: 100px;
-  position: relative;
-  top: 30px;
-  font-weight: bold;
-  color: var(--vp-c-gutter);
-  opacity: 0.7;
-  z-index: -1;
-  mask-image: linear-gradient(var(--vp-c-gutter) 20%, transparent);
-  text-transform: var(--vp-title-uppercase);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 </style>

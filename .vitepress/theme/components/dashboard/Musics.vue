@@ -13,7 +13,6 @@ onMounted(async () => {
   try {
     const data = await getPlaylist();
     playlist.value = data;
-    console.log(playlist.value);
   } catch (error) {
     console.error(error);
   }

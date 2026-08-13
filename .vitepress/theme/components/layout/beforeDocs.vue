@@ -21,7 +21,7 @@
 
           <ClientOnly v-if="frontmatter.updated">
             <span class="meta-item hideOnPhone">
-              <Icon :icon="globalConfig.icon.time || 'lucide:clock'" />
+              <Icon :icon="globalConfig.icon.time" />
               {{ formatRelativeDate(frontmatter.updated) }}
             </span>
           </ClientOnly>
@@ -96,7 +96,7 @@ div.vp-doc.beforeDocs {
 }
 
 .article-header:hover {
-  border-color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-2);
   box-shadow: var(--vp-shadow-brand);
 }
 

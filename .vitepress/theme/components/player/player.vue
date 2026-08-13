@@ -364,11 +364,9 @@ async function YrcToJson(musicid: string, meta: any) {
   json.metadata.al = albumName;
   json.metadata.roma = pdjg.romaif;
   json.metadata.pair = pdjg.pairif;
-  console.log(json);
   return json;
 }
 async function QQJsonGET(name: string, artist: string, album: string) {
-  console.log("正在使用QQ音乐API进行补充查询...");
   function stringSimilarity(a: string, b: string) {
     //vibe coding函数uwu
     const strA = a == null ? "" : String(a);
@@ -411,12 +409,10 @@ async function QQJsonGET(name: string, artist: string, album: string) {
     nmed = null;
   }
   if (!nmed || !nmed.ok) {
-    console.log("QQ音乐API查询失败，使用原生歌词");
     return;
   }
   let nme = await nmed.json();
   if (!nme.data || !Array.isArray(nme.data) || nme.data.length === 0) {
-    console.log("未找到匹配的歌曲，使用原生歌词");
     return;
   }
   let max = 0;
@@ -481,9 +477,6 @@ async function QQJsonGET(name: string, artist: string, album: string) {
   const qqArtist = nme.data[index].singer ? nme.data[index].singer : "";
   const qqAlbum = nme.data[index].album ? nme.data[index].album : "";
   if (max < 1.7) {
-    console.log(
-      `匹配度过低，放弃匹配。相似度：${max}。${qqName} - ${qqArtist} · ${qqAlbum}`,
-    );
     return {
       metadata: {
         zq: false,
@@ -491,7 +484,6 @@ async function QQJsonGET(name: string, artist: string, album: string) {
       },
     };
   } else if (index === -1) {
-    console.log("未找到匹配的歌曲.");
     return { metadata: { zq: false, message: "未找到匹配的歌曲." } };
   }
   let dataejson;
@@ -507,7 +499,6 @@ async function QQJsonGET(name: string, artist: string, album: string) {
     console.error("请求失败:", error);
   }
   if (!dataejson || !dataejson.data) {
-    console.log("QQ音乐API查询歌词失败，使用原生歌词");
     return;
   }
   let qrc = { orig: null, ts: null, roma: null };
@@ -515,10 +506,6 @@ async function QQJsonGET(name: string, artist: string, album: string) {
   qrc.ts = dataejson.data.trans;
   qrc.roma = dataejson.data.roma;
   let qrcjson = QrcToJson(qrc, nme.data[0].id, 0);
-  if (qrcjson) {
-    console.log("QQ音乐API查询成功，使用QQ音乐歌词");
-    return qrcjson;
-  }
   return qrcjson;
 }
 function QrcToJson(qrcd: any, id: number, apinu: number) {
@@ -647,7 +634,6 @@ function QrcToJson(qrcd: any, id: number, apinu: number) {
     json.metadata.pair = false;
   }
   json.metadata.qqmusicid = id;
-  console.log(json);
   return json;
 }
 import { LYRIC_METADATA_KW } from "./words";
@@ -722,7 +708,6 @@ const fetchMusicData = async () => {
             maindate.metadata = qqdata.metadata;
           }
         }
-        console.log("歌词元数据过滤完成，最终:", maindate);
         lyrics.value = maindate.lyrics;
         mediaSession();
         return;
@@ -752,7 +737,6 @@ const fetchMusicData = async () => {
           maindate.metadata = qqdata.metadata;
         }
       }
-      console.log("歌词元数据过滤完成，最终:", maindate);
       lyrics.value = maindate.lyrics;
       mediaSession();
     }
@@ -921,7 +905,6 @@ const findCurrentIndex = async () => {
 };
 
 const playAtIndex = async (index: number) => {
-  console.log("请求切歌，目标索引:", index);
   if (playOrder.value.length > 0) {
     const safeIndex = (index + playOrder.value.length) % playOrder.value.length;
     currentId.value =
@@ -930,7 +913,6 @@ const playAtIndex = async (index: number) => {
       const so = shuffledOrder.value.findIndex((i) => i === safeIndex);
       if (so !== -1) shufflePos.value = so;
     }
-    console.log("切换到歌单中的歌曲，ID:", currentId.value);
     await fetchMusicData();
     await nextTick();
     history.pushState(null, "", "/player?id=" + currentId.value);
@@ -1060,12 +1042,14 @@ function draw() {
   }
   a_draw();
 }
-//键盘监测区
-document.addEventListener("keydown", function (event) {
-  if (event.key === " ") {
+// Keyboard shortcuts (space to play/pause, escape to close mobile lyrics)
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === " ") {
     togglePlay();
+  } else if (e.key === "Escape") {
+    showMobileLyrics.value = false;
   }
-});
+};
 
 // 每次音频切换都重新初始化可视化
 watch(
@@ -1100,22 +1084,28 @@ watch(currentLyricIndex, async (newIndex) => {
 });
 
 // 组件挂载时初始化
-onMounted(() => {
+let titleInterval: number | undefined;
+let timeInterval: number | undefined;
+const onResize = () => {
   isMobile.value = window.innerWidth <= 768;
-  window.addEventListener("resize", () => {
-    isMobile.value = window.innerWidth <= 768;
-  });
-  loadPlaylist().then(() => fetchMusicData());
-  setTimeout(() => draw(), 500);
-  setInterval(document_title_change, 200);
-});
+};
 
 onMounted(() => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") showMobileLyrics.value = false;
-  });
+  isMobile.value = window.innerWidth <= 768;
+  window.addEventListener("resize", onResize);
+  document.addEventListener("keydown", onKeydown);
+  loadPlaylist().then(() => fetchMusicData());
+  setTimeout(() => draw(), 500);
+  titleInterval = window.setInterval(document_title_change, 200);
+  timeInterval = window.setInterval(onTimeUpdate, 15);
 });
-setInterval(onTimeUpdate, 15);
+
+onUnmounted(() => {
+  window.removeEventListener("resize", onResize);
+  document.removeEventListener("keydown", onKeydown);
+  if (titleInterval) clearInterval(titleInterval);
+  if (timeInterval) clearInterval(timeInterval);
+});
 </script>
 
 <template>

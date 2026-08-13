@@ -62,7 +62,7 @@ defineEmits<{
 }
 
 .tag:hover:not(.active) {
-  border-color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-2);
 }
 
 .tag:hover:not(.active) .name,
@@ -73,7 +73,7 @@ defineEmits<{
 }
 
 .active {
-  border-color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-2);
   box-shadow: var(--vp-shadow-brand);
 }
 

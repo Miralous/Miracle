@@ -14,7 +14,7 @@
 @import url("https://rsms.me/inter/inter.css");
 @import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
 @import url("https://fonts.font.im/css2?family=Playwrite+SK:wght@400&display=swap");
-@import url("https://fonts.font.im/css2?family=Noto+Serif+SC:wght@200..600&display=swap");
+@import url("https://fonts.font.im/css2?family=Noto+Serif+SC:wght@300..600&display=swap");
 
 /**
  * Variables
@@ -111,4 +111,8 @@
   src: url("https://www.oppo.com/content/dam/statics/fonts/cn/OPPOSans3.0cn-Regular.woff2")
     format("woff2");
   font-weight: 400;
+}
+
+.VPHome * {
+  user-select: none;
 }

@@ -43,7 +43,7 @@
         :key="index"
         class="task"
       >
-        <icon
+        <Icon
           :icon="
             item.complete
               ? globalConfig.icon.taskComplete

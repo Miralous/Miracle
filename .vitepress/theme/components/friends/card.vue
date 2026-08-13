@@ -71,7 +71,7 @@ const props = withDefaults(defineProps<CardProps>(), {
 }
 
 .card:hover {
-  border-color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-2);
   box-shadow: var(--vp-shadow-brand);
 }
 
@@ -90,7 +90,6 @@ const props = withDefaults(defineProps<CardProps>(), {
   font-weight: 600;
   margin: 0;
   transition: all var(--vp-transition-time);
-  font-family: var(--title), var(--vp-font-family-base);
 }
 
 .card:hover .title {

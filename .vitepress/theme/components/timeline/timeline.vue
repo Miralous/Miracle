@@ -326,23 +326,6 @@ const getLineColorVar = (item?: CombinedTimelineItem) => {
   opacity: 0.8;
 }
 
-.year {
-  margin-top: 30px;
-  line-height: 110px;
-  font-size: 100px;
-  position: relative;
-  top: 30px;
-  font-weight: bold !important;
-  color: var(--vp-c-gutter);
-  opacity: 0.7;
-  z-index: -1;
-  mask-image: linear-gradient(var(--vp-c-gutter) 20%, transparent);
-  text-transform: var(--vp-title-uppercase);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 @media (max-width: 768px) {
   .timeline-item {
     padding: 0.8rem 1rem 0.8rem 28px;

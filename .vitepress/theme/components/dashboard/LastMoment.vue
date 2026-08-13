@@ -71,7 +71,7 @@ const lastMoment = computed<Moment | null>(() => {
 }
 
 .last-moment:hover {
-  border-color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-2);
   box-shadow: var(--vp-shadow-brand);
 }
 

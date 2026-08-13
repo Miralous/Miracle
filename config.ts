@@ -23,7 +23,7 @@ export const globalConfig = {
   author: "Silvaire", // your name
   favicon:
     "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=4&mask=circle", // favicon (suggest: circle mask)
-  url: "https://qwq.blue", // main url (https://xxxx.xxx)
+  url: "https://silvaire.top", // main url (https://xxxx.xxx)
   dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
   deepHideNegative: true, // enable press "s(how)" 1s to show negative button
   multiSelect: false, // allow selecting multiple tags/categories/artists at once to show their content together (if false, only one can be selected)
