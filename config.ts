@@ -5,86 +5,85 @@ import { data as iconList } from "#theme/configs/iconList";
 import { data as photoList } from "#theme/data/photos.data";
 import { data as contributorList } from "#theme/components/contributors/contributors";
 
-// experimental: i18n
+// Experimental: i18n
 import { zh, en } from "#theme/lang/index";
 
 const languageMap: Record<string, any> = { zh, en };
 
-// LANGUAGES ----------------------------------------------------------------------
-// hey !!! you !!!
-// change it to "zh" if you want to use Chinese
-// website language (zh / en)
+// Languages ----------------------------------------------------------------------
+// Note: change this to "zh" to use Chinese.
+// Website language (zh / en)
 const defaultLanguage = "en";
-const languageFile = languageMap[defaultLanguage] || en; // do not edit it
-// CONFIGS ----------------------------------------------------------------------
+const languageFile = languageMap[defaultLanguage] || en; // Do not edit this.
+// Configs ----------------------------------------------------------------------
 export const globalConfig = {
-  title: "Silvaire's Blog", // title
-  description: "Per Aspera Ad Astra", // description
-  author: "Silvaire", // your name
+  title: "Silvaire's Blog", // Title
+  description: "Per Aspera Ad Astra", // Description
+  author: "Silvaire", // Your name
   favicon:
-    "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=4&mask=circle", // favicon (suggest: circle mask)
-  url: "https://silvaire.top", // main url (https://xxxx.xxx)
-  dateCreated: "2024-03-23", // date created (YYYY-MM-DD)
-  deepHideNegative: true, // enable press "s(how)" 1s to show negative button
-  multiSelect: false, // allow selecting multiple tags/categories/artists at once to show their content together (if false, only one can be selected)
-  // ! please create an environment in github settings called 'friend-link-review' and set yourself as a reviewer before use it.
-  allowWorkflowAddFriendLink: true, // allow add friend link from issues automagically.
+    "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=4&mask=circle", // Favicon (suggest: circle mask)
+  url: "https://silvaire.top", // Main URL (https://xxxx.xxx)
+  dateCreated: "2024-03-23", // Date created (YYYY-MM-DD)
+  deepHideNegative: true, // Enable pressing "s(how)" for 1s to show the negative button.
+  multiSelect: false, // Allow selecting multiple tags/categories/artists at once to show their content together. If false, only one can be selected.
+  // ! Please create an environment in GitHub settings called 'friend-link-review' and set yourself as a reviewer before using it.
+  allowWorkflowAddFriendLink: true, // Allow adding friend links from issues automatically.
   textBannerMode: true,
-  // theme setting
+  // Theme settings
   styles: {
     color: {
       hue: 280,
       monochrome: false,
-      globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
+      globalHue: false, // If true, the hue applies to all colors. If false, only the brand color hue changes; other colors are calculated from the Catppuccin Latte & Macchiato palette.
       rainbow: {
-        enabled: false, // hue will be cycled
-        speed: 10, // hue is (getCurrentHue() + x) % 360......(updateHue, 100);
-      }, // copied from 2nd easter egg updated in 2026. (just for fun).
+        enabled: false, // The hue will cycle.
+        speed: 10, // Hue = (getCurrentHue() + x) % 360 ... (updateHue, 100).
+      }, // Copied from the 2nd Easter egg updated in 2026 (just for fun).
     },
     visual: {
-      transition: 10, // x[s(second(s))] / 100 | e.g. 10 -> 0.1s (default)
+      transition: 10, // x[seconds] / 100 | e.g. 10 -> 0.1s (default)
       gap: 12, // x[px]
       radius: 26, // x[px]
-      enableCardTitle: true, // show title in custom card (warning, danger...)
-      transparent: false, // transparent? (for year & artist)
+      enableCardTitle: true, // Show title in custom cards (warning, danger, etc.)
+      transparent: false, // Transparent? (for year & artist)
       uppercase: false, // CATEGORIES / Categories
-      mono: false, // use monospace font for title
+      mono: false, // Use a monospace font for titles.
       pageAnimation: {
         enabled: false,
         time: 0.7, // (s)
       },
-      card: "column", // column / row for music & friend cards
+      card: "column", // Column / row for music & friend cards.
       cardHover: {
-        enabled: true, // enable card hover effect
+        enabled: true, // Enable card hover effect.
         scale: 1.02,
         maxMove: 4,
-        maxRotate: 1, // 3d effect |  set 0 to disable 3D
+        maxRotate: 1, // 3D effect | set 0 to disable 3D.
         easing: 0.2,
       },
     },
   },
 
-  // homepage setting (when globalConfig.modules.banner is a url)
+  // Homepage settings (when globalConfig.modules.banner is a URL)
   homePage: {
     avatar:
-      "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=3", // your avatar
-    // modules
+      "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=3", // Your avatar
+    // Modules
     modules: {
       banner: {
         imgurl:
-          "https://i.mji.rip/2026/05/26/b15f373cb4e715b252bb9aa3f5687904.jpeg", // only work when type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
-        image: "70vh", // only work when type is "image", e.g. "65vh"
+          "https://i.mji.rip/2026/05/26/b15f373cb4e715b252bb9aa3f5687904.jpeg", // Only works when the type is image, e.g. "https://cdn.jsdelivr.net/gh/Miralous/Miracle@main/src/assets/banner.png"
+        image: "70vh", // Only works when the type is "image", e.g. "65vh"
       },
-      pictures: false, // show pictures
-      lastMoment: true, // last moment
-      recentPosts: true, // recent posts
-      projects: true, // projects (may be very sloooooow)
-      musics: true, // music list
-      techStack: true, // tech stack
-      friends: true, // friends
+      pictures: false, // Show pictures
+      lastMoment: true, // Last moment
+      recentPosts: true, // Recent posts
+      projects: true, // Projects (may be very slow)
+      musics: true, // Music list
+      techStack: true, // Tech stack
+      friends: true, // Friends
     },
 
-    // stacks (https://cdn.jsdelivr.us/gh/devicons/devicon/icons/${stack.icon}/${stack.icon}-original.svg)
+    // Stacks (https://cdn.jsdelivr.us/gh/devicons/devicon/icons/${stack.icon}/${stack.icon}-original.svg)
     stacks: [
       { name: "Arch Linux", icon: "archlinux" },
       { name: "CSS", icon: "css3" },
@@ -110,10 +109,10 @@ export const globalConfig = {
     ],
   },
 
-  github: "Miralous", // your github username
-  miracleRepoName: "Miracle", // miracle repo name
+  github: "Miralous", // Your GitHub username
+  miracleRepoName: "Miracle", // Miracle repo name
 
-  // navigation items
+  // Navigation items
   nav: [
     { text: languageFile.dashboard, link: "/" },
     {
@@ -129,17 +128,17 @@ export const globalConfig = {
       text: languageFile.others,
       items: [
         { text: languageFile.friends, link: "/friends" },
-        // enable / disable music list
+        // Enable / disable music list
         { text: languageFile.musics, link: "/musics" },
         { text: languageFile.photos, link: "/photos" },
-        // enable / disable comments
+        // Enable / disable comments
         { text: languageFile.whiteboard, link: "/whiteboard" },
       ],
     },
   ],
 
-  EXIF_GPS: true, // enable GPS in EXIF (if false, it will hide GPS in EXIF)
-  // To show the 'GPS' field in the configuration below
+  EXIF_GPS: true, // Enable GPS in EXIF (if false, GPS is hidden).
+  // Shows the 'GPS' field in the configuration below.
   abbreviated_metadata: ["Model", "ISO", "ExposureTime", "ApertureValue"],
   detail_metadata: [
     "Model",
@@ -150,11 +149,11 @@ export const globalConfig = {
     "GPS",
   ],
 
-  convert_photos: false, // enable convert photos to webp or avif (if false, it will not convert photos)
-  convert_photos_format: "webp", // convert photos to webp or avif (webp / avif)
-  convert_photos_quality: 80, // convert photos quality (0-100)
+  convert_photos: false, // Enable converting photos to WebP or AVIF (if false, photos are not converted).
+  convert_photos_format: "webp", // Convert photos to WebP or AVIF (webp / avif).
+  convert_photos_quality: 80, // Convert photos quality (0-100).
 
-  // abouts
+  // About
   about: {
     desc: "A student who is learning frontend development",
     tags: [
@@ -248,7 +247,7 @@ export const globalConfig = {
     },
   },
 
-  // comments
+  // Comments
   comments: {
     enabled: true,
     type: "giscus",
@@ -266,32 +265,32 @@ export const globalConfig = {
     },
   },
 
-  // waterfall
+  // Waterfall
   waterfall: {
     oneColumnMax: 700,
     twoColumnMax: 1050,
   },
 
-  // friend weight (default: 0)
-  // the higher the weight, the lower the friend will be displayed
+  // Friend weight (default: 0)
+  // The higher the weight, the lower the friend appears.
   friendWeights: {
-    // example: -99, // "example" will be displayed at the top
+    // Example: -99, // "example" will be displayed at the top
     Miracle: -99,
     friends: -1,
-    unable: 0, // "unable" will be displayed at the bottom
+    unable: 0, // "unable" will be displayed at the bottom.
   },
 
-  // netease music list
+  // NetEase music list
   netease: {
     musicList: "17942010185",
     metingApi: "https://api.qijieya.cn/meting",
-    demoMode: true, // if false, it will hide control buttons
-    showTranslation: true, // show translation of lyrics (default: false, set true to show)
-    showRoman: false, // show romanization of lyrics (default: false, set true to show)
-    autoplay: true, // auto play music when page loaded
-    visualizer: false, // show visualizer at the bottom of player (default: false, set true to show)
-    musicSlice: 0, // how many singer to display in music list (default: 20, set 0 to display all)
-    QQMusicLyricsSource: true, // use QQ Music API to get lyrics (default: true, set true to enable), Can greatly increase the coverage of songs with word-by-word lyrics,But there is also a small probability of matching the wrong song
+    demoMode: true, // If false, control buttons are hidden.
+    showTranslation: true, // Show translated lyrics (default: false; set true to show).
+    showRoman: false, // Show romanized lyrics (default: false; set true to show).
+    autoplay: true, // Auto-play music when the page loads.
+    visualizer: false, // Show visualizer at the bottom of player (default: false; set true to show).
+    musicSlice: 0, // How many singers to display in the music list (default: 20; set 0 to display all).
+    QQMusicLyricsSource: true, // Use QQ Music API to get lyrics (default: true). This greatly increases word-by-word lyrics coverage, but there is a small chance of matching the wrong song.
   },
 
   // ! DO NOT EDIT THESE VALUES
