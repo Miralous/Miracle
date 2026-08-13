@@ -31,7 +31,7 @@ export const globalConfig = {
   // theme setting
   styles: {
     color: {
-      hue: 300,
+      hue: 280,
       monochrome: false,
       globalHue: false, // if true, the hue will be applied to all colors; if false, only the hue of brand color will be changed, the others is calculated based on catppuccin latte & macchiato palette.
       rainbow: {

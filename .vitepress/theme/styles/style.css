@@ -44,14 +44,14 @@
     var(--vp-c-bg-alt) 0px 4px 25px -1.5px,
     var(--vp-c-bg-alt) 0px 2.5px 5px -2.5px;
   --vp-shadow-brand:
-    var(--vp-c-brand-soft) 0px 12px 25px -5px,
-    var(--vp-c-brand-soft) 0px 7px 15px -7px;
+    var(--vp-c-brand-soft) 0px 8px 40px -5px,
+    var(--vp-c-brand-soft) 0px 3px 25px -7px;
   --vp-shadow-brand-tag:
     var(--vp-c-brand-soft) 0px 4px 25px -1.5px,
     var(--vp-c-brand-soft) 0px 2.5px 5px -2.5px;
   --vp-shadow-negative:
-    var(--vp-c-yellow-soft) 0px 12px 25px -5px,
-    var(--vp-c-yellow-soft) 0px 7px 15px -7px;
+    var(--vp-c-yellow-soft) 0px 8px 40px -5px,
+    var(--vp-c-yellow-soft) 0px 3px 25px -7px;
 
   /* Blur */
   --vp-blur: blur(10px);
