@@ -768,3 +768,12 @@ mark {
 div.menu a.VPLink:hover {
   background-color: var(--vp-c-bg-alt) !important;
 }
+
+.momentsHtml {
+  p {
+    margin: 0 !important;
+  }
+  img {
+    border-radius: var(--vp-border-radius-3);
+  }
+}

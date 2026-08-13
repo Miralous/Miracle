@@ -14,6 +14,7 @@ interface CardProps {
   type?: string;
   negative?: boolean;
   meta?: string;
+  html?: boolean;
   metadata?: Record<string, string>;
   visibleMetaKeys?: string[];
 }
@@ -28,6 +29,7 @@ const props = withDefaults(defineProps<CardProps>(), {
   type: "",
   negative: false,
   meta: "true",
+  html: false,
   metadata: () => ({}),
   visibleMetaKeys: () => [],
 });
@@ -83,9 +85,16 @@ const displayMetaKeys = computed(() => {
     <div class="textPlace">
       <p class="title" v-if="props.title">{{ props.title }}</p>
 
+      <div
+        class="details momentsHtml"
+        v-if="props.html && props.description"
+        :class="{ notitle: !props.title }"
+        :style="'margin:0'"
+        v-html="props.description"
+      ></div>
       <p
         class="details"
-        v-if="props.description && props.title"
+        v-else-if="props.description && props.title"
         :style="props.meta === 'true' ? 'margin: 0 0 10px 0' : 'margin:0'"
       >
         {{ descriptionText }}

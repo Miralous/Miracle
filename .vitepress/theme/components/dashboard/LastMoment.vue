@@ -9,7 +9,7 @@
   >
     <div class="content">
       <span class="text">
-        {{ lastMoment && lastMoment.content ? lastMoment.content : "" }}
+        {{ lastMomentText }}
       </span>
       <span class="datetime">
         {{
@@ -50,6 +50,11 @@ const lastMoment = computed<Moment | null>(() => {
   // 返回过滤后的第一个（即最新的一条），如果没有则返回 null
   return validMoments[0] || null;
 });
+
+// 将渲染后的 HTML 转为纯文本用于单行展示
+const lastMomentText = computed(() =>
+  lastMoment.value ? lastMoment.value.content.replace(/<[^>]+>/g, "") : "",
+);
 </script>
 
 <style scoped>

@@ -101,6 +101,7 @@ const groupedMoments = computed(() => {
             :originDate="moment.date"
             :image="moment.image"
             :negative="moment.negative"
+            html
           />
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import path from "path";
-import { defineLoader } from "vitepress";
+import { defineLoader, createMarkdownRenderer } from "vitepress";
+import matter from "gray-matter";
 
 export interface Moment {
   fileName: string;
@@ -16,13 +17,30 @@ let data: Moment[];
 export { data };
 
 export default defineLoader({
-  watch: "public/data/moments/*.json",
-  load(files) {
+  watch: "public/data/moments/*.md",
+  async load(files) {
+    const config = (globalThis as any).VITEPRESS_CONFIG;
+    const md = await createMarkdownRenderer(
+      config.srcDir,
+      config.markdown,
+      config.site.base,
+      config.logger,
+    );
+
     return files
       .map((file) => {
         const fileName = path.basename(file);
-        const content = JSON.parse(readFileSync(file, "utf-8"));
-        return { fileName, ...content };
+        const { data: frontmatter, content } = matter(
+          readFileSync(file, "utf-8"),
+        );
+        return {
+          fileName,
+          date: frontmatter.date,
+          time: frontmatter.time,
+          content: md.render(content.trim()),
+          image: frontmatter.image,
+          negative: frontmatter.negative ?? false,
+        };
       })
       .sort(
         (a, b) =>

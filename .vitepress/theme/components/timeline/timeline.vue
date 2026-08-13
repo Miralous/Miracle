@@ -6,6 +6,8 @@ import { data as postsData } from "#theme/data/posts.data";
 
 const momentsData = globalConfig.moments;
 
+const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "");
+
 const { showNegative, initDeepHideListener } = useDeepHideNegative();
 
 interface CombinedTimelineItem {
@@ -59,7 +61,7 @@ const sortedFlatTimeline = computed(() => {
     return {
       id: moment.fileName,
       type: "moment" as const,
-      title: moment.content,
+      title: stripHtml(moment.content),
       dateString: fullDateStr,
       timestamp: Date.parse(fullDateStr),
       negative: moment.negative,
