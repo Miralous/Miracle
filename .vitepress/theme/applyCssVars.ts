@@ -22,13 +22,13 @@ export function applyCssVars() {
     "--vp-transparent": styles.visual.transparent
       ? "transparent"
       : "var(--vp-c-gutter)",
-    "--vp-image-home-vh-height": globalConfig.homePage.modules.banner.image,
+    "--vp-image-home-vh-height": globalConfig.homePage.banner.image.height,
     "--vp-show-title": globalConfig.styles.visual.enableCardTitle
       ? "block"
       : "none",
-    "--vp-card-point-1": globalConfig.styles.visual.card,
+    "--vp-card-point-1": globalConfig.styles.visual.card.type,
     "--vp-card-point-2":
-      globalConfig.styles.visual.card == "column" ? "unset" : "center",
+      globalConfig.styles.visual.card.type == "column" ? "unset" : "center",
     "--vp-page-animation": globalConfig.styles.visual.pageAnimation.enabled
       ? "pageFadeUp cubic-bezier(0.41, 0.42, 0.25, 1.12) backwards"
       : "unset",

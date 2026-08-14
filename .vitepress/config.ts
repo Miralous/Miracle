@@ -22,10 +22,10 @@ import type { RSSOptions } from "vitepress-plugin-rss";
 
 // RSS feed configuration
 const RSS: RSSOptions = {
-  title: globalConfig.title,
-  baseUrl: globalConfig.url,
+  title: globalConfig.informations.title,
+  baseUrl: globalConfig.informations.url,
   copyright: "Released under the CC BY-SA 4.0 license.",
-  description: globalConfig.description,
+  description: globalConfig.informations.description,
   filename: "feed.xml",
   log: true,
   ignoreHome: true,
@@ -38,8 +38,8 @@ const RSS: RSSOptions = {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: globalConfig.title,
-  description: globalConfig.description,
+  title: globalConfig.informations.title,
+  description: globalConfig.informations.description,
   // plz use vercel!!!!!!!
   cleanUrls: true,
   srcDir: "./src",
@@ -54,7 +54,7 @@ export default defineConfig({
     plugins: [RssPlugin(RSS)],
   },
   sitemap: {
-    hostname: globalConfig.url,
+    hostname: globalConfig.informations.url,
   },
   markdown: {
     theme: {
@@ -83,7 +83,7 @@ export default defineConfig({
     },
   },
   head: [
-    ["link", { rel: "icon", href: globalConfig.favicon }],
+    ["link", { rel: "icon", href: globalConfig.informations.favicon }],
     // 在 SSR HTML 首屏注入正确的 CSS 变量，避免 FOUC（首屏闪烁）与 hue=0 的短暂错色
     [
       "style",
@@ -99,7 +99,7 @@ export default defineConfig({
     nav: globalConfig.nav,
 
     // it seems bad TwT
-    logo: globalConfig.favicon,
+    logo: globalConfig.informations.favicon,
 
     langMenuLabel: globalConfig.lang.langMenuLabel,
     darkModeSwitchLabel: globalConfig.lang.darkModeSwitchLabel,
@@ -111,21 +111,21 @@ export default defineConfig({
     lastUpdated: { text: globalConfig.lang.lastUpdated },
 
     footer: {
-      message: `© ${new Date().getFullYear()} ${globalConfig.author}${
+      message: `© ${new Date().getFullYear()} ${globalConfig.informations.author}${
         globalConfig.lang.allRightsReserved
       }<br>
         ${
           globalConfig.lang.poweredBy
         } <a href="https://vitepress.dev/">VitePress</a> & <a href="https://github.com/Miralous/Miracle">Miracle</a><br>
-        ${globalConfig.title} ${
+        ${globalConfig.informations.title} ${
           globalConfig.lang.hasExistedFor
-        } ${getRunningTime(globalConfig.dateCreated)} ${globalConfig.lang.days}
+        } ${getRunningTime(globalConfig.informations.dateCreated)} ${globalConfig.lang.days}
 
         `,
     },
 
     socialLinks: [
-      { icon: "github", link: `https://github.com/${globalConfig.github}` },
+      { icon: "github", link: `https://github.com/${globalConfig.informations.github.name}` },
     ],
 
     search: {

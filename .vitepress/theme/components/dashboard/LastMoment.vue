@@ -44,7 +44,7 @@ const { showNegative } = useDeepHideNegative();
 const lastMoment = computed<Moment | null>(() => {
   // 过滤出应当显示的 moments
   const validMoments = (moments as Moment[]).filter(
-    (m) => !globalConfig.deepHideNegative || showNegative.value || !m.negative,
+    (m) => !globalConfig.features.deepHideNegative || showNegative.value || !m.negative,
   );
 
   // 返回过滤后的第一个（即最新的一条），如果没有则返回 null

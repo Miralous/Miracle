@@ -25,7 +25,7 @@ const props = defineProps({
 
 // URL category
 const urlParams = new URLSearchParams(window.location.search);
-const multiSelect = globalConfig.multiSelect;
+const multiSelect = globalConfig.features.multiSelect;
 const selectedCategories = ref<string[]>(
   urlParams
     .getAll("category")
@@ -174,7 +174,7 @@ const toggleNegative = () => {
 
 // 🔥 键盘监听：S 延迟 1s 解锁
 const handleKeydown = (e: KeyboardEvent) => {
-  if (!globalConfig.deepHideNegative) return;
+  if (!globalConfig.features.deepHideNegative) return;
 
   if (e.key.toLowerCase() !== "s") return;
 
@@ -195,7 +195,7 @@ const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
  * ✅ NEW: 控制 Negative 按钮是否显示
  */
 const showNegativeButton = computed(() => {
-  if (globalConfig.deepHideNegative) {
+  if (globalConfig.features.deepHideNegative) {
     return hasNegativePosts.value && hasShownByShortcut.value;
   }
   return hasNegativePosts.value;
@@ -203,7 +203,7 @@ const showNegativeButton = computed(() => {
 
 // 可选：同步状态（更稳）
 watch(showNegative, (val) => {
-  if (globalConfig.deepHideNegative && val) {
+  if (globalConfig.features.deepHideNegative && val) {
     hasShownByShortcut.value = true;
   }
 });

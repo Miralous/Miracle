@@ -54,7 +54,7 @@ const descriptionText = computed(() => {
 const isClickable = computed(() => !!clink.value);
 
 const displayMetaKeys = computed(() => {
-  const configKeys = (globalConfig as any).abbreviated_metadata || [];
+  const configKeys = (globalConfig as any).photo.abbreviatedMetadata || [];
   if (!props.metadata) return [];
   return configKeys.filter((key: string) => props.metadata![key]);
 });

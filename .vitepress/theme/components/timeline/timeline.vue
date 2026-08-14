@@ -71,7 +71,7 @@ const sortedFlatTimeline = computed(() => {
   const combined = [...normalizedPosts, ...normalizedMoments];
 
   const filtered = combined.filter((item) => {
-    if (globalConfig.deepHideNegative && !showNegative.value) {
+    if (globalConfig.features.deepHideNegative && !showNegative.value) {
       return !item.negative;
     }
     return true;

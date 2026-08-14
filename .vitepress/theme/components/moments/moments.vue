@@ -16,7 +16,7 @@ const { showNegative, pendingTimer, hasShownByShortcut, initDeepHideListener } =
 
 // 🔥 键盘监听：S 延迟 1s 解锁
 const handleKeydown = (e: KeyboardEvent) => {
-  if (!globalConfig.deepHideNegative) return;
+  if (!globalConfig.features.deepHideNegative) return;
 
   if (e.key.toLowerCase() !== "s") return;
 
@@ -40,7 +40,7 @@ const handleKeyup = (e: KeyboardEvent) => {
 
 // 同步状态
 watch(showNegative, (val) => {
-  if (globalConfig.deepHideNegative && val) {
+  if (globalConfig.features.deepHideNegative && val) {
     hasShownByShortcut.value = true;
   }
 });
@@ -66,7 +66,7 @@ onBeforeUnmount(() => {
 const groupedMoments = computed(() => {
   const validMoments = globalConfig.moments.filter(
     (moment: any) =>
-      !globalConfig.deepHideNegative || showNegative.value || !moment.negative,
+      !globalConfig.features.deepHideNegative || showNegative.value || !moment.negative,
   );
 
   const grid = generateGrid(

@@ -2,7 +2,7 @@
   <div class="about">
     <div class="personal">
       <img
-        :src="globalConfig.homePage.avatar"
+        :src="globalConfig.informations.avatar"
         alt="avatar"
         class="avatar"
         @mouseenter="handleMouseEnter"
@@ -10,7 +10,7 @@
         @mouseleave="handleMouseLeave"
       />
       <div class="textPlace">
-        <span class="name">{{ globalConfig.author }}</span>
+        <span class="name">{{ globalConfig.informations.author }}</span>
         <span class="introduce">{{ globalConfig.about.desc }}</span>
       </div>
     </div>

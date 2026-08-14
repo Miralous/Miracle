@@ -9,7 +9,7 @@ const initDeepHideListener = () => {
   if (typeof window === "undefined") return;
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if (!globalConfig.deepHideNegative) return;
+    if (!globalConfig.features.deepHideNegative) return;
     if (e.key.toLowerCase() !== "s") return;
 
     if (hasShownByShortcut.value) return;

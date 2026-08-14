@@ -13,7 +13,7 @@ import { data as photos } from "#theme/data/photos.data";
 
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
-const multiSelect = globalConfig.multiSelect;
+const multiSelect = globalConfig.features.multiSelect;
 const selectedCategories = ref<string[]>([]);
 const onlyWithExif = ref(false);
 

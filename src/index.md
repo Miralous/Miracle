@@ -7,7 +7,7 @@ footer: false
 
 <ClientOnly>
   <div ref="firstPageRef">
-    <FirstPage v-if="globalConfig.textBannerMode"/>
+    <FirstPage v-if="globalConfig.homePage.banner.type == 'text'"/>
     <FirstPage_2 v-else/>
   </div>
 </ClientOnly>

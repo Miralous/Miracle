@@ -843,7 +843,7 @@ const currentLyricIndex = computed(() => {
   return 0;
 });
 function document_title_change() {
-  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist}${albumName.value && albumName.value !== song.value?.name ? `《${albumName.value}》` : ``} | ${globalConfig.author}${globalConfig.lang.musicPlayerSuffix}`;
+  const main_title = `${song.value?.name || globalConfig.lang.unknownTitle} - ${song.value?.artist || globalConfig.lang.unknownArtist}${albumName.value && albumName.value !== song.value?.name ? `《${albumName.value}》` : ``} | ${globalConfig.informations.author}${globalConfig.lang.musicPlayerSuffix}`;
   if (document.hidden == true && audioRef.value && !audioRef.value.paused) {
     if (
       currentLyricIndex.value !== -1 &&

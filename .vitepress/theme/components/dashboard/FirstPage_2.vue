@@ -6,7 +6,7 @@ import { globalConfig } from "#config";
   <div
     class="first-page"
     :style="{
-      backgroundImage: `url(${globalConfig.homePage.modules.banner.imgurl})`,
+      backgroundImage: `url(${globalConfig.homePage.banner.image.url})`,
     }"
   ></div>
 </template>

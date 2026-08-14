@@ -34,7 +34,7 @@ async function formatAddress(
   lat: number | undefined,
   lon: number | undefined,
 ): Promise<string> {
-  if (!lat || !lon || !globalConfig.EXIF_GPS) return "";
+  if (!lat || !lon || !globalConfig.photo.exifGps) return "";
   try {
     const response = await fetch(
       `https://latlonconvaddr.emnasop.cn/?lat=${lat}&lon=${lon}`,
@@ -145,13 +145,13 @@ export default defineLoader({
 
   async load(files) {
     const { globalConfig } = await import("#config");
-    const abbrKeys: string[] = globalConfig?.abbreviated_metadata ?? [];
-    const detailKeys: string[] = (globalConfig as any)?.detail_metadata ?? [];
+    const abbrKeys: string[] = globalConfig?.photo?.abbreviatedMetadata ?? [];
+    const detailKeys: string[] = (globalConfig as any)?.photo?.detailMetadata ?? [];
     const metaKeys: string[] = [...new Set([...abbrKeys, ...detailKeys])];
 
-    const convertEnabled = globalConfig?.convert_photos === true;
-    const convertFormat = globalConfig?.convert_photos_format ?? "webp";
-    const convertQuality = globalConfig?.convert_photos_quality ?? 80;
+    const convertEnabled = globalConfig?.photo?.convertPhotos === true;
+    const convertFormat = globalConfig?.photo?.convertPhotosFormat ?? "webp";
+    const convertQuality = globalConfig?.photo?.convertPhotosQuality ?? 80;
     const targetExt = `.${convertFormat}`;
     const outputDir = path.resolve(process.cwd(), "public/data/convertphotos");
     if (convertEnabled) {

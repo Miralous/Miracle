@@ -5,10 +5,10 @@ import { globalConfig } from "#config";
 <template>
   <div class="first-page">
     <div class="hero-content">
-      <p class="hero-author">{{ globalConfig.author }}</p>
-      <h1 class="hero-title">{{ globalConfig.title }}</h1>
+      <p class="hero-author">{{ globalConfig.informations.author }}</p>
+      <h1 class="hero-title">{{ globalConfig.informations.title }}</h1>
       <div class="hero-divider"></div>
-      <p class="hero-desc">{{ globalConfig.description }}</p>
+      <p class="hero-desc">{{ globalConfig.informations.description }}</p>
     </div>
 
     <div class="scroll-indicator">

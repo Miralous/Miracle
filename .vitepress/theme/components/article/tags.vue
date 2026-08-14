@@ -26,7 +26,7 @@ const props = defineProps({
 // URL tag
 // =========================
 const urlParams = new URLSearchParams(window.location.search);
-const multiSelect = globalConfig.multiSelect;
+const multiSelect = globalConfig.features.multiSelect;
 const selectedTags = ref<string[]>(
   urlParams
     .getAll("tag")
@@ -170,7 +170,7 @@ const handleTagClick = (tag: string) => {
 // 🔥 DeepHide trigger (S key)
 // =========================
 const handleKeydown = (e: KeyboardEvent) => {
-  if (!globalConfig.deepHideNegative) return;
+  if (!globalConfig.features.deepHideNegative) return;
   if (e.key.toLowerCase() !== "s") return;
 
   if (hasShownByShortcut.value) return;
@@ -192,7 +192,7 @@ const toggleNegative = () => {
 // UI logic (same pattern as categories page)
 // =========================
 const showNegativeButton = computed(() => {
-  if (globalConfig.deepHideNegative) {
+  if (globalConfig.features.deepHideNegative) {
     return hasNegativePosts.value && hasShownByShortcut.value;
   }
   return hasNegativePosts.value;
@@ -200,7 +200,7 @@ const showNegativeButton = computed(() => {
 
 // sync unlock state
 watch(showNegative, (val) => {
-  if (globalConfig.deepHideNegative && val) {
+  if (globalConfig.features.deepHideNegative && val) {
     hasShownByShortcut.value = true;
   }
 });

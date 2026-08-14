@@ -13,7 +13,7 @@ import { globalConfig } from "#config";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 const playlist = ref<any[]>([]);
-const multiSelect = globalConfig.multiSelect;
+const multiSelect = globalConfig.features.multiSelect;
 const selectedSingers = ref<string[]>([]);
 
 // 默认图片

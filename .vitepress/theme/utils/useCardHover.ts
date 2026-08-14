@@ -2,12 +2,12 @@ import { easterEggActive } from "./easterEgg";
 import { globalConfig } from "#config";
 
 const maxFrame = 250;
-const maxMove = globalConfig.styles.visual.cardHover.maxMove;
-const easing = globalConfig.styles.visual.cardHover.easing;
+const maxMove = globalConfig.styles.visual.card.hover.maxMove;
+const easing = globalConfig.styles.visual.card.hover.easing;
 const tolerance = 0.01;
 
 // 新增：3D 倾斜强度（角度）
-const maxRotate = globalConfig.styles.visual.cardHover.maxRotate;
+const maxRotate = globalConfig.styles.visual.card.hover.maxRotate;
 
 interface CardState {
   currentX: number;
@@ -79,7 +79,7 @@ function animateCard(el: HTMLElement) {
       ? targetRotateY
       : currentRotateY + (targetRotateY - currentRotateY) * easing;
 
-  const scale = hovered ? globalConfig.styles.visual.cardHover.scale : 1;
+  const scale = hovered ? globalConfig.styles.visual.card.hover.scale : 1;
 
   el.style.transform = `
     perspective(1000px)
@@ -196,7 +196,7 @@ export function useCardHover() {
 
     state.hovered = false;
   };
-  if (!globalConfig.styles.visual.cardHover.enabled) {
+  if (!globalConfig.styles.visual.card.hover.enabled) {
     return {
       handleMouseMove: () => {},
       handleMouseEnter: () => {},

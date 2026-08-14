@@ -11,7 +11,7 @@ import { useCardHover } from "#theme/utils/useCardHover";
 import { globalConfig } from "#config";
 
 const friendWeights: Record<string, number> = globalConfig.friendWeights;
-const multiSelect = globalConfig.multiSelect;
+const multiSelect = globalConfig.features.multiSelect;
 
 const defaultImg = "https://pic2.zhimg.com/50/v2-cc1a32fcb444fc9d5e23f2ee078dc6e1_720w.jpg?source=1940ef5c";
 
@@ -23,10 +23,10 @@ const selectedFolders = ref<string[]>([]);
 const showSiteInfo = ref(false);
 
 const siteInfo = {
-  name: globalConfig.author,
-  avatar: globalConfig.homePage.avatar,
-  desc: globalConfig.description,
-  link: globalConfig.url,
+  name: globalConfig.informations.author,
+  avatar: globalConfig.informations.avatar,
+  desc: globalConfig.informations.description,
+  link: globalConfig.informations.url,
 };
 
 const toggleSiteInfo = () => {
@@ -108,7 +108,7 @@ const handleFolderClick = (folder: string) => {
 
   const handleClick = () => {
 
-    const url = `https://github.com/${globalConfig.github}/${globalConfig.miracleRepoName}/issues/new?template=add-link.yaml`;
+    const url = `https://github.com/${globalConfig.informations.github.name}/${globalConfig.informations.github.repo}/issues/new?template=add-link.yaml`;
     
     // 当前窗口跳转
     window.location.href = url;
@@ -127,7 +127,7 @@ const handleFolderClick = (folder: string) => {
           class="hide-phone add-link"
           :label="globalConfig.lang.addLink"
           green=true
-          v-if="globalConfig.allowWorkflowAddFriendLink"
+          v-if="globalConfig.features.allowWorkflowAddFriendLink"
           @click="handleClick"
           @mouseenter="handleMouseEnter"
           @mousemove="handleMouseMove"

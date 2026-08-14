@@ -16,8 +16,8 @@ const notFound = ref(false);
 
 const lg = globalConfig.lang;
 
-const detailKeys: string[] = (globalConfig as any).detail_metadata || [];
-const abbrKeys: string[] = (globalConfig as any).abbreviated_metadata || [];
+const detailKeys: string[] = (globalConfig as any).photo.detailMetadata || [];
+const abbrKeys: string[] = (globalConfig as any).photo.abbreviatedMetadata || [];
 const metaKeys: string[] = detailKeys.length ? detailKeys : abbrKeys;
 
 const displayMetaKeys = computed(() => {
