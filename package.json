@@ -40,7 +40,6 @@
     "typed.js": "^2.1.0"
   },
   "scripts": {
-    "clean": "node .vitepress/theme/scripts/setup.js",
     "dev": "vitepress dev --port 4321",
     "build": "vitepress build",
     "preview": "vitepress preview --port 4321",
