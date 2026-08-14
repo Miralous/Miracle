@@ -30,8 +30,10 @@ function getCurrentHue(): number {
     const value = getComputedStyle(document.documentElement)
       .getPropertyValue("--hue")
       .trim();
-    const parsed = Number(value);
-    if (Number.isFinite(parsed)) return parsed;
+    if (value !== "") {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed)) return parsed;
+    }
   }
 
   // 3. Fallback default

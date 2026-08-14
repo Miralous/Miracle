@@ -305,8 +305,9 @@ div.vp-code-group.vp-adaptive-theme {
     border-top-right-radius: var(--vp-border-radius-2) !important;
   }
 
-  div.language-bash.vp-adaptive-theme.active {
+  div.vp-adaptive-theme.active {
     margin-bottom: 0px;
+    border-bottom: 1px solid var(--vp-c-divider);
   }
 
   pre {

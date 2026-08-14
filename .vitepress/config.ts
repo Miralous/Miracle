@@ -82,7 +82,17 @@ export default defineConfig({
       });
     },
   },
-  head: [["link", { rel: "icon", href: globalConfig.favicon }]],
+  head: [
+    ["link", { rel: "icon", href: globalConfig.favicon }],
+    // 在 SSR HTML 首屏注入正确的 CSS 变量，避免 FOUC（首屏闪烁）与 hue=0 的短暂错色
+    [
+      "style",
+      {},
+      `:root{--hue:${globalConfig.styles.color.hue};--chue:${
+        globalConfig.styles.color.globalHue ? globalConfig.styles.color.hue : 280
+      };}`,
+    ],
+  ],
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

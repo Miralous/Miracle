@@ -36,7 +36,6 @@ async function formatAddress(
 ): Promise<string> {
   if (!lat || !lon || !globalConfig.EXIF_GPS) return "";
   try {
-    console.log(`Fetching address for lat=${lat}, lon=${lon}`);
     const response = await fetch(
       `https://latlonconvaddr.emnasop.cn/?lat=${lat}&lon=${lon}`,
     );

@@ -23,8 +23,11 @@ function getCurrentHue() {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue("--hue")
     .trim();
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 280;
+  if (value !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 280;
 }
 
 function updateHue() {
