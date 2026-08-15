@@ -1158,7 +1158,7 @@ onUnmounted(() => {
         </div>
         <div
           class="am-control-button-container"
-          v-if="globalConfig.netease.demoMode"
+          v-if="globalConfig.netease.showButtons"
         >
           <button
             class="am-control-button am-mode-btn"

@@ -84,7 +84,7 @@ export type FriendWeights = Record<string, number>;
 export interface NeteaseConfig {
   musicList: string;
   metingApi: string;
-  demoMode: boolean;
+  showButtons: boolean;
   showTranslation: boolean;
   showRoman: boolean;
   autoplay: boolean;

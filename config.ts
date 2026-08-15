@@ -114,7 +114,7 @@ export const globalConfig: GlobalConfig = {
   netease: {
     musicList: "17942010185", // NetEase playlist ID.
     metingApi: "https://api.qijieya.cn/meting", // Meting API endpoint.
-    demoMode: true, // If false, music player control buttons are hidden.
+    showButtons: true, // If false, music player control buttons are hidden.
     showTranslation: true, // Show translated lyrics.
     showRoman: false, // Show romanized lyrics.
     autoplay: true, // Auto-play music when the page loads.
