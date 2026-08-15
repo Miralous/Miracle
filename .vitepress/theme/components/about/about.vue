@@ -56,6 +56,26 @@
     </div>
 
     <h2>
+      <Icon :icon="globalConfig.icon.contact" />
+      {{ globalConfig.lang.contacts }}
+    </h2>
+    <div class="contacts">
+      <component
+        :is="item.link ? 'a' : 'div'"
+        v-for="(item, index) in globalConfig.about.contacts"
+        :key="index"
+        class="contact"
+        :href="item.link || undefined"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Icon :icon="item.icon" class="contact-icon" />
+        <span class="platform">{{ item.platform }}</span>
+        <span class="account">{{ item.account }}</span>
+      </component>
+    </div>
+
+    <h2>
       <Icon :icon="globalConfig.icon.techStack" />
       {{ globalConfig.lang.techStack }}
     </h2>
@@ -176,6 +196,9 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
 </script>
 
 <style lang="css" scoped>
+* {
+  user-select: text !important;
+}
 /* 前面原有的 CSS 保持不变 ... */
 .tags {
   perspective: 1000px;
@@ -217,11 +240,14 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
   border: 1px solid var(--vp-c-divider);
   box-shadow: var(--vp-shadow);
   border-radius: var(--vp-border-radius-1);
-  padding: 25px;
-  gap: var(--vp-gap);
+  padding: 15px 15px;
+  gap: calc(var(--vp-gap) / 4);
   .task {
     display: flex;
     align-items: center;
+    padding: 7px 15px;
+    transition: all var(--vp-transition-time);
+    border-radius: var(--vp-border-radius-2);
     gap: var(--vp-gap);
     span.complete {
       color: var(--vp-c-text-3);
@@ -230,6 +256,37 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
     }
     .notComplete {
       color: var(--vp-c-text-2);
+    }
+  }
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: var(--vp-shadow);
+  border-radius: var(--vp-border-radius-1);
+  padding: 15px 15px;
+  gap: calc(var(--vp-gap) / 4);
+  .contact {
+    display: flex;
+    padding: 7px 15px;
+    align-items: center;
+    gap: var(--vp-gap);
+    border-radius: var(--vp-border-radius-2);
+    text-decoration: none;
+    color: inherit;
+    transition: all var(--vp-transition-time);
+    .contact-icon {
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+    .platform {
+      font-weight: 600;
+    }
+    .account {
+      color: var(--vp-c-text-2);
+      transition: all var(--vp-transition-time);
     }
   }
 }

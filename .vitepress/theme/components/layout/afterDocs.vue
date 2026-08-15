@@ -4,6 +4,7 @@
     v-if="globalConfig.comments.enabled && globalConfig.comments.type"
   >
     <div v-if="props.title === 'false'" style="margin-top: 40px"></div>
+    <PostNav v-if="props.title !== 'false'" />
     <h2 class="styledH2" v-if="props.title !== 'false'">
       {{ globalConfig.lang.comments }}
     </h2>
@@ -59,6 +60,7 @@
 import { useData } from "vitepress";
 import { globalConfig } from "#config";
 import Twikoo from "./twikoo.vue";
+import PostNav from "./postNav.vue";
 // 获取当前配色方案
 const { isDark } = useData();
 

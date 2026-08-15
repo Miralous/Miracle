@@ -32,6 +32,7 @@ export const data = {
   tasks: "ph:list-checks-duotone",
   taskComplete: "ph:check-circle-fill",
   taskNotComplete: "ph:circle",
+  contact: "ph:chat-circle-duotone",
   schedule: "ph:calendar-blank-duotone",
   close: "ph:x-bold",
   playlist: "ph:list-bullets-bold",
