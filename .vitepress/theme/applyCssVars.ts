@@ -30,10 +30,16 @@ export function applyCssVars() {
     "--vp-card-point-2":
       globalConfig.styles.visual.card.type == "column" ? "unset" : "center",
     "--vp-page-animation": globalConfig.styles.visual.pageAnimation.enabled
-      ? "pageFadeUp cubic-bezier(0.41, 0.42, 0.25, 1.12) backwards"
+      ? "pageFadeUp cubic-bezier(0.16, 1, 0.3, 1) backwards"
       : "unset",
     "--vp-page-animation-time": globalConfig.styles.visual.pageAnimation.enabled
       ? globalConfig.styles.visual.pageAnimation.time + "s"
+      : "unset",
+    "--vp-animation-y": globalConfig.styles.visual.pageAnimation.enabled
+      ? globalConfig.styles.visual.pageAnimation.translateY + "px"
+      : "unset",
+    "--vp-animation-blur": globalConfig.styles.visual.pageAnimation.enabled
+      ? globalConfig.styles.visual.pageAnimation.blur + "px"
       : "unset",
   };
 

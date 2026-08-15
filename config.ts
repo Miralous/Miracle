@@ -79,8 +79,10 @@ export const globalConfig: GlobalConfig = {
       uppercase: false, // Display category names in uppercase.
       mono: false, // Use a monospace font for titles.
       pageAnimation: {
-        enabled: false, // Enable page transition animations.
-        time: 0.7, // Animation duration in seconds.
+        enabled: true, // Enable page transition animations.
+        time: 1.2, // Animation duration in seconds.
+        translateY: 20, //  Vertical translation distance in pixels.
+        blur: 3, // Blur intensity in pixels.
       },
       card: {
         type: "column", // Layout direction for music and friend cards: "column" | "row".
@@ -234,8 +236,52 @@ export const globalConfig: GlobalConfig = {
     ],
     todo: [
       { complete: true, text: "Write more articles" },
-      { complete: false, text: "Miracle v2" },
+      { complete: true, text: "Miracle v2" },
       { complete: false, text: "Make more friends" },
+    ],
+    // Contact methods. `icon` uses iconify icon names.
+    // Fill in the platforms and accounts you want to show.
+    contacts: [
+      {
+        icon: "mingcute:qq-fill", // Platform icon (image).
+        platform: "QQ", // Platform name.
+        account: "3624285658", // Your account on that platform.
+      },
+      {
+        icon: "ri:qq-line", // Platform icon (image).
+        platform: "Miracle Dev Group", // Platform name.
+        account: "1047573884", // Your account on that platform.
+      },
+      {
+        icon: "ri:qq-line", // Platform icon (image).
+        platform: "Personal Group", // Platform name.
+        account: "1094626427", // Your account on that platform.
+      },
+
+      {
+        icon: "ph:github-logo-duotone", // Platform icon (image).
+        platform: "GitHub", // Platform name.
+        account: "silvaire-qwq", // Your account on that platform.
+        link: "https://github.com/silvaire-qwq", // Optional: link to the profile.
+      },
+      {
+        icon: "ph:television-duotone",
+        platform: "BiliBili",
+        account: "Silvaire",
+        link: "https://space.bilibili.com/1586464858", // Optional: link to the profile.
+      },
+      // More examples (delete or edit as you like):
+      {
+        icon: "ph:envelope-duotone",
+        platform: "Email",
+        account: "silvaire_qwq@outlook.com",
+        link: "mailto:silvaire_qwq@outlook.com", // Optional: link to the profile.
+      },
+      // {
+      //   icon: "ph:telegram-logo-duotone",
+      //   platform: "Telegram",
+      //   account: "@yourname",
+      // },
     ],
     schedule: {
       enabled: true,

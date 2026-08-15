@@ -58,6 +58,8 @@ export interface CardVisual {
 export interface PageAnimation {
   enabled: boolean;
   time: number;
+  translateY: number;
+  blur: number;
 }
 
 export interface VisualConfig {
@@ -161,6 +163,13 @@ export interface TodoItem {
   text: string;
 }
 
+export interface ContactItem {
+  icon: string;
+  platform: string;
+  account: string;
+  link?: string;
+}
+
 export interface ScheduleItem {
   time: string;
   name: string;
@@ -181,6 +190,7 @@ export interface AboutConfig {
   desc: string;
   tags: AboutTag[];
   todo: TodoItem[];
+  contacts: ContactItem[];
   schedule: ScheduleConfig;
 }
 

@@ -156,10 +156,12 @@ import { globalConfig } from "#config";
   from {
     opacity: 0;
     transform: translateY(30px);
+    filter: blur(var(--vp-animation-blur));
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0px);
   }
 }
 
@@ -167,22 +169,27 @@ import { globalConfig } from "#config";
   from {
     opacity: 0;
     transform: scaleY(0);
+    filter: blur(var(--vp-animation-blur));
   }
   to {
     opacity: 0.2;
     transform: scaleY(1);
+    filter: blur(0px);
   }
 }
 
 @keyframes scrollDrop {
   0% {
     transform: translateY(-100%);
+    filter: blur(var(--vp-animation-blur));
   }
   50% {
     transform: translateY(0);
+    filter: blur(calc(var(--vp-animation-blur) / 2));
   }
   100% {
     transform: translateY(100%);
+    filter: blur(0px);
   }
 }
 

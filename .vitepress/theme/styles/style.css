@@ -12,7 +12,7 @@
 @import url("./twikoo.css");
 @import url("katex/dist/katex.min.css");
 @import url("https://rsms.me/inter/inter.css");
-@import url("https://rsms.me/res/fonts/ibm-plex-mono.css?v=20260427014245");
+@import url("https://fonts.font.im/css2?family=Google+Sans+Code:wght@400&display=swap");
 @import url("https://fonts.font.im/css2?family=Playwrite+SK:wght@400&display=swap");
 @import url("https://fonts.font.im/css2?family=Noto+Serif+SC:wght@300..600&display=swap");
 
@@ -23,7 +23,7 @@
 :root {
   /* font family */
   --vp-font-family-base: "InterVariable", "OPPO Sans", system-ui, sans-serif;
-  --vp-font-family-mono: "IBM Plex Mono", var(--vp-font-family-base);
+  --vp-font-family-mono: "Google Sans Code", var(--vp-font-family-base);
   /* only for title !!!!!! */
   --vp-font-family-title:
     "Noto Serif SC", var(--vp-use-mono), var(--vp-font-family-mono),
@@ -33,7 +33,7 @@
     var(--vp-font-family-base);
 
   /* Border Radius */
-  --vp-border-radius-2: calc(var(--vp-border-radius-1) - 6px);
+  --vp-border-radius-2: calc(var(--vp-border-radius-1) - 9px);
   --vp-border-radius-3: calc(var(--vp-border-radius-2) - 6px);
   --vp-border-radius-4: calc(var(--vp-border-radius-3) - 6px);
 
@@ -133,11 +133,19 @@
 
 @keyframes pageFadeUp {
   from {
-    opacity: 0.7;
-    transform: translateY(5px);
+    opacity: 0.3;
+    transform: translateY(var(--vp-animation-y));
+    filter: blur(var(--vp-animation-blur));
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none;
   }
 }
