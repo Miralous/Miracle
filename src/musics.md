@@ -1,6 +1,7 @@
 ---
 layout: home
 footer: false
+title: Musics
 ---
 
 <script setup lang="ts">

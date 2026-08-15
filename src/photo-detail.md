@@ -1,6 +1,7 @@
 ---
 layout: home
 footer: false
+title: Preview
 ---
 
 <script setup lang="ts">

@@ -2,6 +2,7 @@
 layout: home
 footer: false
 pageClass: hideAv
+title: About
 ---
 
 <ClientOnly>
