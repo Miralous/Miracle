@@ -23,6 +23,7 @@ import About from "./components/about/about.vue";
 import MusicPlayer from "./components/player/player.vue";
 import PhotoDetail from "./components/photo/PhotoDetail.vue";
 import Contributors from "./components/contributors/ctb.vue";
+import AddLink from "./components/friends/addLink.vue";
 
 const components = {
   // Dashboard
@@ -44,6 +45,7 @@ const components = {
   Tags,
   Timeline,
   About,
+  AddLink,
   Moments,
   // Layout
   Icon,

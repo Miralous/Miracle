@@ -48,6 +48,13 @@ export const data = {
   prev: "ph:caret-left-bold",
   next: "ph:caret-right-bold",
 
+  title: "ph:tag-duotone",
+  avatar: "ph:image-duotone",
+  desc: "ph:asterisk-duotone",
+  url: "ph:link-duotone",
+  tick: "ph:check-duotone",
+  arrow: "ph:arrow-up-right-duotone",
+
   /* EXIF metadata icons (PhotoDetail) */
   meta: {
     Category: "ph:book-bookmark-duotone",

@@ -109,7 +109,7 @@ const handleFolderClick = (folder: string) => {
 
   const handleClick = () => {
 
-    const url = `https://github.com/${globalConfig.informations.github.name}/${globalConfig.informations.github.repo}/issues/new?template=add-link.yaml`;
+    const url = `/add-link`;
     
     // 当前窗口跳转
     window.location.href = url;
@@ -139,19 +139,6 @@ const handleFolderClick = (folder: string) => {
         </template>
         </TagChip>
         <TagChip
-          class="hide-phone"
-          :label="globalConfig.lang.siteInfo"
-          :active="showSiteInfo"
-          @click="toggleSiteInfo"
-          @mouseenter="handleMouseEnter"
-          @mousemove="handleMouseMove"
-          @mouseleave="handleMouseLeave"
-        >
-        <template #icon>
-          <Icon :icon="globalConfig.icon.info" />
-        </template>
-        </TagChip>
-        <TagChip
           v-for="folder in folders"
           :key="folder"
           :label="folder"
@@ -161,19 +148,6 @@ const handleFolderClick = (folder: string) => {
           @mousemove="handleMouseMove"
           @mouseleave="handleMouseLeave"
         />
-      </div>
-      <div v-if="showSiteInfo" class="site-info-card" 
-          @mouseenter="handleMouseEnter"
-          @mousemove="handleMouseMove"
-          @mouseleave="handleMouseLeave">
-        <img :src="siteInfo.avatar" :alt="siteInfo.name" class="site-info-avatar" />
-        <div class="site-info-body">
-          <a :href="siteInfo.link" target="_blank" rel="noopener" class="site-info-link">
-            {{ siteInfo.link }}
-          </a>
-          <span class="site-info-name">{{ siteInfo.name }}</span>
-          <span class="site-info-desc">{{ siteInfo.desc }}</span>
-        </div>
       </div>
       <div v-for="group in groupedFriends" :key="group.key" style="margin-bottom: 32px;">
         <h1 class="year">{{ group.key }}</h1>
@@ -215,60 +189,6 @@ const handleFolderClick = (folder: string) => {
   display: flex;
   flex-direction: column;
   gap: var(--vp-gap);
-}
-.site-info-card {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--vp-gap) *2);
-  padding: 25px;
-  margin-bottom: 30px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: var(--vp-border-radius-1);
-  background-color: var(--vp-c-bg);
-  box-shadow: var(--vp-shadow);
-  transition: all var(--vp-transition-time);
-}
-.site-info-card:hover {
-  border-color: var(--vp-c-brand-2);
-  box-shadow: var(--vp-shadow-brand);
-}
-.site-info-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-.site-info-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  * {
-    user-select:text !important;
-  }
-}
-.site-info-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--vp-c-text-1);
-}
-.site-info-desc {
-  font-size: 14px;
-  color: var(--vp-c-text-2);
-}
-.site-info-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--vp-c-text-3);
-  opacity: 0.8;
-  transition: all var(--vp-transition-time);
-}
-.site-info-link:hover {
-  color: var(--vp-c-brand-1);
-  opacity: 1;
 }
 
 @media (max-width: 767px) {
