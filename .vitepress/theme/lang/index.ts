@@ -65,6 +65,8 @@ const languageFile = {
   playModeSingle: { zh: "单曲循环", en: "Single Loop" },
   playModeShuffle: { zh: "随机播放", en: "Shuffle" },
   songUnit: { zh: "首", en: "songs" },
+  playNext: { zh: "插播", en: "Play Next" },
+  playedNext: { zh: "下一首播放中", en: "Playing Next" },
   statistics: { zh: "统计", en: "Statistics" },
   previousPost: { zh: "上一篇", en: "Previous" },
   nextPost: { zh: "下一篇", en: "Next" },
