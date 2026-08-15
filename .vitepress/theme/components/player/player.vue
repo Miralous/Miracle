@@ -799,6 +799,10 @@ const onLoadedMetadata = async () => {
     }
     await tryAutoplay();
     draw();
+    // 音频就绪后，若鼠标仍悬浮在标题上或已开启常开，则启动抖动
+    if ((wantShake || alwaysOn) && !rythm) {
+      void startTitleShake();
+    }
   }
 };
 
@@ -1042,14 +1046,128 @@ function draw() {
   }
   a_draw();
 }
-// Keyboard shortcuts (space to play/pause, escape to close mobile lyrics)
+// Keyboard shortcuts (space to play/pause, escape to close mobile lyrics, t to toggle always-on shake)
 const onKeydown = (e: KeyboardEvent) => {
   if (e.key === " ") {
     togglePlay();
   } else if (e.key === "Escape") {
     showMobileLyrics.value = false;
+  } else if ((e.key === "t" || e.key === "T") && !e.repeat) {
+    toggleAlwaysOn();
   }
 };
+
+// ===== Rythm.js 效果（顶栏标题 shake + 封面 neon，悬浮/T 键常开触发，默认关闭）=====
+const RYTHM_CDN_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/rythm.js/2.2.6/rythm.min.js";
+const TITLE_RYTHM_CLASS = "rythm-title-shake";
+const COVER_RYTHM_CLASS = "rythm-cover-neon";
+let rythm: any = null;
+let rythmActive = false;
+let wantShake = false;
+let alwaysOn = false;
+let rythmAudioContext: AudioContext | null = null;
+let titleEl: HTMLElement | null = null;
+
+const loadRythm = () =>
+  new Promise<any>((resolve, reject) => {
+    const g = window as any;
+    if (g.Rythm) return resolve(g.Rythm);
+    const script = document.createElement("script");
+    script.src = RYTHM_CDN_URL;
+    script.async = true;
+    script.onload = () => resolve(g.Rythm);
+    script.onerror = () => reject(new Error("Rythm.js CDN 加载失败"));
+    document.head.appendChild(script);
+  });
+
+function getNavTitleEl(): HTMLElement | null {
+  return (
+    document.querySelector<HTMLElement>(".VPNavBarTitle a.title > span") ||
+    document.querySelector<HTMLElement>(".VPNavBarTitle a.title")
+  );
+}
+
+function getCoverEl(): HTMLElement | null {
+  return document.querySelector<HTMLElement>(".am-cover-wrapper");
+}
+
+function addRythmClasses() {
+  getNavTitleEl()?.classList.add(TITLE_RYTHM_CLASS);
+  getCoverEl()?.classList.add(COVER_RYTHM_CLASS);
+}
+
+function removeRythmClasses() {
+  getNavTitleEl()?.classList.remove(TITLE_RYTHM_CLASS);
+  getCoverEl()?.classList.remove(COVER_RYTHM_CLASS);
+}
+
+async function startTitleShake() {
+  if (rythmActive) return;
+  if (rythm) {
+    addRythmClasses();
+    rythm.start();
+    rythmActive = true;
+    return;
+  }
+  // 在用户手势内同步创建 AudioContext，避免被浏览器挂起
+  if (!rythmAudioContext) rythmAudioContext = new AudioContext();
+  try {
+    const RythmClass = await loadRythm();
+    const audio = audioRef.value;
+    const el = getNavTitleEl();
+    if ((!wantShake && !alwaysOn) || !audio || !el) return;
+    if (rythmAudioContext.state === "suspended") {
+      await rythmAudioContext.resume().catch(() => {});
+    }
+    rythm = new RythmClass(rythmAudioContext);
+    rythm.connectExternalAudioElement(audio);
+    addRythmClasses();
+    // 顶栏标题：shake，幅度 ±30px；低频段 0-10 校准，只跟鼓点/低音节奏
+    rythm.addRythm(TITLE_RYTHM_CLASS, "shake", 0, 10, { max: 30, min: -30 });
+    // 封面：neon 辉光，同样低频校准
+    rythm.addRythm(COVER_RYTHM_CLASS, "neon", 0, 10);
+    rythm.start();
+    rythmActive = true;
+  } catch (e) {
+    console.error("Rythm.js 初始化失败:", e);
+  }
+}
+
+function stopShake() {
+  if (rythmActive) {
+    rythm.stop();
+    rythmActive = false;
+    removeRythmClasses();
+  }
+}
+
+function stopTitleShake() {
+  wantShake = false;
+  if (!alwaysOn) stopShake();
+}
+
+function toggleAlwaysOn() {
+  alwaysOn = !alwaysOn;
+  if (alwaysOn) {
+    void startTitleShake();
+  } else if (!wantShake) {
+    stopShake();
+  }
+}
+
+function bindTitleHover() {
+  titleEl = getNavTitleEl();
+  if (!titleEl) {
+    window.setTimeout(bindTitleHover, 200);
+    return;
+  }
+  titleEl.addEventListener("mouseenter", () => {
+    wantShake = true;
+    void startTitleShake();
+  });
+  titleEl.addEventListener("mouseleave", stopTitleShake);
+}
 
 // 每次音频切换都重新初始化可视化
 watch(
@@ -1098,6 +1216,7 @@ onMounted(() => {
   setTimeout(() => draw(), 500);
   titleInterval = window.setInterval(document_title_change, 200);
   timeInterval = window.setInterval(onTimeUpdate, 15);
+  bindTitleHover();
 });
 
 onUnmounted(() => {
@@ -1105,6 +1224,10 @@ onUnmounted(() => {
   document.removeEventListener("keydown", onKeydown);
   if (titleInterval) clearInterval(titleInterval);
   if (timeInterval) clearInterval(timeInterval);
+  if (rythm && rythmActive) rythm.stop();
+  titleEl?.removeEventListener("mouseenter", startTitleShake);
+  titleEl?.removeEventListener("mouseleave", stopTitleShake);
+  removeRythmClasses();
 });
 </script>
 
