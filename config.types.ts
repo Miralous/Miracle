@@ -58,6 +58,8 @@ export interface CardVisual {
 export interface PageAnimation {
   enabled: boolean;
   time: number;
+  translateY: number;
+  blur: number;
 }
 
 export interface VisualConfig {

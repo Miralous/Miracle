@@ -79,8 +79,10 @@ export const globalConfig: GlobalConfig = {
       uppercase: false, // Display category names in uppercase.
       mono: false, // Use a monospace font for titles.
       pageAnimation: {
-        enabled: false, // Enable page transition animations.
-        time: 0.7, // Animation duration in seconds.
+        enabled: true, // Enable page transition animations.
+        time: 1.2, // Animation duration in seconds.
+        translateY: 20, //  Vertical translation distance in pixels.
+        blur: 3, // Blur intensity in pixels.
       },
       card: {
         type: "column", // Layout direction for music and friend cards: "column" | "row".
