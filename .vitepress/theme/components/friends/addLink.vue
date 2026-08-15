@@ -29,8 +29,8 @@ const confirmations = reactive(
 const allConfirmed = computed(() => confirmations.every((c) => c.checked));
 
 const stepTitle = computed(() => {
-  if (step.value === 1) return globalConfig.lang.addLinkConfirmTitle;
-  if (step.value === 2) return globalConfig.lang.addLinkInfoTitle;
+  if (step.value === 1) return globalConfig.lang.addLinkInfoTitle;
+  if (step.value === 2) return globalConfig.lang.addLinkConfirmTitle;
   return globalConfig.lang.addLinkSubmitTitle;
 });
 
@@ -112,10 +112,10 @@ const handleClick = () => {
         <span>{{ stepTitle }}</span>
       </div>
       <p v-if="step === 1" class="step-desc">
-        {{ globalConfig.lang.addLinkConfirmDesc }}
+        {{ infoDesc }}
       </p>
       <p v-else-if="step === 2" class="step-desc">
-        {{ infoDesc }}
+        {{ globalConfig.lang.addLinkConfirmDesc }}
       </p>
       <p v-else-if="step === 3" class="step-desc">
         {{ submitDesc }}
@@ -123,7 +123,23 @@ const handleClick = () => {
     </div>
 
     <div v-if="step !== 3" class="card">
-      <div v-if="step === 1" class="confirm-list">
+      <div v-if="step === 1" class="infos">
+        <div
+          v-for="(item, index) in link"
+          :key="index"
+          class="info"
+          @click="copyKey(item)"
+        >
+          <Icon
+            :icon="item.copied ? globalConfig.icon.tick : item.icon"
+            class="icon"
+          />
+          <span class="name">{{ item.name }}</span>
+          <span class="key">{{ item.key }}</span>
+        </div>
+      </div>
+
+      <div v-else class="confirm-list">
         <div
           v-for="(c, index) in confirmations"
           :key="index"
@@ -140,22 +156,6 @@ const handleClick = () => {
             class="check-icon"
           />
           <span class="confirm-label">{{ c.label }}</span>
-        </div>
-      </div>
-
-      <div v-else class="infos">
-        <div
-          v-for="(item, index) in link"
-          :key="index"
-          class="info"
-          @click="copyKey(item)"
-        >
-          <Icon
-            :icon="item.copied ? globalConfig.icon.tick : item.icon"
-            class="icon"
-          />
-          <span class="name">{{ item.name }}</span>
-          <span class="key">{{ item.key }}</span>
         </div>
       </div>
     </div>
@@ -186,17 +186,18 @@ const handleClick = () => {
       >
         {{ globalConfig.lang.backStep }}
       </button>
-      <button
-        v-if="step < totalSteps"
-        class="btn btn-next"
-        :style="{ opacity: step === 1 && !allConfirmed ? '0' : '1' }"
-        @click="nextStep"
-        @mouseenter="handleMouseEnter"
-        @mousemove="handleMouseMove"
-        @mouseleave="handleMouseLeave"
-      >
-        {{ globalConfig.lang.nextStep }}
-      </button>
+      <Transition name="next-pop" :css="step === 2">
+        <button
+          v-if="step < totalSteps && (step !== 2 || allConfirmed)"
+          class="btn btn-next"
+          @click="nextStep"
+          @mouseenter="handleMouseEnter"
+          @mousemove="handleMouseMove"
+          @mouseleave="handleMouseLeave"
+        >
+          {{ globalConfig.lang.nextStep }}
+        </button>
+      </Transition>
     </div>
   </div>
 </template>
@@ -286,6 +287,15 @@ const handleClick = () => {
   color: var(--vp-c-brand-2);
   border-color: var(--vp-c-brand-2);
   box-shadow: var(--vp-shadow-brand);
+}
+.next-pop-enter-active,
+.next-pop-leave-active {
+  transition: all var(--vp-transition-time);
+}
+.next-pop-enter-from,
+.next-pop-leave-to {
+  opacity: 0;
+  transform: translateX(calc(var(--vp-gap) * 2));
 }
 .addBtn {
   border: 1px solid var(--vp-c-divider);
