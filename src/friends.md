@@ -1,6 +1,7 @@
 ---
 layout: home
 footer: false
+title: Friends
 ---
 
 <script setup lang="ts">

@@ -1,6 +1,7 @@
 ---
 layout: home
 footer: false
+title: Timeline
 ---
 
 <ClientOnly>

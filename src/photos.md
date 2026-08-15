@@ -1,6 +1,7 @@
 ---
 layout: home
 footer: false
+title: Photos
 ---
 
 <script setup lang="ts">
