@@ -139,7 +139,7 @@ defineEmits<{
 }
 
 .list-item.checked .item-icon {
-  color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-2);
 }
 
 .item-label.bold {

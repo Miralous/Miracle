@@ -57,7 +57,7 @@ const folders = computed(() => {
   const set = new Set<string>();
   friends.forEach((friend) => {
     const folder = friend.folder ?? "friends";
-    if (!isUnable(folder)) set.add(folder);
+    set.add(folder);
   });
   return Array.from(set).sort((a, b) => {
     const wa = friendWeights[a] ?? 0;
@@ -70,8 +70,9 @@ const folders = computed(() => {
 const groupedFriends = computed(() => {
   const selected = selectedFolders.value.map((f) => f.toLowerCase());
   const filtered = friends.filter((friend) => {
-    if (!selected.length) return true;
-    return selected.includes((friend.folder ?? "friends").toLowerCase());
+    const folder = (friend.folder ?? "friends").toLowerCase();
+    if (!selected.length) return !isUnable(folder);
+    return selected.includes(folder);
   });
 
   const raw = generateGrid(
