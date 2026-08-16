@@ -10,9 +10,6 @@ interface ListItem {
 withDefaults(
   defineProps<{
     items: ListItem[];
-    padding?: string;
-    gap?: string;
-    itemPadding?: string;
     itemAlign?: "center" | "flex-start";
     iconSize?: string;
     labelBold?: boolean;
@@ -20,9 +17,6 @@ withDefaults(
     hoverable?: boolean;
   }>(),
   {
-    padding: "15px 15px",
-    gap: "calc(var(--vp-gap) / 4)",
-    itemPadding: "7px 15px",
     itemAlign: "center",
     iconSize: "1.2em",
     labelBold: false,
@@ -37,7 +31,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="list-card" :style="{ padding, gap }">
+  <div class="list-card">
     <component
       :is="item.link ? 'a' : 'div'"
       v-for="(item, index) in items"
@@ -47,7 +41,7 @@ defineEmits<{
         checked: item.state === 'checked',
         hoverable,
       }"
-      :style="{ padding: itemPadding, alignItems: itemAlign }"
+      :style="{ alignItems: itemAlign }"
       :href="item.link || undefined"
       :target="item.link ? '_blank' : undefined"
       :rel="item.link ? 'noopener noreferrer' : undefined"
@@ -93,11 +87,26 @@ defineEmits<{
   border: 1px solid var(--vp-c-divider);
   box-shadow: var(--vp-shadow);
   border-radius: var(--vp-border-radius-1);
+  padding: 15px 15px;
+  gap: calc(var(--vp-gap) / 4);
+}
+
+.list-card.padded {
+  padding: 20px;
+}
+
+.list-card.confirm {
+  gap: calc(var(--vp-gap) / 2);
+}
+
+.list-card.confirm .list-item {
+  padding: 10px 15px;
 }
 
 .list-item {
   display: flex;
   gap: var(--vp-gap);
+  padding: 7px 15px;
   border-radius: var(--vp-border-radius-2);
   text-decoration: none;
   transition: all var(--vp-transition-time);

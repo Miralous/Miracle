@@ -160,7 +160,7 @@ const handleClick = () => {
     <ListCard
       v-if="step === 1"
       :items="linkItems"
-      padding="20px"
+      class="padded"
       label-bold
       value-ellipsis
       hoverable
@@ -170,9 +170,7 @@ const handleClick = () => {
     <ListCard
       v-else-if="step === 2"
       :items="confirmItems"
-      padding="20px"
-      gap="calc(var(--vp-gap) / 2)"
-      item-padding="10px 15px"
+      class="padded confirm"
       item-align="flex-start"
       icon-size="1.3em"
       hoverable
