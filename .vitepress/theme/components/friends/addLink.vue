@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import { globalConfig } from "#config";
 import { useCardHover } from "#theme/utils/useCardHover";
 
@@ -27,6 +27,14 @@ const confirmations = reactive(
 );
 
 const allConfirmed = computed(() => confirmations.every((c) => c.checked));
+
+// 只在第二步内由勾选状态变化引起的显隐时播放动画
+const nextPopAnimating = ref(false);
+
+watch([step, allConfirmed], ([newStep, newConfirmed], [oldStep, oldConfirmed]) => {
+  nextPopAnimating.value =
+    newStep === oldStep && newConfirmed !== oldConfirmed;
+});
 
 const stepTitle = computed(() => {
   if (step.value === 1) return globalConfig.lang.addLinkInfoTitle;
@@ -186,7 +194,7 @@ const handleClick = () => {
       >
         {{ globalConfig.lang.backStep }}
       </button>
-      <Transition name="next-pop" :css="step === 2">
+      <Transition name="next-pop" :css="nextPopAnimating">
         <button
           v-if="step < totalSteps && (step !== 2 || allConfirmed)"
           class="btn btn-next"
