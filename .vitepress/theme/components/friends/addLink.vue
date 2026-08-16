@@ -240,6 +240,7 @@ const handleClick = () => {
 .step-desc {
   color: var(--vp-c-text-2);
   margin: calc(var(--vp-gap) / 2) 0 0;
+  text-align: center;
 }
 .nav-btns {
   display: flex;
