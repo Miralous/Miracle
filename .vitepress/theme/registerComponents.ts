@@ -5,6 +5,7 @@ import Articles from "./components/article/article.vue";
 import PostCard from "./components/article/postCard.vue";
 import Tags from "./components/article/tags.vue";
 import TagChip from "./components/common/TagChip.vue";
+import ListCard from "./components/common/ListCard.vue";
 import FirstPage from "./components/dashboard/FirstPage.vue";
 import FirstPage_2 from "./components/dashboard/FirstPage_2.vue";
 import Friends from "./components/dashboard/Friends.vue";
@@ -40,6 +41,7 @@ const components = {
   Pictures,
   FriendCard,
   TagChip,
+  ListCard,
   // Pages
   Articles,
   Tags,

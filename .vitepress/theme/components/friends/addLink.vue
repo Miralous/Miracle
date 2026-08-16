@@ -31,10 +31,13 @@ const allConfirmed = computed(() => confirmations.every((c) => c.checked));
 // 只在第二步内由勾选状态变化引起的显隐时播放动画
 const nextPopAnimating = ref(false);
 
-watch([step, allConfirmed], ([newStep, newConfirmed], [oldStep, oldConfirmed]) => {
-  nextPopAnimating.value =
-    newStep === oldStep && newConfirmed !== oldConfirmed;
-});
+watch(
+  [step, allConfirmed],
+  ([newStep, newConfirmed], [oldStep, oldConfirmed]) => {
+    nextPopAnimating.value =
+      newStep === oldStep && newConfirmed !== oldConfirmed;
+  },
+);
 
 const stepTitle = computed(() => {
   if (step.value === 1) return globalConfig.lang.addLinkInfoTitle;
@@ -80,8 +83,28 @@ const link = reactive([
   },
 ]);
 
+const linkItems = computed(() =>
+  link.map((item) => ({
+    icon: item.copied ? globalConfig.icon.tick : item.icon,
+    label: item.name,
+    value: item.key,
+  })),
+);
+
+const confirmItems = computed(() =>
+  confirmations.map((c) => ({
+    icon: c.checked
+      ? globalConfig.icon.taskComplete
+      : globalConfig.icon.taskNotComplete,
+    label: c.label,
+    state: c.checked ? "checked" : "unchecked",
+  })),
+);
+
 // 复制并临时切换图标
-const copyKey = async (item: { key: string; copied: boolean }) => {
+const copyKey = async (index: number) => {
+  const item = link[index];
+
   try {
     await navigator.clipboard.writeText(item.key);
   } catch (err) {
@@ -96,6 +119,10 @@ const copyKey = async (item: { key: string; copied: boolean }) => {
   }
 
   item.copied = true;
+};
+
+const toggleConfirm = (index: number) => {
+  confirmations[index].checked = !confirmations[index].checked;
 };
 
 const nextStep = () => {
@@ -130,43 +157,27 @@ const handleClick = () => {
       </p>
     </div>
 
-    <div v-if="step !== 3" class="card">
-      <div v-if="step === 1" class="infos">
-        <div
-          v-for="(item, index) in link"
-          :key="index"
-          class="info"
-          @click="copyKey(item)"
-        >
-          <Icon
-            :icon="item.copied ? globalConfig.icon.tick : item.icon"
-            class="icon"
-          />
-          <span class="name">{{ item.name }}</span>
-          <span class="key">{{ item.key }}</span>
-        </div>
-      </div>
+    <ListCard
+      v-if="step === 1"
+      :items="linkItems"
+      padding="20px"
+      label-bold
+      value-ellipsis
+      hoverable
+      @item-click="(_, index) => copyKey(index)"
+    />
 
-      <div v-else class="confirm-list">
-        <div
-          v-for="(c, index) in confirmations"
-          :key="index"
-          class="confirm-item"
-          :class="{ checked: c.checked }"
-          @click="c.checked = !c.checked"
-        >
-          <Icon
-            :icon="
-              c.checked
-                ? globalConfig.icon.taskComplete
-                : globalConfig.icon.taskNotComplete
-            "
-            class="check-icon"
-          />
-          <span class="confirm-label">{{ c.label }}</span>
-        </div>
-      </div>
-    </div>
+    <ListCard
+      v-else-if="step === 2"
+      :items="confirmItems"
+      padding="20px"
+      gap="calc(var(--vp-gap) / 2)"
+      item-padding="10px 15px"
+      item-align="flex-start"
+      icon-size="1.3em"
+      hoverable
+      @item-click="(_, index) => toggleConfirm(index)"
+    />
 
     <div
       v-else
@@ -215,12 +226,6 @@ const handleClick = () => {
   max-width: 720px;
   margin: 0 auto;
 }
-.card {
-  border: 1px solid var(--vp-c-divider);
-  box-shadow: var(--vp-shadow);
-  border-radius: var(--vp-border-radius-1);
-  padding: 20px;
-}
 .head-card {
   margin: calc(var(--vp-gap) * 2) 0;
   display: flex;
@@ -237,40 +242,6 @@ const handleClick = () => {
 .step-desc {
   color: var(--vp-c-text-2);
   margin: calc(var(--vp-gap) / 2) 0 0;
-}
-.confirm-list {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--vp-gap) / 2);
-}
-.confirm-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--vp-gap);
-  padding: 10px 15px;
-  border-radius: var(--vp-border-radius-2);
-  cursor: pointer;
-  transition: all var(--vp-transition-time);
-}
-.confirm-item:hover {
-  background-color: var(--vp-c-bg-soft);
-}
-.check-icon {
-  font-size: 1.3em;
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: var(--vp-c-text-3);
-}
-.confirm-item.checked .check-icon {
-  color: var(--vp-c-brand-1);
-}
-.confirm-item.checked .confirm-label {
-  color: var(--vp-c-text-1);
-}
-.confirm-label {
-  color: var(--vp-c-text-2);
-  line-height: 1.6;
-  transition: all var(--vp-transition-time);
 }
 .nav-btns {
   display: flex;
@@ -324,40 +295,6 @@ const handleClick = () => {
   }
   &:hover .iconify {
     rotate: 45deg;
-  }
-}
-.infos {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--vp-gap) / 4);
-  .info {
-    display: flex;
-    padding: 7px 15px;
-    align-items: center;
-    gap: var(--vp-gap);
-    border-radius: var(--vp-border-radius-2);
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    transition: all var(--vp-transition-time);
-    &:hover {
-      background-color: var(--vp-c-bg-soft);
-    }
-    .icon {
-      font-size: 1.2em;
-      flex-shrink: 0;
-    }
-    .name {
-      font-weight: 600;
-    }
-    .key {
-      color: var(--vp-c-text-2);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      transition: all var(--vp-transition-time);
-      user-select: text;
-    }
   }
 }
 </style>
