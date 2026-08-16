@@ -264,7 +264,7 @@ const handleClick = () => {
 .btn:hover {
   color: var(--vp-c-brand-2);
   border-color: var(--vp-c-brand-2);
-  box-shadow: var(--vp-shadow-brand);
+  box-shadow: var(--vp-shadow-brand-tag);
 }
 .next-pop-enter-active,
 .next-pop-leave-active {
@@ -287,9 +287,9 @@ const handleClick = () => {
     transition: all var(--vp-transition-time);
   }
   &:hover {
-    color: var(--vp-c-brand-2);
-    border-color: var(--vp-c-brand-2);
-    box-shadow: var(--vp-shadow-brand);
+    color: var(--vp-c-green-2);
+    border-color: var(--vp-c-green-2);
+    box-shadow: var(--vp-shadow-green-tag);
     cursor: pointer;
   }
   &:hover .iconify {
