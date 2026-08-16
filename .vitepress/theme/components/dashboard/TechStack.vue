@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useCardHover } from "#theme/utils/useCardHover";
+import { useCardHover } from "#theme/utils/composables/useCardHover";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 import { globalConfig } from "#config";
 

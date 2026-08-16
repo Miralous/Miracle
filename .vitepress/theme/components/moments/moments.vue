@@ -2,11 +2,11 @@
 import { computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { globalConfig } from "#config";
 import { generateGrid } from "../../utils/generateGrid";
-import { columnCount, updateColumns } from "../../utils/dynamicColumns";
-import PostCard from "../article/postCard.vue";
+import { columnCount, updateColumns } from "../../utils/composables/dynamicColumns";
+import PostCard from "../common/postCard.vue";
 
 // 引入同款负面状态 Hook
-import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
+import { useDeepHideNegative } from "../../utils/composables/useDeepHideNegative";
 
 const props = defineProps<{ maxItems?: number }>();
 

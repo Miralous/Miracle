@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { globalConfig } from "#config";
-import { useCardHover } from "#theme/utils/useCardHover";
+import { useCardHover } from "#theme/utils/composables/useCardHover";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 function shuffle(array: any[]) {

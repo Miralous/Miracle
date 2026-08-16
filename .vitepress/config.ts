@@ -5,7 +5,7 @@ import { defineConfig } from "vitepress";
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 import { RssPlugin } from "vitepress-plugin-rss";
 import { globalConfig } from "#config";
-import { getRunningTime } from "#theme/utils/getRunningTime";
+import { getRunningTime } from "#theme/utils/format/getRunningTime";
 import { sub } from "@mdit/plugin-sub";
 import markdownItKatex from "markdown-it-katex";
 import { footnote } from "@mdit/plugin-footnote";

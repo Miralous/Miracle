@@ -2,18 +2,18 @@
 import { Icon } from "@iconify/vue";
 import type { App } from "vue";
 import Articles from "./components/article/article.vue";
-import PostCard from "./components/article/postCard.vue";
+import PostCard from "./components/common/postCard.vue";
 import Tags from "./components/article/tags.vue";
 import TagChip from "./components/common/TagChip.vue";
 import ListCard from "./components/common/ListCard.vue";
-import FirstPage from "./components/dashboard/FirstPage.vue";
-import FirstPage_2 from "./components/dashboard/FirstPage_2.vue";
+import TextBanner from "./components/dashboard/TextBanner.vue";
+import ImageBanner from "./components/dashboard/ImageBanner.vue";
 import Friends from "./components/dashboard/Friends.vue";
 import LastMoment from "./components/dashboard/LastMoment.vue";
 import Projects from "./components/dashboard/Projects.vue";
 import RecentPosts from "./components/dashboard/RecentPosts.vue";
 import TechStack from "./components/dashboard/TechStack.vue";
-import FriendCard from "./components/friends/card.vue";
+import FriendCard from "./components/common/friendCard.vue";
 import Comments from "./components/layout/afterDocs.vue";
 import Twikoo from "./components/layout/twikoo.vue";
 import Moments from "./components/moments/moments.vue";
@@ -22,14 +22,13 @@ import Pictures from "./components/dashboard/Pictures.vue";
 import Timeline from "./components/timeline/timeline.vue";
 import About from "./components/about/about.vue";
 import MusicPlayer from "./components/player/player.vue";
-import PhotoDetail from "./components/photo/PhotoDetail.vue";
-import Contributors from "./components/contributors/ctb.vue";
+import PhotoDetail from "./components/photo/photoDetail.vue";
 import AddLink from "./components/friends/addLink.vue";
 
 const components = {
   // Dashboard
-  FirstPage,
-  FirstPage_2,
+  TextBanner,
+  ImageBanner,
   RecentPosts,
   Projects,
   TechStack,
@@ -55,8 +54,6 @@ const components = {
   Twikoo,
   MusicPlayer,
   PhotoDetail,
-  // Contributors
-  Contributors,
 };
 
 type GlobalComponentTypes = typeof components;

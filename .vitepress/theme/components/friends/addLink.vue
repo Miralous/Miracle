@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from "vue";
 import { globalConfig } from "#config";
-import { useCardHover } from "#theme/utils/useCardHover";
+import { useCardHover } from "#theme/utils/composables/useCardHover";
 
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 

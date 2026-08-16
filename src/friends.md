@@ -7,8 +7,8 @@ title: Friends
 <script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from "vue";
 import { generateGrid } from "#theme/utils/generateGrid";
-import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
-import { useCardHover } from "#theme/utils/useCardHover";
+import { columnCount, updateColumns } from "#theme/utils/composables/dynamicColumns";
+import { useCardHover } from "#theme/utils/composables/useCardHover";
 import { globalConfig } from "#config";
 
 const friendWeights: Record<string, number> = globalConfig.friendWeights;

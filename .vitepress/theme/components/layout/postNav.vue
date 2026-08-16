@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { useData } from "vitepress";
 import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
-import { useCardHover } from "../../utils/useCardHover";
+import { useCardHover } from "../../utils/composables/useCardHover";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
 const { page } = useData();

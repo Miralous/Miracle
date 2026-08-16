@@ -1,8 +1,7 @@
 import { data as momentList } from "#theme/data/moments.data";
 import { data as friendList } from "#theme/data/friends.data";
-import { data as iconList } from "#theme/configs/iconList";
+import { data as iconList } from "#theme/data/iconList";
 import { data as photoList } from "#theme/data/photos.data";
-import { data as contributorList } from "#theme/components/contributors/contributors";
 import { zh, en } from "#theme/lang/index";
 
 const languageMap: Record<string, any> = { zh, en };
@@ -236,7 +235,6 @@ export interface GlobalConfig {
   waterfall: WaterfallConfig;
 
   friends: typeof friendList;
-  contributors: typeof contributorList;
   moments: typeof momentList;
   photos: typeof photoList;
   lang: typeof languageFile;

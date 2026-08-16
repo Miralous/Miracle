@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCardHover } from "../../utils/useCardHover";
+import { useCardHover } from "../../utils/composables/useCardHover";
 
 defineProps<{
   label?: string;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, computed } from "vue";
 import { globalConfig } from "#config";
-import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
+import { columnCount, updateColumns } from "#theme/utils/composables/dynamicColumns";
 
 function shuffle<T>(array: T[]): T[] {
   return array

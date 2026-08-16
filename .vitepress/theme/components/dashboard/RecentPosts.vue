@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { data as posts } from "../../data/posts.data";
-import PostCard from "../article/postCard.vue";
+import PostCard from "../common/postCard.vue";
 
 const props = defineProps({
   maxItems: {

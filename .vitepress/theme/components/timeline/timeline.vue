@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { globalConfig } from "#config";
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
+import { useDeepHideNegative } from "../../utils/composables/useDeepHideNegative";
 import { data as postsData } from "#theme/data/posts.data";
 
 const momentsData = globalConfig.moments;

@@ -2,7 +2,7 @@ import { h, nextTick } from "vue";
 import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import { inBrowser } from "vitepress";
-import { handleEasterEgg } from "./utils/easterEgg";
+import { handleEasterEgg } from "./utils/composables/easterEgg";
 import { enhanceAppWithTabs } from "vitepress-plugin-tabs/client";
 
 import "./styles/style.css";

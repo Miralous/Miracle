@@ -84,7 +84,7 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { globalConfig } from "#config";
-import { useCardHover } from "../../utils/useCardHover";
+import { useCardHover } from "../../utils/composables/useCardHover";
 
 const l = globalConfig.about.tags;
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();

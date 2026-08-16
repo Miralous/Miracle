@@ -1,8 +1,7 @@
 import { data as momentList } from "#theme/data/moments.data";
 import { data as friendList } from "#theme/data/friends.data";
-import { data as iconList } from "#theme/configs/iconList";
+import { data as iconList } from "#theme/data/iconList";
 import { data as photoList } from "#theme/data/photos.data";
-import { data as contributorList } from "#theme/components/contributors/contributors";
 import type { GlobalConfig } from "#config.types";
 
 // ----------------------------------------------------------------------------
@@ -327,7 +326,6 @@ export const globalConfig: GlobalConfig = {
   // Auto-imported data — DO NOT EDIT
   // --------------------------------------------------------------------------
   friends: friendList,
-  contributors: contributorList,
   moments: momentList,
   photos: photoList,
   lang: languageFile,

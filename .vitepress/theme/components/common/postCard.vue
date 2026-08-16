@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useCardHover } from "../../utils/useCardHover";
+import { useCardHover } from "../../utils/composables/useCardHover";
 import { globalConfig } from "#config";
-import { formatRelativeDate } from "../../utils/formatRelativeDate";
+import { formatRelativeDate } from "../../utils/format/formatRelativeDate";
 
 interface CardProps {
   title?: string;
