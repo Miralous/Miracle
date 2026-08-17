@@ -11,7 +11,7 @@ It's Miracle!!!!!
 </p>
 
 > [!NOTE]
-> You can join our QQ group: 1047573884
+> You can join our QQ group: 1094626427
 
 ## Getting Started
 
