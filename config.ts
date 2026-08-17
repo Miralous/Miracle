@@ -302,8 +302,8 @@ export const globalConfig: GlobalConfig = {
     type: "giscus", // Comment system: "giscus" | "twikoo".
     giscus: {
       repo: "Miralous/Miracle",
-      repoId: "R_kgDOPz1WLw",
-      categoryId: "DIC_kwDOPz1WL84Cvsrq",
+      repoId: "R_kgDOT7JWbw",
+      categoryId: "DIC_kwDOT7JWb84DDknA",
       themes: {
         light: "https://giscus.catppuccin.com/themes/latte.css",
         dark: "https://giscus.catppuccin.com/themes/mocha.css",
