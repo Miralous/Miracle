@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCardHover } from "../../utils/useCardHover";
+import { useCardHover } from "../../utils/composables/useCardHover";
 import { globalConfig } from "#config";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 

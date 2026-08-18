@@ -7,9 +7,9 @@ title: Musics
 <script setup lang="ts">
 import { ref, onMounted, computed, onBeforeUnmount, nextTick } from 'vue';
 import { generateGrid } from "#theme/utils/generateGrid";
-import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
-import { useCardHover } from "#theme/utils/useCardHover";
-import { getPlaylist } from "#theme/utils/getPlaylist";
+import { columnCount, updateColumns } from "#theme/utils/composables/dynamicColumns";
+import { useCardHover } from "#theme/utils/composables/useCardHover";
+import { getPlaylist } from "#theme/utils/api/getPlaylist";
 import { globalConfig } from "#config";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 
@@ -136,7 +136,7 @@ const handleSingerClick = (singer: string) => {
   window.history.pushState({}, "", url);
 };
 
-import {getSongId} from "#theme/utils/getSongId"
+import {getSongId} from "#theme/utils/api/getSongId"
 </script>
 
 <h1 class="artist">{{ globalConfig.lang.artists }}</h1>

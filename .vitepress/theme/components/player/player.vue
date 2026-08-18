@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick, h } from "vue";
 // prepared
 import { globalConfig } from "#config";
-import { getPlaylist } from "#theme/utils/getPlaylist";
+import { getPlaylist } from "#theme/utils/api/getPlaylist";
 
 interface PlayerProps {
   id: string;
@@ -636,7 +636,7 @@ function QrcToJson(qrcd: any, id: number, apinu: number) {
   json.metadata.qqmusicid = id;
   return json;
 }
-import { LYRIC_METADATA_KW } from "./words";
+import { LYRIC_METADATA_KW } from "./lyrics";
 //import { on } from "events";
 
 // 核心关键词（长词优先，请确保已加入 "单位" 或 "举办单位"）

@@ -1,7 +1,7 @@
 ---
 layout: home
 footer: false
-title: Contributors
+title: Add Link
 ---
 
-<Contributors/>
+<AddLink/>

@@ -8,11 +8,11 @@ import {
   onBeforeUnmount,
 } from "vue";
 import { Icon } from "@iconify/vue";
-import { formatRelativeDate } from "../../utils/formatRelativeDate";
-import PostCard from "./postCard.vue";
+import { formatRelativeDate } from "../../utils/format/formatRelativeDate";
+import PostCard from "../common/postCard.vue";
 import { generateGrid } from "../../utils/generateGrid";
-import { useCardHover } from "../../utils/useCardHover";
-import { columnCount, updateColumns } from "../../utils/dynamicColumns";
+import { useCardHover } from "../../utils/composables/useCardHover";
+import { columnCount, updateColumns } from "../../utils/composables/dynamicColumns";
 import { data as posts } from "../../data/posts.data";
 import { globalConfig } from "#config";
 
@@ -35,7 +35,7 @@ const selectedCategories = ref<string[]>(
 );
 
 // negative 状态
-import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
+import { useDeepHideNegative } from "../../utils/composables/useDeepHideNegative";
 
 const { showNegative, pendingTimer, hasShownByShortcut, initDeepHideListener } =
   useDeepHideNegative();
@@ -286,5 +286,5 @@ watch(showNegative, (val) => {
 </template>
 
 <style scoped>
-@import url("./style.css");
+@import url("../common/postCard.css");
 </style>

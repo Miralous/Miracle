@@ -7,8 +7,8 @@ footer: false
 
 <ClientOnly>
   <div ref="firstPageRef">
-    <FirstPage v-if="globalConfig.homePage.banner.type == 'text'"/>
-    <FirstPage_2 v-else/>
+    <TextBanner v-if="globalConfig.homePage.banner.type == 'text'"/>
+    <ImageBanner v-else/>
   </div>
 </ClientOnly>
 <div class="VPContent is-home" id="VPContent" style="padding-top: 0 !important;">
@@ -74,10 +74,10 @@ footer: false
     const checkScroll = () => {
         if (!firstPageRef.value) return
         
-        // 获取 FirstPage 元素距离视口的位置信息
+        // 获取 TextBanner 元素距离视口的位置信息
         const rect = firstPageRef.value.getBoundingClientRect()
         
-        // 当 FirstPage 的底部还在视口内时（> 0 代表还没完全滚出去，> 64 代表没被导航栏完全遮挡）
+        // 当 TextBanner 的底部还在视口内时（> 0 代表还没完全滚出去，> 64 代表没被导航栏完全遮挡）
         if (rect.bottom > 64) {
             // 给 body 添加一个特定的类名
             document.body.classList.add('override-nav-bg')

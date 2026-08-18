@@ -58,9 +58,9 @@
 
 <script setup>
 import { useData } from "vitepress";
-import { formatRelativeDate } from "../../utils/formatRelativeDate";
+import { formatRelativeDate } from "../../utils/format/formatRelativeDate";
 import { globalConfig } from "#config";
-import { formatUrl } from "../../utils/formatUrl";
+import { formatUrl } from "../../utils/format/formatUrl";
 import { data as posts } from "../../data/posts.data";
 
 const { page } = useData();

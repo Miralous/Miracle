@@ -1,5 +1,5 @@
 import { createContentLoader } from "vitepress";
-import { formatRelativeDate } from "../utils/formatRelativeDate";
+import { formatRelativeDate } from "../utils/format/formatRelativeDate";
 import {
   extractText,
   countWords,

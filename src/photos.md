@@ -8,8 +8,8 @@ title: Photos
 import { ref, onMounted, computed, onBeforeUnmount } from "vue";
 import { generateGrid } from "#theme/utils/generateGrid";
 import {globalConfig} from "#config"
-import { columnCount, updateColumns } from "#theme/utils/dynamicColumns";
-import { useCardHover } from "#theme/utils/useCardHover";
+import { columnCount, updateColumns } from "#theme/utils/composables/dynamicColumns";
+import { useCardHover } from "#theme/utils/composables/useCardHover";
 import { data as photos } from "#theme/data/photos.data";
 
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();

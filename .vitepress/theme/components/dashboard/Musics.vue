@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import { getPlaylist } from "#theme/utils/getPlaylist";
+import { getPlaylist } from "#theme/utils/api/getPlaylist";
 
 const playlist = ref<any[]>([]);
 
@@ -32,7 +32,7 @@ const limitedSongs = computed(() => {
   return shuffle(playlist.value).slice(0, 6);
 });
 
-import { getSongId } from "#theme/utils/getSongId";
+import { getSongId } from "#theme/utils/api/getSongId";
 </script>
 
 <template>

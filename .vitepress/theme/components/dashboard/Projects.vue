@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { globalConfig } from "#config";
-import PostCard from "../article/postCard.vue";
+import PostCard from "../common/postCard.vue";
 const username = globalConfig.informations.github.name;
 const posts = ref<any[]>([]);
 const loading = ref(true);

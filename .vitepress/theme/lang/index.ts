@@ -117,6 +117,57 @@ const languageFile = {
   },
   Contrast: { zh: "对比度", en: "Contrast" },
   Sharpness: { zh: "锐度", en: "Sharpness" },
+  name: { zh: "名称", en: "Name" },
+  desc: { zh: "简介", en: "Description" },
+  avatar: { zh: "头像", en: "Avatar" },
+  link: { zh: "链接", en: "Link" },
+  clickToAdd: { zh: "点击添加", en: "Click to add" },
+  addLinkConfirmTitle: { zh: "确认信息", en: "Confirm Information" },
+  addLinkConfirmDesc: {
+    zh: "请逐项确认以下内容均符合实际情况",
+    en: "Please confirm that all of the following statements are true.",
+  },
+  addLinkInfoTitle: { zh: "站点信息", en: "Site Information" },
+  addLinkInfoDesc: {
+    zh: "请将 {title} 添加到您的网站公示。点击以复制。",
+    en: "Please add {title} to your website. Click to copy.",
+  },
+  addLinkSubmitTitle: { zh: "提交申请", en: "Submit" },
+  addLinkSubmitDesc: {
+    zh: "经过 {author} 的批准后将会被自动添加到网站。",
+    en: "After {author}'s approval, it will be automatically added to the website.",
+  },
+  addLinkStep: { zh: "步骤", en: "Step" },
+  nextStep: { zh: "下一步", en: "Next" },
+  backStep: { zh: "上一步", en: "Back" },
+  addLinkAgree1: {
+    zh: "网站可在中国大陆正常访问。",
+    en: "The website is accessible from mainland China.",
+  },
+  addLinkAgree2: {
+    zh: "网站不包含违反中国大陆法律法规的内容。",
+    en: "The website does not contain content that violates the laws and regulations of mainland China.",
+  },
+  addLinkAgree3: {
+    zh: "网站在过去一年内至少发布过一篇文章。",
+    en: "The website has published at least one post within the last year.",
+  },
+  addLinkAgree4: {
+    zh: "头像链接稳定且能长期正常加载。",
+    en: "The avatar URL is stable and loads reliably over time.",
+  },
+  addLinkAgree5: {
+    zh: "我已将本站添加到我的友链中。",
+    en: "I have added this website to my friend links.",
+  },
+  addLinkAgree6: {
+    zh: "本申请不是用于修改已有信息。",
+    en: "This request is not for modifying existing information.",
+  },
+  addLinkAgree7: {
+    zh: "除特殊情况外，我不会单方面移除友链。",
+    en: "I will not unilaterally remove the friend link except under exceptional circumstances.",
+  },
 } satisfies Record<string, Record<Locale, string>>;
 
 export type Locale = "zh" | "en";

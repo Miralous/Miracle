@@ -24,10 +24,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useCardHover } from "../../utils/useCardHover";
-import { formatRelativeDate } from "../../utils/formatRelativeDate";
+import { useCardHover } from "../../utils/composables/useCardHover";
+import { formatRelativeDate } from "../../utils/format/formatRelativeDate";
 import { globalConfig } from "#config";
-import { useDeepHideNegative } from "../../utils/useDeepHideNegative";
+import { useDeepHideNegative } from "../../utils/composables/useDeepHideNegative";
 
 interface Moment {
   date: string;

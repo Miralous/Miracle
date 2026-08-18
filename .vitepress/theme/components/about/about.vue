@@ -37,43 +37,13 @@
     <h2>
       <Icon :icon="globalConfig.icon.tasks" /> {{ globalConfig.lang.tasks }}
     </h2>
-    <div class="tasks">
-      <div
-        v-for="(item, index) in globalConfig.about.todo"
-        :key="index"
-        class="task"
-      >
-        <Icon
-          :icon="
-            item.complete
-              ? globalConfig.icon.taskComplete
-              : globalConfig.icon.taskNotComplete
-          "
-          :class="item.complete ? 'complete' : 'notComplete'"
-        />
-        <span :class="{ complete: item.complete }">{{ item.text }}</span>
-      </div>
-    </div>
+    <ListCard :items="taskItems" />
 
     <h2>
       <Icon :icon="globalConfig.icon.contact" />
       {{ globalConfig.lang.contacts }}
     </h2>
-    <div class="contacts">
-      <component
-        :is="item.link ? 'a' : 'div'"
-        v-for="(item, index) in globalConfig.about.contacts"
-        :key="index"
-        class="contact"
-        :href="item.link || undefined"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Icon :icon="item.icon" class="contact-icon" />
-        <span class="platform">{{ item.platform }}</span>
-        <span class="account">{{ item.account }}</span>
-      </component>
-    </div>
+    <ListCard :items="contactItems" label-bold />
 
     <h2>
       <Icon :icon="globalConfig.icon.techStack" />
@@ -114,10 +84,29 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { globalConfig } from "#config";
-import { useCardHover } from "../../utils/useCardHover";
+import { useCardHover } from "../../utils/composables/useCardHover";
 
 const l = globalConfig.about.tags;
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
+
+const taskItems = computed(() =>
+  globalConfig.about.todo.map((item) => ({
+    icon: item.complete
+      ? globalConfig.icon.taskComplete
+      : globalConfig.icon.taskNotComplete,
+    label: item.text,
+    state: item.complete ? "complete" : "incomplete",
+  })),
+);
+
+const contactItems = computed(() =>
+  globalConfig.about.contacts.map((item) => ({
+    icon: item.icon,
+    label: item.platform,
+    value: item.account,
+    link: item.link,
+  })),
+);
 
 // 映射星期数据以符合 UI 显示 (中英对照)
 const scheduleMap = [
@@ -234,63 +223,6 @@ const isCurrentCourse = (dayKey: string, timeRange: string) => {
     }
   }
 }
-.tasks {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--vp-c-divider);
-  box-shadow: var(--vp-shadow);
-  border-radius: var(--vp-border-radius-1);
-  padding: 15px 15px;
-  gap: calc(var(--vp-gap) / 4);
-  .task {
-    display: flex;
-    align-items: center;
-    padding: 7px 15px;
-    transition: all var(--vp-transition-time);
-    border-radius: var(--vp-border-radius-2);
-    gap: var(--vp-gap);
-    span.complete {
-      color: var(--vp-c-text-3);
-      opacity: 0.8;
-      text-decoration: line-through;
-    }
-    .notComplete {
-      color: var(--vp-c-text-2);
-    }
-  }
-}
-
-.contacts {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--vp-c-divider);
-  box-shadow: var(--vp-shadow);
-  border-radius: var(--vp-border-radius-1);
-  padding: 15px 15px;
-  gap: calc(var(--vp-gap) / 4);
-  .contact {
-    display: flex;
-    padding: 7px 15px;
-    align-items: center;
-    gap: var(--vp-gap);
-    border-radius: var(--vp-border-radius-2);
-    text-decoration: none;
-    color: inherit;
-    transition: all var(--vp-transition-time);
-    .contact-icon {
-      font-size: 1.2em;
-      flex-shrink: 0;
-    }
-    .platform {
-      font-weight: 600;
-    }
-    .account {
-      color: var(--vp-c-text-2);
-      transition: all var(--vp-transition-time);
-    }
-  }
-}
-
 .schedule {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
