@@ -178,6 +178,17 @@ function togglePlaylist() {
   showPlaylist.value = !showPlaylist.value;
 }
 
+function isCurrentTrack(track: SongData) {
+  return String(track.url.match(/\d+$/)?.[0]) === String(currentId.value);
+}
+
+function playQueueTrack(track: SongData) {
+  const index = playOrder.value.indexOf(track);
+  if (index === -1) return;
+  void playAtIndex(index);
+  showPlaylist.value = false;
+}
+
 // 歌单面板拖拽相关
 let dragIdx = -1;
 function onDragStart(i: number) {
@@ -1356,7 +1367,9 @@ onUnmounted(() => {
             >
               <span
                 v-if="
-                  index === currentLyricIndex && line.etext && maindate.metadata.zq
+                  index === currentLyricIndex &&
+                  line.etext &&
+                  maindate.metadata.zq
                 "
                 class="lrc-original"
               >
@@ -1507,11 +1520,12 @@ onUnmounted(() => {
             class="am-playlist-bg"
             :style="{ backgroundImage: `url(${song?.pic})` }"
           ></div>
-          <div class="am-playlist-glass"></div>
           <div class="am-playlist-panel">
             <div class="am-playlist-header">
               <div class="am-playlist-header-info">
-                <h3 class="am-playlist-title">
+                <span class="am-playlist-kicker">接下来播放</span>
+                <h3 class="am-playlist-title">播放队列</h3>
+                <div class="am-playlist-meta">
                   <icon
                     :icon="
                       playMode === 'shuffle'
@@ -1528,12 +1542,19 @@ onUnmounted(() => {
                         ? globalConfig.lang.playModeSingle
                         : globalConfig.lang.playModeShuffle
                   }}
-                </h3>
-                <span class="am-playlist-count"
-                  >{{ playOrder.length }} {{ globalConfig.lang.songUnit }}</span
-                >
+                  <span class="am-playlist-meta-dot"></span>
+                  <span class="am-playlist-count"
+                    >{{ playOrder.length }}
+                    {{ globalConfig.lang.songUnit }}</span
+                  >
+                </div>
               </div>
-              <button class="am-playlist-close" @click="showPlaylist = false">
+              <button
+                class="am-playlist-close"
+                type="button"
+                aria-label="关闭播放队列"
+                @click="showPlaylist = false"
+              >
                 <icon :icon="globalConfig.icon.close" />
               </button>
             </div>
@@ -1543,36 +1564,49 @@ onUnmounted(() => {
                 :key="track.url + idx"
                 class="am-playlist-item"
                 :class="{
-                  'am-playlist-item-active':
-                    String(track.url.match(/\d+$/)) === String(currentId),
+                  'am-playlist-item-active': isCurrentTrack(track),
                   'am-playlist-item-drag': playMode !== 'shuffle',
                 }"
                 :draggable="playMode !== 'shuffle'"
                 @dragstart="onDragStart(idx)"
                 @dragover="onDragOver"
                 @drop="onDrop(idx)"
-                @click="
-                  playAtIndex(idx);
-                  showPlaylist = false;
-                "
+                @click="playQueueTrack(track)"
               >
-                <span
-                  class="am-playlist-drag-handle"
-                  v-if="playMode !== 'shuffle'"
-                >
-                  <icon icon="ph:dots-six-vertical" />
-                </span>
-                <img
-                  :src="track.pic"
-                  loading="lazy"
-                  class="am-playlist-item-cover"
-                />
+                <div class="am-playlist-index" aria-hidden="true">
+                  <span v-if="!isCurrentTrack(track)">{{ idx + 1 }}</span>
+                  <span
+                    v-else
+                    class="am-playing-bars"
+                    :class="{ paused: !isPlaying }"
+                  >
+                    <i></i><i></i><i></i>
+                  </span>
+                </div>
+                <div class="am-playlist-artwork">
+                  <img
+                    :src="track.pic"
+                    :alt="`${track.name} 封面`"
+                    loading="lazy"
+                    class="am-playlist-item-cover"
+                  />
+                  <span class="am-playlist-artwork-play" aria-hidden="true">
+                    <icon icon="ph:play-fill" />
+                  </span>
+                </div>
                 <div class="am-playlist-item-info">
                   <span class="am-playlist-item-name">{{ track.name }}</span>
                   <span class="am-playlist-item-artist">{{
                     track.artist
                   }}</span>
                 </div>
+                <span
+                  class="am-playlist-drag-handle"
+                  v-if="playMode !== 'shuffle'"
+                  aria-hidden="true"
+                >
+                  <icon icon="ph:dots-six-vertical-bold" />
+                </span>
               </div>
             </div>
           </div>
@@ -2324,114 +2358,245 @@ onUnmounted(() => {
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
+  background: rgba(0, 0, 0, 0.28);
 }
 .am-playlist-bg {
   position: absolute;
   inset: -30px;
   background-size: cover;
   background-position: center;
-  filter: blur(60px) brightness(0.3);
+  filter: blur(80px) brightness(0.24) saturate(1.3);
   transform: scale(1.05);
   z-index: 0;
-}
-.am-playlist-glass {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(40px) saturate(150%);
-  -webkit-backdrop-filter: blur(40px) saturate(150%);
-  z-index: 1;
 }
 .am-playlist-panel {
   position: relative;
   z-index: 2;
-  width: min(400px, 85vw);
+  width: min(440px, 88vw);
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.06);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 22, 0.82);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: -24px 0 70px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(50px) saturate(180%);
+  -webkit-backdrop-filter: blur(50px) saturate(180%);
 }
 .am-playlist-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 12px;
+  padding: 30px 26px 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .am-playlist-header-info {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.am-playlist-kicker {
+  color: #fa2d48;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 .am-playlist-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 750;
   color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin: 0;
   border: none;
 }
-.am-playlist-count {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.45);
-}
-.am-playlist-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 6px;
+.am-playlist-meta {
   display: flex;
   align-items: center;
-  transition: opacity 0.2s;
+  gap: 6px;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 12px;
+}
+.am-playlist-meta .iconify {
+  width: 13px;
+  height: 13px;
+  color: rgba(255, 255, 255, 0.48) !important;
+}
+.am-playlist-meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.am-playlist-count {
+  color: inherit;
+}
+.am-playlist-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 .am-playlist-close:hover {
-  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.17);
+  transform: scale(1.04);
 }
 .am-playlist-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 8px 14px 24px;
+  scrollbar-width: none;
 }
 .am-playlist-body::-webkit-scrollbar {
   display: none;
 }
 .am-playlist-item {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 10px 20px;
-  gap: 12px;
+  min-height: 66px;
+  padding: 7px 10px 7px 6px;
+  gap: 10px;
+  border-radius: 7px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+.am-playlist-item::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  left: 76px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.075);
 }
 .am-playlist-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
 }
 .am-playlist-item-active {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(250, 45, 72, 0.1) !important;
 }
 .am-playlist-item-active .am-playlist-item-name {
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  color: #ff5268;
+}
+.am-playlist-index {
+  width: 20px;
+  flex: 0 0 20px;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 11px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.am-playing-bars {
+  height: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+.am-playing-bars i {
+  width: 2px;
+  height: 100%;
+  border-radius: 2px;
+  background: #fa2d48;
+  animation: am-equalizer 0.8s ease-in-out infinite alternate;
+}
+.am-playing-bars i:nth-child(2) {
+  animation-delay: -0.45s;
+}
+.am-playing-bars i:nth-child(3) {
+  animation-delay: -0.2s;
+}
+.am-playing-bars.paused i {
+  animation-play-state: paused;
+  height: 3px;
+}
+@keyframes am-equalizer {
+  0% {
+    height: 3px;
+  }
+  100% {
+    height: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .am-playing-bars i {
+    animation: none;
+    height: 8px;
+  }
 }
 .am-playlist-drag-handle {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.25);
+  width: 22px;
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.2);
   cursor: grab;
   flex-shrink: 0;
+  opacity: 0;
+  transition:
+    opacity 0.18s,
+    color 0.18s;
+}
+.am-playlist-item:hover .am-playlist-drag-handle {
+  color: rgba(255, 255, 255, 0.52);
+  opacity: 1;
 }
 .am-playlist-drag-handle:active {
   cursor: grabbing;
 }
+.am-playlist-artwork {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 9px rgba(0, 0, 0, 0.28);
+}
 .am-playlist-item-cover {
-  width: 42px;
-  height: 42px;
-  border-radius: 6px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  flex-shrink: 0;
+  transition:
+    filter 0.18s,
+    transform 0.25s ease;
+}
+.am-playlist-artwork-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  opacity: 0;
+  transform: scale(0.84);
+  transition:
+    opacity 0.18s,
+    transform 0.18s;
+}
+.am-playlist-item:hover .am-playlist-item-cover {
+  filter: brightness(0.55);
+  transform: scale(1.03);
+}
+.am-playlist-item:hover .am-playlist-artwork-play {
+  opacity: 1;
+  transform: scale(1);
 }
 .am-playlist-item-info {
   flex: 1;
@@ -2441,16 +2606,18 @@ onUnmounted(() => {
 }
 .am-playlist-item-name {
   font-size: 14px;
+  line-height: 1.35;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.92);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .am-playlist-item-artist {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  margin-top: 2px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.46);
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2486,7 +2653,17 @@ onUnmounted(() => {
     max-height: 75vh;
     border-left: none;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px 16px 0 0;
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.34);
+  }
+  .am-playlist-header {
+    padding: 22px 20px 14px;
+  }
+  .am-playlist-body {
+    padding-inline: 8px;
+  }
+  .am-playlist-drag-handle {
+    opacity: 0.42;
   }
   .playlist-fade-enter-from .am-playlist-panel,
   .playlist-fade-leave-to .am-playlist-panel {
