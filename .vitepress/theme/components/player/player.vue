@@ -1232,9 +1232,7 @@ onUnmounted(() => {
               @click="seekAudio({ target: { value: line.time } } as any)"
             >
               <span
-                v-if="
-                  index === currentLyricIndex && line.etext && maindate.metadata.zq
-                "
+                v-if="index === currentLyricIndex && line.etext && maindate.metadata.zq"
                 class="lrc-original"
               >
                 <span
@@ -1380,45 +1378,63 @@ onUnmounted(() => {
           v-if="showPlaylist"
           @click.self="showPlaylist = false"
         >
-          <div
-            class="am-playlist-bg"
-            :style="{ backgroundImage: `url(${song?.pic})` }"
-          ></div>
+          <div class="am-playlist-bg"></div>
           <div class="am-playlist-glass"></div>
-          <div class="am-playlist-panel">
+          <section
+            class="am-playlist-panel"
+            role="dialog"
+            aria-modal="true"
+            :aria-label="globalConfig.lang.playlistTitle"
+          >
             <div class="am-playlist-header">
               <div class="am-playlist-header-info">
                 <h3 class="am-playlist-title">
-                  <icon
-                    :icon="
-                      playMode === 'shuffle'
-                        ? 'ph:shuffle'
-                        : playMode === 'single'
-                          ? 'ph:repeat-once'
-                          : 'ph:repeat'
-                    "
-                  />
-                  {{
-                    playMode === "list"
-                      ? globalConfig.lang.playModeList
-                      : playMode === "single"
-                        ? globalConfig.lang.playModeSingle
-                        : globalConfig.lang.playModeShuffle
-                  }}
+                  {{ globalConfig.lang.playlistTitle }}
                 </h3>
-                <span class="am-playlist-count"
-                  >{{ playOrder.length }} {{ globalConfig.lang.songUnit }}</span
-                >
+                <div class="am-playlist-meta">
+                  <span class="am-playlist-count"
+                    >{{ playOrder.length }}
+                    {{ globalConfig.lang.songUnit }}</span
+                  >
+                  <span class="am-playlist-mode">
+                    <icon
+                      :icon="
+                        playMode === 'shuffle'
+                          ? 'ph:shuffle'
+                          : playMode === 'single'
+                            ? 'ph:repeat-once'
+                            : 'ph:repeat'
+                      "
+                    />
+                    {{
+                      playMode === "list"
+                        ? globalConfig.lang.playModeList
+                        : playMode === "single"
+                          ? globalConfig.lang.playModeSingle
+                          : globalConfig.lang.playModeShuffle
+                    }}
+                  </span>
+                </div>
               </div>
-              <button class="am-playlist-close" @click="showPlaylist = false">
+              <button
+                class="am-playlist-close"
+                :aria-label="globalConfig.lang.closePlaylist"
+                :title="globalConfig.lang.closePlaylist"
+                @click="showPlaylist = false"
+              >
                 <icon :icon="globalConfig.icon.close" />
               </button>
             </div>
-            <div class="am-playlist-body">
+            <div
+              class="am-playlist-body"
+              role="list"
+              :aria-label="globalConfig.lang.playlistTitle"
+            >
               <div
                 v-for="(track, idx) in currentPlayOrder"
                 :key="track.url + idx"
                 class="am-playlist-item"
+                role="listitem"
                 :class="{
                   'am-playlist-item-active':
                     String(track.url.match(/\d+$/)) === String(currentId),
@@ -1436,11 +1452,14 @@ onUnmounted(() => {
                 <span
                   class="am-playlist-drag-handle"
                   v-if="playMode !== 'shuffle'"
+                  :title="globalConfig.lang.dragToReorder"
+                  :aria-label="globalConfig.lang.dragToReorder"
                 >
                   <icon icon="ph:dots-six-vertical" />
                 </span>
                 <img
                   :src="track.pic"
+                  :alt="`${track.name} ${globalConfig.lang.albumCover}`"
                   loading="lazy"
                   class="am-playlist-item-cover"
                 />
@@ -1450,9 +1469,17 @@ onUnmounted(() => {
                     track.artist
                   }}</span>
                 </div>
+                <span
+                  v-if="String(track.url.match(/\d+$/)) === String(currentId)"
+                  class="am-playlist-now-playing"
+                  :aria-label="globalConfig.lang.nowPlaying"
+                  :title="globalConfig.lang.nowPlaying"
+                >
+                  <i></i><i></i><i></i>
+                </span>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </Transition>
     </Teleport>
@@ -2195,108 +2222,173 @@ onUnmounted(() => {
 
 /* ===== 歌单面板 ===== */
 .am-playlist-overlay {
+  --am-playlist-accent: var(--vp-c-brand-1);
+  --am-playlist-accent-soft: var(--vp-c-brand-soft);
+  --am-playlist-surface: color-mix(in srgb, var(--vp-c-bg) 82%, transparent);
+  --am-playlist-border: color-mix(
+    in srgb,
+    var(--vp-c-divider) 72%,
+    var(--vp-c-brand-1)
+  );
   position: fixed;
   inset: 0;
   z-index: 9998;
   display: flex;
   justify-content: flex-end;
-  align-items: stretch;
+  align-items: center;
+  padding: 18px;
+  color: var(--vp-c-text-1);
 }
 .am-playlist-bg {
   position: absolute;
-  inset: -30px;
-  background-size: cover;
-  background-position: center;
-  filter: blur(60px) brightness(0.3);
-  transform: scale(1.05);
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 82% 18%,
+      color-mix(in srgb, var(--vp-c-brand-1) 34%, transparent),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 18% 88%,
+      color-mix(in srgb, var(--vp-c-brand-2) 22%, transparent),
+      transparent 42%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--vp-c-bg) 92%, var(--vp-c-brand-soft)),
+      color-mix(in srgb, var(--vp-c-bg-alt) 86%, var(--vp-c-brand-1))
+    );
   z-index: 0;
 }
 .am-playlist-glass {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(40px) saturate(150%);
-  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  background: color-mix(in srgb, var(--vp-c-bg) 28%, transparent);
+  backdrop-filter: blur(32px) saturate(140%);
+  -webkit-backdrop-filter: blur(32px) saturate(140%);
   z-index: 1;
 }
 .am-playlist-panel {
   position: relative;
   z-index: 2;
-  width: min(400px, 85vw);
+  width: min(430px, 88vw);
+  height: min(760px, calc(100vh - 36px));
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.06);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  background: var(--am-playlist-surface);
+  border: 1px solid var(--am-playlist-border);
+  border-radius: 24px;
+  box-shadow:
+    0 24px 80px color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(44px) saturate(180%);
+  -webkit-backdrop-filter: blur(44px) saturate(180%);
 }
 .am-playlist-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: color-mix(in srgb, var(--vp-c-bg) 46%, transparent);
 }
 .am-playlist-header-info {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
 }
 .am-playlist-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--vp-c-text-1);
   margin: 0;
   border: none;
 }
-.am-playlist-count {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.45);
-}
-.am-playlist-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 6px;
+.am-playlist-meta {
   display: flex;
   align-items: center;
-  transition: opacity 0.2s;
+  gap: 8px;
+}
+.am-playlist-count {
+  font-size: 12px;
+  color: var(--vp-c-text-2);
+}
+.am-playlist-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--am-playlist-accent-soft);
+  color: var(--am-playlist-accent);
+  font-size: 11px;
+  font-weight: 650;
+}
+.am-playlist-close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.2s,
+    background 0.2s,
+    transform 0.2s;
 }
 .am-playlist-close:hover {
-  opacity: 0.7;
+  color: var(--am-playlist-accent);
+  background: var(--am-playlist-accent-soft);
+  transform: scale(1.05);
 }
 .am-playlist-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vp-c-divider) transparent;
 }
 .am-playlist-body::-webkit-scrollbar {
-  display: none;
+  width: 5px;
+}
+.am-playlist-body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--vp-c-divider);
 }
 .am-playlist-item {
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  min-height: 64px;
+  padding: 8px 10px;
   gap: 12px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
 }
 .am-playlist-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 82%, transparent);
 }
 .am-playlist-item-active {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: var(--am-playlist-accent-soft) !important;
 }
 .am-playlist-item-active .am-playlist-item-name {
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  color: var(--am-playlist-accent);
 }
 .am-playlist-drag-handle {
   font-size: 18px;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--vp-c-text-3);
   cursor: grab;
   flex-shrink: 0;
 }
@@ -2304,11 +2396,12 @@ onUnmounted(() => {
   cursor: grabbing;
 }
 .am-playlist-item-cover {
-  width: 42px;
-  height: 42px;
-  border-radius: 6px;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 .am-playlist-item-info {
   flex: 1;
@@ -2318,19 +2411,52 @@ onUnmounted(() => {
 }
 .am-playlist-item-name {
   font-size: 14px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  font-weight: 650;
+  color: var(--vp-c-text-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .am-playlist-item-artist {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--vp-c-text-2);
   margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.am-playlist-now-playing {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--am-playlist-accent);
+  flex-shrink: 0;
+}
+.am-playlist-now-playing i {
+  width: 2px;
+  height: 12px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: playlist-equalizer 0.8s ease-in-out infinite alternate;
+}
+.am-playlist-now-playing i:nth-child(2) {
+  height: 8px;
+  animation-delay: -0.4s;
+}
+.am-playlist-now-playing i:nth-child(3) {
+  height: 5px;
+  animation-delay: -0.2s;
+}
+@keyframes playlist-equalizer {
+  from {
+    transform: scaleY(0.35);
+  }
+  to {
+    transform: scaleY(1);
+  }
 }
 
 /* ===== 歌单面板过渡动画 ===== */
@@ -2353,21 +2479,28 @@ onUnmounted(() => {
 
 /* ===== 移动端歌单面板调整 ===== */
 @media (max-width: 768px) {
-  .am-playlist-panel {
-    width: 100%;
-  }
   .am-playlist-overlay {
     align-items: flex-end;
+    padding: 0;
   }
   .am-playlist-panel {
+    width: 100%;
+    height: min(78vh, 720px);
     max-height: 75vh;
+    border-right: none;
+    border-bottom: none;
     border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px 16px 0 0;
+    border-radius: 24px 24px 0 0;
   }
   .playlist-fade-enter-from .am-playlist-panel,
   .playlist-fade-leave-to .am-playlist-panel {
     transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .am-playlist-now-playing i {
+    animation: none;
   }
 }
 
