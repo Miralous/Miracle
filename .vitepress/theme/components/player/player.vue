@@ -1112,7 +1112,10 @@ onUnmounted(() => {
   <!-- 核心修改 1: 容器加入 am-no-lyrics 状态支持居中 -->
   <div
     class="am-player-wrapper"
-    :class="{ 'am-no-lyrics': !hasLyrics, 'mobile-hide-lyrics': true }"
+    :class="{
+      'am-no-lyrics': !hasLyrics,
+      'mobile-hide-lyrics': true,
+    }"
     v-if="song"
   >
     <!-- 模糊背景 -->
@@ -1232,7 +1235,11 @@ onUnmounted(() => {
               @click="seekAudio({ target: { value: line.time } } as any)"
             >
               <span
-                v-if="index === currentLyricIndex && line.etext && maindate.metadata.zq"
+                v-if="
+                  index === currentLyricIndex &&
+                  line.etext &&
+                  maindate.metadata.zq
+                "
                 class="lrc-original"
               >
                 <span
@@ -1383,7 +1390,7 @@ onUnmounted(() => {
           <section
             class="am-playlist-panel"
             role="dialog"
-            aria-modal="true"
+            aria-modal="false"
             :aria-label="globalConfig.lang.playlistTitle"
           >
             <div class="am-playlist-header">
@@ -1625,6 +1632,9 @@ onUnmounted(() => {
   margin-top: calc(var(--vp-gap) * 2);
 }
 .am-control-button-container {
+  position: relative;
+  z-index: 10000;
+  pointer-events: auto;
   margin-top: calc(var(--vp-gap) * 2);
   display: flex;
   align-items: center;
@@ -2238,6 +2248,8 @@ onUnmounted(() => {
   align-items: center;
   padding: 18px;
   color: var(--vp-c-text-1);
+  /* 仅面板接收点击，底层播放器控制按钮保持可操作 */
+  pointer-events: none;
 }
 .am-playlist-bg {
   position: absolute;
@@ -2259,14 +2271,20 @@ onUnmounted(() => {
       color-mix(in srgb, var(--vp-c-bg-alt) 86%, var(--vp-c-brand-1))
     );
   z-index: 0;
+  pointer-events: none;
+}
+.am-playlist-overlay .am-playlist-bg {
+  background: transparent;
 }
 .am-playlist-glass {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--vp-c-bg) 28%, transparent);
-  backdrop-filter: blur(32px) saturate(140%);
-  -webkit-backdrop-filter: blur(32px) saturate(140%);
+  background: transparent;
+  /* 歌单打开时不模糊页面背景 */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   z-index: 1;
+  pointer-events: none;
 }
 .am-playlist-panel {
   position: relative;
@@ -2282,8 +2300,9 @@ onUnmounted(() => {
   box-shadow:
     0 24px 80px color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent),
     0 8px 24px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(44px) saturate(180%);
-  -webkit-backdrop-filter: blur(44px) saturate(180%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  pointer-events: auto;
 }
 .am-playlist-header {
   display: flex;
@@ -2480,17 +2499,17 @@ onUnmounted(() => {
 /* ===== 移动端歌单面板调整 ===== */
 @media (max-width: 768px) {
   .am-playlist-overlay {
-    align-items: flex-end;
+    align-items: stretch;
     padding: 0;
   }
   .am-playlist-panel {
     width: 100%;
-    height: min(78vh, 720px);
-    max-height: 75vh;
+    height: 100%;
+    max-height: none;
     border-right: none;
     border-bottom: none;
     border-left: none;
-    border-radius: 24px 24px 0 0;
+    border-radius: 0;
   }
   .playlist-fade-enter-from .am-playlist-panel,
   .playlist-fade-leave-to .am-playlist-panel {
