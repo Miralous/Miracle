@@ -138,7 +138,7 @@ const handleFolderClick = (folder: string) => {
           class="hide-phone add-link"
           :label="globalConfig.lang.addLink"
           green=true
-          v-if="globalConfig.features.allowWorkflowAddFriendLink"
+          v-if="globalConfig.features.allowWorkflowConfigFriendLink"
           @click="handleClick"
           @mouseenter="handleMouseEnter"
           @mousemove="handleMouseMove"

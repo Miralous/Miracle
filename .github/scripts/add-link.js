@@ -12,12 +12,12 @@ if (!fs.existsSync(configPath)) {
 
 const configContent = fs.readFileSync(configPath, "utf8");
 const allowMatch = configContent.match(
-  /allowWorkflowAddFriendLink\s*[:=]\s*(true|false)/,
+  /allowWorkflowConfigFriendLink\s*[:=]\s*(true|false)/,
 );
 
 if (!allowMatch || allowMatch[1] !== "true") {
   console.error(
-    "globalConfig.allowWorkflowAddFriendLink is not enabled. Aborting.",
+    "globalConfig.allowWorkflowConfigFriendLink is not enabled. Aborting.",
   );
   process.exit(1);
 }
@@ -28,8 +28,7 @@ const desc =
   (body.match(/### Website description\s+([^\n]+)/) || [])[1]?.trim() || "";
 const link = (body.match(/### Website URL\s+([^\n]+)/) || [])[1]?.trim();
 const img = (body.match(/### Avatar URL\s+([^\n]+)/) || [])[1]?.trim() || "";
-const github =
-  (body.match(/### GitHub Username\s+([^\n]+)/) || [])[1]?.trim() || "";
+const github = process.env.ISSUE_USER; // 从环境变量获取 issue 提交者用户名
 
 // 检查必填项
 if (!title || !link || !github) {

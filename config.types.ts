@@ -26,7 +26,7 @@ export interface Informations {
 export interface Features {
   deepHideNegative: boolean;
   multiSelect: boolean;
-  allowWorkflowAddFriendLink: boolean;
+  allowWorkflowConfigFriendLink: boolean;
 }
 
 export interface RainbowColor {

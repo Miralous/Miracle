@@ -1,0 +1,13 @@
+name: Friend Link Deletion Request
+description: Request to remove your website from the /friends page.
+title: Friend Link Deletion Request
+labels: ["delete-link"]
+body:
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      description: Please confirm that you want to delete your friend link.
+      options:
+        - label: I confirm that I want to delete my friend link associated with my GitHub account.
+          required: true

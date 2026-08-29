@@ -53,7 +53,7 @@ export const globalConfig: GlobalConfig = {
     multiSelect: false, // Allow selecting multiple tags/categories/artists to combine their content.
     // If true, friend links can be added automatically from GitHub issues.
     // ! Requires a GitHub environment named "friend-link-review" with yourself as reviewer.
-    allowWorkflowAddFriendLink: true,
+    allowWorkflowConfigFriendLink: true,
   },
 
   // --------------------------------------------------------------------------
