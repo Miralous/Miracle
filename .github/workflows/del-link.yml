@@ -27,7 +27,7 @@ jobs:
         env:
           ISSUE_USER: ${{ github.event.issue.user.login }}
           ISSUE_BODY: ${{ github.event.issue.body }}
-        run: node .github/scripts/delete-link.js
+        run: node .github/scripts/del-link.js
 
       - name: Commit & Push
         run: |
