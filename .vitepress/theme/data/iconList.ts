@@ -1,6 +1,7 @@
 export const data = {
   add: "ph:plus-bold",
   recentPosts: "ph:newspaper-duotone",
+  github: "ph:github-logo-duotone",
   projects: "ph:github-logo-duotone",
   techStack: "ph:code-duotone",
   friends: "ph:users-duotone",
@@ -54,6 +55,7 @@ export const data = {
   url: "ph:link-duotone",
   tick: "ph:check-duotone",
   arrow: "ph:arrow-up-right-duotone",
+  ask: "ph:question-duotone",
 
   /* EXIF metadata icons (PhotoDetail) */
   meta: {

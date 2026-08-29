@@ -40,14 +40,28 @@ if (!title || !link || !github) {
 const dir = "public/data/friends";
 fs.mkdirSync(dir, { recursive: true });
 
+// 读取目录下所有已有的友链记录，用于检查重复
+const existingFiles = fs
+  .readdirSync(dir)
+  .filter((file) => file.endsWith(".json"));
+const existingEntries = existingFiles.map((file) =>
+  JSON.parse(fs.readFileSync(`${dir}/${file}`, "utf8")),
+);
+
 // 检查是否已存在相同链接
-for (const file of fs.readdirSync(dir)) {
-  if (!file.endsWith(".json")) continue;
-  const existing = JSON.parse(fs.readFileSync(`${dir}/${file}`, "utf8"));
-  if (existing.link === link) {
-    console.log("Link already exists, skipping");
-    process.exit(0);
-  }
+const linkExists = existingEntries.some((entry) => entry.link === link);
+if (linkExists) {
+  console.log("Link already exists, skipping");
+  process.exit(0);
+}
+
+// 检查当前 GitHub 账号是否已经添加过友链
+const userExists = existingEntries.some((entry) => entry.github === github);
+if (userExists) {
+  console.error(
+    `The GitHub account @${github} has already submitted a friend link.`,
+  );
+  process.exit(1);
 }
 
 // 使用域名作为文件名

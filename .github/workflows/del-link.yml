@@ -34,7 +34,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add public/data/friends/
-          git commit -m "Delete friend link for @${{ github.event.issue.user.login }}" || echo "No changes"
+          git commit -m "chore(link): deleted @${{ github.event.issue.user.login }}" || echo "No changes"
           git pull --rebase origin main
           git push origin main || echo "No changes"
 

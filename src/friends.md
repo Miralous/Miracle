@@ -136,8 +136,7 @@ const handleFolderClick = (folder: string) => {
       <div class="tags">
         <TagChip
           class="hide-phone add-link"
-          :label="globalConfig.lang.addLink"
-          green=true
+          :label="globalConfig.lang.request"
           v-if="globalConfig.features.allowWorkflowConfigFriendLink"
           @click="handleClick"
           @mouseenter="handleMouseEnter"
@@ -145,7 +144,7 @@ const handleFolderClick = (folder: string) => {
           @mouseleave="handleMouseLeave"
         >
         <template #icon>
-          <Icon :icon="globalConfig.icon.add" />
+          <Icon :icon="globalConfig.icon.ask" />
         </template>
         </TagChip>
         <TagChip

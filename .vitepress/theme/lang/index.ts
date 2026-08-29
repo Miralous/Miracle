@@ -50,7 +50,6 @@ const languageFile = {
   friday: { zh: "星期五", en: "Friday" },
   saturday: { zh: "星期六", en: "Saturday" },
   photos: { zh: "图库", en: "Photos" },
-  addLink: { zh: "加入", en: "Add" },
   onlyWithExif: { zh: "包括 EXIF", en: "With EXIF" },
   previewTree: { zh: "预览文件库", en: "Preview tree" },
   miracle: { zh: "Miracle", en: "Miracle" },
@@ -133,6 +132,7 @@ const languageFile = {
     en: "Please add {title} to your website. Click to copy.",
   },
   addLinkSubmitTitle: { zh: "提交申请", en: "Submit" },
+  request: { zh: "请求", en: "Requests" },
   addLinkSubmitDesc: {
     zh: "经过 {author} 的批准后将会被自动添加到网站。",
     en: "After {author}'s approval, it will be automatically added to the website.",
@@ -167,6 +167,54 @@ const languageFile = {
   addLinkAgree7: {
     zh: "除特殊情况外，我不会单方面移除友链。",
     en: "I will not unilaterally remove the friend link except under exceptional circumstances.",
+  },
+  addLink: { zh: "添加友链", en: "Add Link" },
+  delLink: { zh: "删除友链", en: "Delete Link" },
+  addLinkS: { zh: "添加", en: "Add" },
+  delLinkS: { zh: "删除", en: "Delete" },
+  delLinkInfoTitle: { zh: "删除说明", en: "Delete Information" },
+  delLinkInfoDesc: {
+    zh: "请仔细阅读以下注意事项。",
+    en: "Please read the following notes carefully.",
+  },
+  delLinkConfirmTitle: { zh: "确认删除", en: "Confirm Deletion" },
+  delLinkConfirmDesc: {
+    zh: "请勾选以下确认项以继续。",
+    en: "Please check the following items to continue.",
+  },
+  delLinkSubmitTitle: { zh: "提交删除", en: "Submit Deletion" },
+  delLinkSubmitDesc: {
+    zh: "提交后将自动删除您的友链，且不可恢复。",
+    en: "Your friend link will be automatically removed after submission and cannot be restored.",
+  },
+  clickToDelete: { zh: "点击删除", en: "Click to delete" },
+  delLinkNotice1: {
+    zh: "您必须使用添加友链时所用的 GitHub 账号登录，工作流会自动验证您的账号是否已添加过链接。",
+    en: "You must log in with the same GitHub account used to add the friend link. The workflow will verify that your account has previously added a link.",
+  },
+  delLinkNotice2: {
+    zh: "删除友链时无法选择具体要删除的链接。",
+    en: "The deletion process cannot specify which link to remove.",
+  },
+  delLinkAgree1: {
+    zh: "我已使用当前 GitHub 账号添加过友链。",
+    en: "I have previously added a friend link using this GitHub account.",
+  },
+  delLinkAgree2: {
+    zh: "我确认要删除我的友链。",
+    en: "I confirm that I want to delete my friend link.",
+  },
+  delLinkAgree3: {
+    zh: "我已知晓删除后不可恢复。",
+    en: "I understand that deletion is irreversible.",
+  },
+  chooseMode: {
+    zh: "选择操作",
+    en: "Choose Action",
+  },
+  chooseModeDesc: {
+    zh: "如需修改信息，请先删除再重新添加。",
+    en: "To modify your information, please delete the current link and re-add it.",
   },
 } satisfies Record<string, Record<Locale, string>>;
 
