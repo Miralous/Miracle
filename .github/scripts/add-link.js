@@ -32,7 +32,7 @@ const github =
   (body.match(/### GitHub Username\s+([^\n]+)/) || [])[1]?.trim() || "";
 
 // 检查必填项
-if (!title || !link) {
+if (!title || !link || !github) {
   console.error("Missing required fields.");
   process.exit(1);
 }

@@ -30,7 +30,7 @@ body:
       description: Your GitHub username, used for the edit link.
       placeholder: "silvaire-qwq"
     validations:
-      required: false
+      required: true
   - type: input
     id: site-name
     attributes:
