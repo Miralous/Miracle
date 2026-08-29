@@ -28,10 +28,12 @@ const desc =
   (body.match(/### Website description\s+([^\n]+)/) || [])[1]?.trim() || "";
 const link = (body.match(/### Website URL\s+([^\n]+)/) || [])[1]?.trim();
 const img = (body.match(/### Avatar URL\s+([^\n]+)/) || [])[1]?.trim() || "";
+const github =
+  (body.match(/### GitHub Username\s+([^\n]+)/) || [])[1]?.trim() || "";
 
 // 检查必填项
 if (!title || !link) {
-  console.error("Missing required fields (Website title or Website URL)");
+  console.error("Missing required fields.");
   process.exit(1);
 }
 
@@ -65,7 +67,8 @@ const entry = {
   link,
   desc,
   img,
+  github,
 };
 
 fs.writeFileSync(filePath, JSON.stringify(entry, null, 2), "utf8");
-console.log(`Added: ${title} -> ${filePath}`);
+console.log(`Added ${title} to ${filePath}`);

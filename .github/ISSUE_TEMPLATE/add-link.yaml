@@ -24,6 +24,14 @@ body:
         - label: I will not unilaterally remove the friend link except under exceptional circumstances.
           required: true
   - type: input
+    id: site-gh
+    attributes:
+      label: GitHub Username
+      description: Your GitHub username, used for the edit link.
+      placeholder: "silvaire-qwq"
+    validations:
+      required: false
+  - type: input
     id: site-name
     attributes:
       label: Website title
