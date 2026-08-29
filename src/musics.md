@@ -80,6 +80,20 @@ const singers = computed(() => {
     }
 });
 
+const singerCounts = computed(() => {
+  const counts: Record<string, number> = {};
+  playlist.value.forEach((song) => {
+    if (!song.artist) return;
+    song.artist
+      .split("/")
+      .map((a) => a.trim())
+      .forEach((a) => {
+        counts[a] = (counts[a] || 0) + 1;
+      });
+  });
+  return counts;
+});
+
 const groupedByArtist = computed(() => {
   const selected = selectedSingers.value.map(s => s.toLowerCase());
   const visibleSingers = singers.value.map(s => s.toLowerCase()); 
@@ -150,6 +164,7 @@ import {getSongId} from "#theme/utils/api/getSongId"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
     :label="singer"
+    :count="singerCounts[singer]"
   />
 </div>
 

@@ -49,6 +49,16 @@ const categories = computed(() => {
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 });
 
+const categoryCounts = computed(() => {
+  const counts: Record<string, number> = {};
+  photos.forEach((photo) => {
+    if (onlyWithExif.value && !(photo.visibleMetaKeys?.length)) return;
+    const category = photo.category || "Uncategorized";
+    counts[category] = (counts[category] || 0) + 1;
+  });
+  return counts;
+});
+
 // 按分类分组
 const groupedByCategory = computed(() => {
   const filters = selectedCategories.value.map((c) => c.toLowerCase());
@@ -119,6 +129,7 @@ const handleCategoryClick = (category: string) => {
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
     :label="category"
+    :count="categoryCounts[category]"
   />
 </div>
 

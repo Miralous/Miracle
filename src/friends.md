@@ -67,6 +67,15 @@ const folders = computed(() => {
   });
 });
 
+const folderCounts = computed(() => {
+  const counts: Record<string, number> = {};
+  friends.forEach((friend) => {
+    const folder = friend.folder ?? "friends";
+    counts[folder] = (counts[folder] || 0) + 1;
+  });
+  return counts;
+});
+
 const groupedFriends = computed(() => {
   const selected = selectedFolders.value.map((f) => f.toLowerCase());
   const filtered = friends.filter((friend) => {
@@ -143,6 +152,7 @@ const handleFolderClick = (folder: string) => {
           v-for="folder in folders"
           :key="folder"
           :label="folder"
+          :count="folderCounts[folder]"
           :active="selectedFolders.includes(folder)"
           @click="handleFolderClick(folder)"
           @mouseenter="handleMouseEnter"
