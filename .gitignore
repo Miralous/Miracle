@@ -114,3 +114,6 @@ draft.md
 
 # folders created by IDE
 .idea
+
+### Generated friend avatars (mirrored by scripts/mirror-friend-avatars.mjs) ###
+public/friends/

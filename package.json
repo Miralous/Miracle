@@ -40,9 +40,10 @@
     "typed.js": "^2.1.0"
   },
   "scripts": {
-    "dev": "vitepress dev --port 4321",
-    "build": "vitepress build",
+    "dev": "pnpm avatars && vitepress dev --port 4321",
+    "build": "pnpm avatars && vitepress build",
     "preview": "vitepress preview --port 4321",
+    "avatars": "node scripts/mirror-friend-avatars.mjs",
     "format": "pnpm exec prettier . --write"
   }
 }
