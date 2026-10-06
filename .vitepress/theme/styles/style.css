@@ -12,6 +12,7 @@
 @import url("./twikoo.css");
 @import url("katex/dist/katex.min.css");
 @import url("https://rsms.me/inter/inter.css");
+@import url("https://cdn.jsdelivr.net/npm/google-sans-text-web@1.0.0/index.css");
 @import url("https://fonts.font.im/css2?family=Google+Sans+Code:wght@400&display=swap");
 @import url("https://fonts.font.im/css2?family=Playwrite+SK:wght@400&display=swap");
 @import url("https://fonts.font.im/css2?family=Noto+Serif+SC:wght@300..600&display=swap");
@@ -22,7 +23,7 @@
 
 :root {
   /* font family */
-  --vp-font-family-base: "InterVariable", "OPPO Sans", system-ui, sans-serif;
+  --vp-font-family-base: "Google Sans Text", "OPPO Sans", system-ui, sans-serif;
   --vp-font-family-mono: "Google Sans Code", var(--vp-font-family-base);
   /* only for title !!!!!! */
   --vp-font-family-title:
