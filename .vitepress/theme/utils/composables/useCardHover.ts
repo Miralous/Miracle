@@ -55,6 +55,10 @@ function animateCard(el: HTMLElement) {
     !currentRotateY
   ) {
     el.style.transform = "";
+    // 同时清理悬停时写入的 3D 上下文，避免残留的 preserve-3d
+    // 让卡片内的图标（svg / img）被错误地合成后消失
+    el.style.transformStyle = "";
+    el.style.willChange = "";
     cardStates.delete(el);
     return;
   }
@@ -87,11 +91,7 @@ function animateCard(el: HTMLElement) {
     rotateX(${nextRotateX}deg)
     rotateY(${nextRotateY}deg)
     scale(${scale})
-    translateZ(0)
   `;
-
-  el.style.transformStyle = "preserve-3d";
-  el.style.willChange = "transform";
 
   state.currentX = nextX;
   state.currentY = nextY;
