@@ -533,6 +533,56 @@ div.VPLocalNav {
 }
 .VPLocalSearchBox {
   backdrop-filter: blur(var(--vp-blur));
+
+  .backdrop {
+    animation: searchBackdropIn var(--vp-search-animation-time) ease both;
+  }
+
+  .shell {
+    transform-origin: top center;
+    animation: searchShellIn var(--vp-search-animation-time)
+      var(--vp-search-animation-ease) both;
+  }
+}
+
+/* 搜索框收起：由 searchAnimation.ts 在组件卸载后接管该节点 */
+.VPLocalSearchBox.search-leaving {
+  pointer-events: none;
+
+  .backdrop {
+    animation: searchBackdropOut var(--vp-search-animation-time) ease both;
+  }
+
+  .shell {
+    animation: searchShellOut var(--vp-search-animation-time)
+      var(--vp-search-animation-ease) both;
+  }
+}
+
+@keyframes searchBackdropIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes searchShellIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+@keyframes searchBackdropOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes searchShellOut {
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
 }
 
 div.shell {

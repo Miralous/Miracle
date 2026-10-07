@@ -66,6 +66,10 @@
   /* Blur */
   --vp-blur: blur(10px);
 
+  /* Search box animation */
+  --vp-search-animation-time: 0.25s;
+  --vp-search-animation-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
   /* Mini Icon Background */
   --vp-mini-bg: var(--vp-c-bg-elv);
 
