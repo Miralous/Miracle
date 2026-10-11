@@ -15,7 +15,6 @@
 @import url("https://cdn.jsdelivr.net/npm/google-sans-text-web@1.0.0/index.css");
 @import url("https://fonts.font.im/css2?family=Google+Sans+Code:wght@400&display=swap");
 @import url("https://fonts.font.im/css2?family=Playwrite+SK:wght@400&display=swap");
-@import url("https://fonts.font.im/css2?family=Noto+Serif+SC:wght@300..600&display=swap");
 
 /**
  * Variables
@@ -27,7 +26,7 @@
   --vp-font-family-mono: "Google Sans Code", var(--vp-font-family-base);
   /* only for title !!!!!! */
   --vp-font-family-title:
-    "Noto Serif SC", var(--vp-use-mono), var(--vp-font-family-mono),
+    "NType 82", var(--vp-use-mono), var(--vp-font-family-mono),
     var(--vp-font-family-base);
   --vp-font-family-name:
     "Playwrite SK", var(--vp-use-mono), var(--vp-font-family-mono),
@@ -93,6 +92,13 @@
 
 .dark {
   --vp-mini-bg: var(--vp-c-border);
+}
+
+@font-face {
+  font-family: "NType 82";
+  src: url("/fonts/NType82-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
