@@ -3,6 +3,7 @@ import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import { inBrowser } from "vitepress";
 import { handleEasterEgg } from "./utils/composables/easterEgg";
+import { setupSearchAnimation } from "./utils/composables/searchAnimation";
 import { enhanceAppWithTabs } from "vitepress-plugin-tabs/client";
 
 import "./styles/style.css";
@@ -61,6 +62,7 @@ export default {
 
     const init = async () => {
       applyCssVars();
+      setupSearchAnimation();
     };
 
     // 首次加载
