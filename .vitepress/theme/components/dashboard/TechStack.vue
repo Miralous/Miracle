@@ -17,16 +17,17 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { withBase } from "vitepress";
 import { useCardHover } from "#theme/utils/composables/useCardHover";
 const { handleMouseMove, handleMouseEnter, handleMouseLeave } = useCardHover();
 import { globalConfig } from "#config";
 
 const stacks = ref(globalConfig.homePage.stacks);
 
-// 动态生成完整 URL
+// 使用本地图标，避免第三方 CDN 不可用导致图标加载失败
 stacks.value = stacks.value.map((stack) => ({
   ...stack,
-  icon: `https://jsd-proxy.ygxz.in/gh/devicons/devicon/icons/${stack.icon}/${stack.icon}-original.svg`,
+  icon: withBase(`/icons/techstack/${stack.icon}.svg`),
 }));
 
 // 自动按首字母排序

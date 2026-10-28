@@ -162,8 +162,8 @@ export const globalConfig: GlobalConfig = {
       friends: true, // Show friends module.
     },
 
-    // Tech stack icons. Icon names come from devicons:
-    // https://cdn.jsdelivr.us/gh/devicons/devicon/icons/${stack.icon}/${stack.icon}-original.svg
+    // Tech stack icons. Local SVG files live in public/icons/techstack/<icon>.svg
+    // and are sourced from devicons: https://github.com/devicons/devicon
     stacks: [
       { name: "Arch Linux", icon: "archlinux" },
       { name: "CSS", icon: "css3" },
